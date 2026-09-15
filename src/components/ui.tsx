@@ -331,7 +331,17 @@ export function ImagePicker({
             if (event.target === event.currentTarget) dialog.current?.close()
           }}
         >
-          <h2 id={`${id}-avatar-title`}>Choose an avatar</h2>
+          <div className="avatar-dialog-header">
+            <h2 id={`${id}-avatar-title`}>Choose an avatar</h2>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Close avatar picker"
+              onClick={() => dialog.current?.close()}
+            >
+              <X size={18} aria-hidden="true" />
+            </button>
+          </div>
           <p className="hint">Choose a color or gradient for your profile.</p>
           {avatarPickerOpened && (
             <>
@@ -355,9 +365,6 @@ export function ImagePicker({
               <Notice>{error}</Notice>
             </>
           )}
-          <Button type="button" className="secondary small" onClick={() => dialog.current?.close()}>
-            Cancel
-          </Button>
         </dialog>
       )}
     </div>

@@ -1135,6 +1135,12 @@ select {
 .avatar-dialog::backdrop {
   background: #0006;
 }
+.avatar-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
 .avatar-options {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
