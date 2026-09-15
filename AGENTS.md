@@ -30,3 +30,10 @@ Rekann is a lightweight people workspace for small teams. Notion is the canonica
 - Use the Wrangler authentication profile `rekann`, which is bound locally to `/Users/pavelclaw/Projects/Rekann/rekann-app`. Verify the active profile and account with `corepack pnpm exec wrangler whoami` before remote Cloudflare writes.
 - Keep the account ID in `wrangler.jsonc` as a target guard. The account ID is an identifier, not a credential.
 - Do not store OAuth credentials, API tokens, Global API Keys, passwords, recovery codes, or production secrets in the repository or project documentation.
+
+## Neon ownership and local account routing
+
+- Rekann uses the Neon organization `Rekann` (`org-weathered-term-87288143`) and project `Rekann App` (`bold-flower-53962598`) in `aws-ap-southeast-1`.
+- Use the Neon CLI profile `rekann`. The repository `.neon` context pins the organization, project, and `production` database branch.
+- Treat `.neon` identifiers as non-secret configuration. Keep connection strings, database passwords, API keys, and generated `.env` files out of Git and project documentation.
+- Do not change the database schema or provision application authentication until the Auth & Workspace design review is complete.
