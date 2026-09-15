@@ -1,0 +1,9 @@
+# Single-package dependency policy; this is not a monorepo.
+minimumReleaseAge: 10080
+allowBuilds:
+  esbuild: true
+  workerd: true
+# Miniflare pins an affected image library; remove after upstream includes the patch.
+# https://github.com/advisories/GHSA-rgj7-g3m4-5g8c
+overrides:
+  'miniflare>sharp': 0.35.4
