@@ -29,6 +29,7 @@ Rekann is a lightweight people workspace for small teams. Notion is the canonica
 - Rekann deploys only to the Cloudflare account associated with `rekannapp@gmail.com`, account ID `f0f101bf2b8415c34b2a1589e4017295`.
 - Use the Wrangler authentication profile `rekann`, which is bound locally to `/Users/pavelclaw/Projects/Rekann/rekann-app`. Verify the active profile and account with `corepack pnpm exec wrangler whoami` before remote Cloudflare writes.
 - Keep the account ID in `wrangler.jsonc` as a target guard. The account ID is an identifier, not a credential.
+- Production deploys use the GitHub `production` environment. After CI passes on `main`, GitHub Actions deploys the Worker with environment secrets `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`.
 - Do not store OAuth credentials, API tokens, Global API Keys, passwords, recovery codes, or production secrets in the repository or project documentation.
 
 ## Neon ownership and local account routing
