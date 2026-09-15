@@ -1,6 +1,9 @@
 import { useEffect, useLayoutEffect, useId, useRef, useState, type KeyboardEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { Check, Search, X } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { spring } from '../lib/motion'
+import { ScrollArea } from './scroll-area'
 import { useHydrated } from './ui'
 
 const normalize = (value: string) => value.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
@@ -27,6 +30,11 @@ export function SelectField({
   const trigger = useRef<HTMLButtonElement>(null)
   const popup = useRef<HTMLDivElement>(null)
   const search = useRef<HTMLInputElement>(null)
+  const list = useRef<HTMLDivElement>(null)
+  const keyboardNavigation = useRef(false)
+  const reduceMotion = useReducedMotion()
+  const [highlight, setHighlight] = useState({ y: 0, height: 36 })
+  const [hovering, setHovering] = useState(false)
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
@@ -44,6 +52,8 @@ export function SelectField({
   function show() {
     if (trigger.current?.matches(':disabled')) return
     setQuery('')
+    keyboardNavigation.current = true
+    setHovering(false)
     setActive(Math.max(0, options.indexOf(value)))
     setOpen(true)
   }
@@ -91,13 +101,26 @@ export function SelectField({
   useEffect(() => {
     if (disabled) setOpen(false)
   }, [disabled])
-  useEffect(() => {
-    if (open)
-      document.getElementById(`${id}-option-${active}`)?.scrollIntoView({ block: 'nearest' })
-  }, [active, open, id])
+  useLayoutEffect(() => {
+    if (!open) return
+    const row = document.getElementById(`${id}-option-${active}`)
+    if (row) {
+      setHighlight({ y: row.offsetTop, height: row.offsetHeight })
+      if (keyboardNavigation.current) {
+        const viewport = row.closest<HTMLElement>('.scroll-viewport')
+        if (viewport) {
+          if (row.offsetTop < viewport.scrollTop) viewport.scrollTop = row.offsetTop
+          else if (row.offsetTop + row.offsetHeight > viewport.scrollTop + viewport.clientHeight)
+            viewport.scrollTop = row.offsetTop + row.offsetHeight - viewport.clientHeight
+        }
+      }
+    }
+  }, [active, open, id, query])
 
   function keyboard(event: KeyboardEvent) {
     if (event.nativeEvent.isComposing) return
+    keyboardNavigation.current = true
+    setHovering(true)
     if (event.key === 'Escape' && open) {
       event.preventDefault()
       close(true)
@@ -166,76 +189,126 @@ export function SelectField({
         <span id={`${id}-value`}>{value || placeholder}</span>
         <img src="/icons/chevron-down.svg" alt="" width={16} height={16} />
       </button>
-      {open &&
-        ready &&
+      {ready &&
         createPortal(
-          <div
-            ref={popup}
-            id={`${id}-popup`}
-            className="select-popup"
-            style={position}
-            role={searchable ? 'dialog' : undefined}
-            aria-label={searchable ? `Choose ${label.toLowerCase()}` : undefined}
-          >
-            {searchable && (
-              <div className="select-search">
-                <Search size={16} aria-hidden="true" />
-                <input
-                  ref={search}
-                  role="combobox"
-                  aria-label="Search countries"
-                  placeholder="Search countries…"
-                  aria-autocomplete="list"
-                  aria-expanded={open}
-                  aria-controls={`${id}-list`}
-                  aria-activedescendant={filtered[active] ? `${id}-option-${active}` : undefined}
-                  value={query}
-                  onChange={(event) => {
-                    setQuery(event.target.value)
-                    setActive(0)
-                  }}
-                  onKeyDown={keyboard}
-                />
-                {query && (
-                  <button
-                    type="button"
-                    className="select-clear"
-                    aria-label="Clear search"
-                    tabIndex={-1}
-                    onClick={() => {
-                      setQuery('')
-                      setActive(0)
-                      search.current?.focus()
+          <AnimatePresence>
+            {open && (
+              <motion.div
+                ref={popup}
+                id={`${id}-popup`}
+                className="select-popup"
+                style={position}
+                initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, transition: spring.moderate.exit }}
+                transition={spring.moderate}
+                role={searchable ? 'dialog' : undefined}
+                aria-label={searchable ? `Choose ${label.toLowerCase()}` : undefined}
+              >
+                {searchable && (
+                  <div className="select-search">
+                    <Search size={16} aria-hidden="true" />
+                    <input
+                      ref={search}
+                      role="combobox"
+                      aria-label="Search countries"
+                      placeholder="Search countries…"
+                      aria-autocomplete="list"
+                      aria-expanded={open}
+                      aria-controls={`${id}-list`}
+                      aria-activedescendant={
+                        filtered[active] ? `${id}-option-${active}` : undefined
+                      }
+                      value={query}
+                      onChange={(event) => {
+                        setQuery(event.target.value)
+                        setActive(0)
+                      }}
+                      onKeyDown={keyboard}
+                    />
+                    {query && (
+                      <button
+                        type="button"
+                        className="select-clear"
+                        aria-label="Clear search"
+                        tabIndex={-1}
+                        onClick={() => {
+                          setQuery('')
+                          setActive(0)
+                          search.current?.focus()
+                        }}
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
+                  </div>
+                )}
+                <ScrollArea>
+                  <div
+                    ref={list}
+                    id={`${id}-list`}
+                    role="listbox"
+                    aria-label={label}
+                    className="select-options"
+                    onMouseLeave={() => setHovering(false)}
+                    onMouseMove={(event) => {
+                      const rows = Array.from(
+                        list.current!.querySelectorAll<HTMLElement>('[role="option"]'),
+                      )
+                      let nearest = 0
+                      let distance = Infinity
+                      rows.forEach((row, index) => {
+                        const rect = row.getBoundingClientRect()
+                        const next = Math.abs(event.clientY - rect.top - rect.height / 2)
+                        if (next < distance) {
+                          distance = next
+                          nearest = index
+                        }
+                      })
+                      keyboardNavigation.current = false
+                      setHovering(true)
+                      setActive(nearest)
+                    }}
+                    onClick={(event) => {
+                      if (event.target === event.currentTarget && filtered[active])
+                        choose(filtered[active])
                     }}
                   >
-                    <X size={16} />
-                  </button>
+                    <motion.div
+                      aria-hidden="true"
+                      className="select-highlight"
+                      initial={false}
+                      animate={{
+                        y: highlight.y,
+                        height: highlight.height,
+                        opacity: hovering && filtered.length ? 1 : 0,
+                      }}
+                      transition={reduceMotion ? { duration: 0 } : spring.fast}
+                    />
+                    {filtered.map((option, index) => (
+                      <div
+                        key={option}
+                        id={`${id}-option-${index}`}
+                        role="option"
+                        aria-selected={value === option}
+                        className={`select-option ${active === index ? 'active' : ''}`}
+                        onMouseDown={(event) => event.preventDefault()}
+                        onClick={() => choose(option)}
+                      >
+                        <span>{option}</span>
+                        {value === option && <Check size={16} aria-hidden="true" />}
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+                {searchable && (
+                  <p role="status" className={filtered.length ? 'sr-only' : 'select-empty'}>
+                    {filtered.length ? `${filtered.length} countries found` : 'No countries found'}
+                  </p>
                 )}
-              </div>
+              </motion.div>
             )}
-            <div id={`${id}-list`} role="listbox" aria-label={label} className="select-options">
-              {filtered.map((option, index) => (
-                <div
-                  key={option}
-                  id={`${id}-option-${index}`}
-                  role="option"
-                  aria-selected={value === option}
-                  className={`select-option ${active === index ? 'active' : ''}`}
-                  onPointerMove={() => setActive(index)}
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => choose(option)}
-                >
-                  <span>{option}</span>
-                  {value === option && <Check size={16} aria-hidden="true" />}
-                </div>
-              ))}
-            </div>
-            {searchable && (
-              <p role="status" className={filtered.length ? 'sr-only' : 'select-empty'}>
-                {filtered.length ? `${filtered.length} countries found` : 'No countries found'}
-              </p>
-            )}
-          </div>,
+          </AnimatePresence>,
           document.body,
         )}
     </div>

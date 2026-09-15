@@ -15,6 +15,24 @@ test('country search, keyboard selection, dismissal and mobile dropdown bounds',
   await expect(search).toBeFocused()
   await expect(page.getByRole('option')).toHaveCount(249)
   await expect(page.getByRole('option').first()).toHaveText('Indonesia')
+  const viewport = page.locator('.scroll-viewport')
+  const thumb = page.locator('.scroll-thumb')
+  await expect(thumb).toBeVisible()
+  await expect(viewport).toHaveAttribute('data-fade-bottom', 'true')
+  const thumbBox = (await thumb.boundingBox())!
+  expect(thumbBox.width).toBeLessThanOrEqual(6)
+  const beforeHover = await viewport.evaluate((node) => node.scrollTop)
+  const rowBox = (await page.getByRole('option', { name: 'Albania', exact: true }).boundingBox())!
+  await page.mouse.move(rowBox.x + 50, rowBox.y + rowBox.height / 2)
+  await expect(page.locator('.select-highlight')).toHaveCSS('opacity', '1')
+  await expect.poll(() => viewport.evaluate((node) => node.scrollTop)).toBe(beforeHover)
+  await page.screenshot({ path: 'test-results/dropdown-fluid.png' })
+  await viewport.hover()
+  await page.mouse.wheel(0, 400)
+  await expect.poll(() => viewport.evaluate((node) => node.scrollTop)).toBeGreaterThan(0)
+  await expect(viewport).toHaveAttribute('data-fade-top', 'true')
+  await search.press('Escape')
+  await location.click()
   expect(new Set(countries).size).toBe(249)
   expect(countries.slice(1)).toEqual(
     [...countries.slice(1)].sort((a, b) => a.localeCompare(b, 'en')),
@@ -68,5 +86,11 @@ test('country search, keyboard selection, dismissal and mobile dropdown bounds',
     await search.press('Enter')
     await expect(location).toContainText('Indonesia')
   }
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await location.click()
+  await expect(page.locator('.select-popup')).toHaveCSS('transform', 'none')
+  await search.fill('Japan')
+  await search.press('Enter')
+  await expect(location).toContainText('Japan')
   await owner.dispose()
 })

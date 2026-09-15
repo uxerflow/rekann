@@ -59,3 +59,5 @@ Local dev and preview now use port 4310, keeping Rekann separate from other proj
 Newly verified owners with no workspace are routed directly to company onboarding. The workspace chooser only appears when an account has multiple workspaces; invitation redirects remain unchanged.
 
 The owner approved new Location and Industry dropdown designs in Figma on September 15, 2026. Company onboarding now uses these custom menus. Location has searchable ISO country/territory coverage, Indonesia first, then English alphabetical ordering; no IP lookup or automatic selection. Menu states and Figma links are recorded in `docs/DESIGN_SYSTEM.md`.
+
+Dropdown interactions now adapt Fluid Functionalism scrollbar, motion, and nearest-row hover patterns using Radix ScrollArea and Framer Motion. Shared spring tokens and a reusable scroll-area component support future lists. Custom desktop thumbs are 3–6 px, touch scroll remains native, overflow edges fade, and reduced motion disables spatial animation. Surfaces/dark mode remain explicitly deferred.

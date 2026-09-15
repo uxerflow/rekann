@@ -861,9 +861,11 @@ select {
   border-radius: var(--radius);
   background: #fff;
   box-shadow: 0 8px 24px #00000014;
+  transform-origin: top center;
 }
 .select-popup[data-side='top'] {
-  transform: translateY(-100%);
+  translate: 0 -100%;
+  transform-origin: bottom center;
 }
 .select-search {
   display: flex;
@@ -913,9 +915,71 @@ select {
   background: var(--color-border);
 }
 .select-options {
-  overflow-y: auto;
+  position: relative;
+  isolation: isolate;
+}
+.scroll-area {
+  display: flex;
+  flex-direction: column;
   min-height: 0;
+  overflow: hidden;
+}
+.scroll-viewport {
+  --fade-top: 0px;
+  --fade-bottom: 0px;
+  min-height: 0;
+  width: 100%;
   overscroll-behavior: contain;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--fade-top),
+    #000 calc(100% - var(--fade-bottom)),
+    transparent
+  );
+}
+.scroll-viewport[data-fade-top='true'] {
+  --fade-top: 10px;
+}
+.scroll-viewport[data-fade-bottom='true'] {
+  --fade-bottom: 10px;
+}
+.scroll-track {
+  display: flex;
+  width: 10px;
+  padding: 2px;
+  touch-action: none;
+  user-select: none;
+}
+.scroll-thumb {
+  flex: 1;
+  min-height: 24px;
+  border-radius: 999px;
+  background: #29292933;
+  transform: scaleX(0.5);
+  transition:
+    transform 160ms ease-out,
+    background-color 160ms ease-out;
+}
+.scroll-track:hover .scroll-thumb,
+.scroll-track:active .scroll-thumb {
+  transform: scaleX(1);
+  background: #29292966;
+}
+@media (pointer: coarse) {
+  .scroll-track {
+    display: none;
+  }
+}
+.select-highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 8px;
+  border-radius: 6px;
+  background: var(--color-surface);
+  pointer-events: none;
+  z-index: -1;
 }
 .select-option {
   display: flex;
@@ -926,6 +990,7 @@ select {
   padding: 8px 10px;
   line-height: 20px;
   border-radius: 6px;
+  margin-right: 8px;
   cursor: pointer;
   transition:
     background-color var(--interaction-duration) var(--interaction-easing),
@@ -936,9 +1001,6 @@ select {
 }
 .select-option > svg {
   flex-shrink: 0;
-}
-.select-option.active {
-  background: var(--color-surface);
 }
 .select-option[aria-selected='true'] {
   background: var(--color-option-selected);
