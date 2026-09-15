@@ -18,6 +18,7 @@ Rekann is a lightweight people workspace for small teams. Notion is the canonica
 
 - Rekann is owned by the GitHub organization `uxerflow` and is managed through the personal account `barlydesign`. For GitHub operations in this repository, verify or switch GitHub CLI to `barlydesign` before creating repositories, pushing, or changing remote settings.
 - The canonical Rekann remote is `https://github.com/uxerflow/rekann.git`. The owner authorized its public creation under Apache-2.0 on September 15, 2026.
+- Keep `main` as the only long-lived branch. Use short-lived `feat/*`, `fix/*`, `docs/*`, or `chore/*` branches and merge them through pull requests after CI passes. Treat staging and production as deployment environments rather than Git branches.
 - This repository uses the local commit identity `Barly Vallendito <22915547+barlydesign@users.noreply.github.com>`.
 - RepoLearn is a separate project at `/Users/pavelclaw/Projects/Repo/repo-learn`, owned by the `repo-learn` organization. It currently uses GitHub CLI account `devrepostudio` and local commit identity `workrepostudio <workrepostudio@gmail.com>`.
 - GitHub CLI account selection is global for `github.com`; always check the active account and repository remote before external GitHub writes. Never log out or remove the other project accounts as part of Rekann work.

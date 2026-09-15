@@ -1,6 +1,6 @@
 # Project State
 
-Updated: September 14, 2026.
+Updated: September 15, 2026.
 
 ## Current phase
 
@@ -22,7 +22,7 @@ Node 24.21.0 was downloaded through npm exec and used for build/typecheck/runtim
 
 ## Repository and boundaries
 
-Local Git uses `main` and the public canonical repository is `https://github.com/uxerflow/rekann`. The project is published under Apache-2.0 with contribution, conduct, security-reporting, issue/PR templates, Dependabot, and build/typecheck CI foundations. Generated dependencies/build/runtime state and graphify-out are ignored. AGENTS.md, CLAUDE.md, and Notion navigation docs are present. Graphify was not installed or configured in this fresh application bootstrap.
+Local Git uses `main` as its only long-lived branch, with short-lived work branches merged through pull requests. Staging and production are deployment environments rather than Git branches. The public canonical repository is `https://github.com/uxerflow/rekann`. The project is published under Apache-2.0 with contribution, conduct, security-reporting, issue/PR templates, Dependabot, and passing build/typecheck CI foundations. Generated dependencies/build/runtime state and graphify-out are ignored. AGENTS.md, CLAUDE.md, and Notion navigation docs are present. Graphify was not installed or configured in this fresh application bootstrap.
 
 There is no authentication, database, storage, email integration, deployment, production credential, or implemented product workflow. The bootstrap is not production-security validation. No local foundation blocker remains.
 

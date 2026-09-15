@@ -14,6 +14,8 @@ pnpm typecheck
 
 Keep pull requests focused and explain the problem, resulting behavior, and validation performed. Write source code, documentation, application copy, and commit messages in English. Never include credentials, production data, or private workspace information.
 
+Create work from `main` in a short-lived branch named `feat/*`, `fix/*`, `docs/*`, or `chore/*`. Open a pull request, wait for CI, and merge it into `main`. Staging and production are deployment environments and do not use permanent Git branches.
+
 By submitting a contribution, you agree that it is licensed under the Apache License 2.0 used by this repository.
 
 ## Reporting security issues
