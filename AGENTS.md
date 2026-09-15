@@ -23,3 +23,10 @@ Rekann is a lightweight people workspace for small teams. Notion is the canonica
 - RepoLearn is a separate project at `/Users/pavelclaw/Projects/Repo/repo-learn`, owned by the `repo-learn` organization. It currently uses GitHub CLI account `devrepostudio` and local commit identity `workrepostudio <workrepostudio@gmail.com>`.
 - GitHub CLI account selection is global for `github.com`; always check the active account and repository remote before external GitHub writes. Never log out or remove the other project accounts as part of Rekann work.
 - Do not store GitHub tokens, credentials, recovery codes, or other secrets in repository files or project documentation.
+
+## Cloudflare ownership and local account routing
+
+- Rekann deploys only to the Cloudflare account associated with `rekannapp@gmail.com`, account ID `f0f101bf2b8415c34b2a1589e4017295`.
+- Use the Wrangler authentication profile `rekann`, which is bound locally to `/Users/pavelclaw/Projects/Rekann/rekann-app`. Verify the active profile and account with `corepack pnpm exec wrangler whoami` before remote Cloudflare writes.
+- Keep the account ID in `wrangler.jsonc` as a target guard. The account ID is an identifier, not a credential.
+- Do not store OAuth credentials, API tokens, Global API Keys, passwords, recovery codes, or production secrets in the repository or project documentation.
