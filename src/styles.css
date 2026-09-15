@@ -7,6 +7,9 @@
   --color-brand: #1da578;
   --color-action: #1da578;
   --color-action-hover: #127857;
+  --color-action-pressed: #0e6348;
+  --interaction-duration: 160ms;
+  --interaction-easing: ease-out;
   --color-text: #292929;
   --color-muted: #707070;
   --color-border: #e5e5e5;
@@ -46,7 +49,20 @@ a {
   text-decoration: none;
 }
 a:hover {
-  text-decoration: underline;
+  color: var(--color-action-hover);
+  text-decoration: none;
+}
+a:active {
+  color: var(--color-action-pressed);
+}
+a,
+button,
+.file-button {
+  transition:
+    color var(--interaction-duration) var(--interaction-easing),
+    background-color var(--interaction-duration) var(--interaction-easing),
+    border-color var(--interaction-duration) var(--interaction-easing),
+    box-shadow var(--interaction-duration) var(--interaction-easing);
 }
 button {
   cursor: pointer;
@@ -105,14 +121,12 @@ small {
   line-height: 20px;
   background: var(--color-action);
   color: #fff;
-  transition:
-    background 0.15s,
-    box-shadow 0.15s;
   text-decoration: none;
   white-space: nowrap;
 }
-.button:hover {
+.button:hover:not(:disabled) {
   background: var(--color-action-hover);
+  color: #fff;
   text-decoration: none;
 }
 .button.secondary {
@@ -122,8 +136,9 @@ small {
   padding: 7px 12px;
   box-shadow: none;
 }
-.button.secondary:hover {
+.button.secondary:hover:not(:disabled) {
   background: var(--color-surface);
+  color: var(--color-text);
   border-color: var(--color-border);
 }
 .button.small {
@@ -144,8 +159,9 @@ small {
   align-items: center;
   justify-content: center;
 }
-.icon-button:hover {
+.icon-button:hover:not(:disabled) {
   background: #f2f2f2;
+  color: var(--color-text);
 }
 .text-button {
   border: 0;
@@ -155,10 +171,41 @@ small {
   font-size: inherit;
 }
 .text-button:hover:not(:disabled) {
-  text-decoration: underline;
+  color: var(--color-action-hover);
+  text-decoration: none;
 }
 .text-button.danger {
   color: var(--color-danger);
+}
+.button:active:not(:disabled) {
+  background: var(--color-action-pressed);
+  color: #fff;
+}
+.button.secondary:active:not(:disabled) {
+  background: #f0f0f0;
+  color: var(--color-text);
+}
+.button.destructive:hover:not(:disabled),
+.button.destructive:active:not(:disabled) {
+  background: #912018;
+  color: #fff;
+}
+.text-button:active:not(:disabled) {
+  color: var(--color-action-pressed);
+}
+.text-button.danger:hover:not(:disabled),
+.text-button.danger:active:not(:disabled) {
+  color: #912018;
+}
+.icon-button:active:not(:disabled) {
+  background: #e9e9e9;
+  color: var(--color-text);
+}
+.back-link:hover,
+.back-link:active,
+.new-workspace:hover,
+.new-workspace:active {
+  color: var(--color-text);
 }
 .field {
   display: flex;

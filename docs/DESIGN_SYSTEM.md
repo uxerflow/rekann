@@ -39,3 +39,7 @@ The product decisions still apply: Google sign-in is disabled; English copy is e
 `tests/visual.spec.ts` compares browser bounds at 1440 × 936 against the values above with a 1 px tolerance, checks exact focus/color/radius properties, captures empty/focused/filled states, and exercises avatar choice and step-back state retention. Mobile is a responsive adaptation: decorative previews are hidden and controls retain 44 px touch height. Raster text rendering may differ by browser/OS; the measured dimensions and color tokens are the review contract.
 
 Forms and interactive Button components wait for hydration before accepting input. The six-cell code control uses one native input so paste, autofill, and screen-reader labeling continue to work. Avatar choice generates initials locally; uploaded photos remain user-provided and follow the existing private R2 pipeline.
+
+## Interaction standard
+
+Text links and text buttons never add an underline on hover. Use a subtle darker foreground on hover and press instead, with a shared 160 ms ease-out transition for color, background, border, and shadow. Brand actions use `#1da578` → `#127857` → `#0e6348`; muted and destructive controls retain their semantic color family. Buttons, icons, navigation, and clickable cards use the same smooth transition where relevant, without movement or scaling. Disabled controls do not react. Keep keyboard focus visible and respect reduced-motion preferences. Apply this standard to future relevant components.

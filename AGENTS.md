@@ -39,3 +39,7 @@ Rekann is a lightweight people workspace for small teams. Notion is the canonica
 - Treat `.neon` identifiers as non-secret configuration. Keep connection strings, database passwords, API keys, and generated `.env` files out of Git and project documentation.
 - Auth & Workspace review is complete for the scope in `docs/AUTH_WORKSPACE.md`. Development uses the `auth-development` database branch (`br-holy-feather-b33zppyv`), with runtime credentials in ignored `.dev.vars` and owner credentials in ignored `.env.migrations`. The existing `.neon` context still targets production: use an explicit development branch when retrieving CLI credentials.
 - UI roles are Admin, optional Manager / HR, and Employee. Team is the directory label. Admin is scoped to one workspace, never a platform-wide superuser. Google sign-in stays disabled. All product copy is English. Figma reads use the local figma-cli daemon/bridge, not Figma MCP.
+
+## Interaction styling
+
+- Follow `docs/DESIGN_SYSTEM.md` for new components. Text-link and text-button hover states use subtle darker color instead of underlines. Use shared 160 ms ease-out color/background/border transitions for relevant interactive elements, visible keyboard focus, and reduced-motion support.
