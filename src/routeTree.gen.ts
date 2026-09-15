@@ -10,33 +10,205 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as InviteTokenRouteImport } from './routes/invite.$token'
+import { Route as OnboardingCompanyRouteImport } from './routes/onboarding.company'
+import { Route as OnboardingProfileRouteImport } from './routes/onboarding.profile'
+import { Route as WSlugRouteImport } from './routes/w.$slug'
+import { Route as WorkspaceWorkspaceIdRouteImport } from './routes/workspace.$workspaceId'
+import { Route as ApiAppSplatRouteImport } from './routes/api.app.$'
+import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
+import { Route as WSlugSplatRouteImport } from './routes/w.$slug.$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InviteTokenRoute = InviteTokenRouteImport.update({
+  id: '/invite/$token',
+  path: '/invite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingCompanyRoute = OnboardingCompanyRouteImport.update({
+  id: '/onboarding/company',
+  path: '/onboarding/company',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingProfileRoute = OnboardingProfileRouteImport.update({
+  id: '/onboarding/profile',
+  path: '/onboarding/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WSlugRoute = WSlugRouteImport.update({
+  id: '/w/$slug',
+  path: '/w/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkspaceWorkspaceIdRoute = WorkspaceWorkspaceIdRouteImport.update({
+  id: '/workspace/$workspaceId',
+  path: '/workspace/$workspaceId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAppSplatRoute = ApiAppSplatRouteImport.update({
+  id: '/api/app/$',
+  path: '/api/app/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WSlugSplatRoute = WSlugSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => WSlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/invite/$token': typeof InviteTokenRoute
+  '/onboarding/company': typeof OnboardingCompanyRoute
+  '/onboarding/profile': typeof OnboardingProfileRoute
+  '/w/$slug': typeof WSlugRouteWithChildren
+  '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRoute
+  '/api/app/$': typeof ApiAppSplatRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/w/$slug/$': typeof WSlugSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/invite/$token': typeof InviteTokenRoute
+  '/onboarding/company': typeof OnboardingCompanyRoute
+  '/onboarding/profile': typeof OnboardingProfileRoute
+  '/w/$slug': typeof WSlugRouteWithChildren
+  '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRoute
+  '/api/app/$': typeof ApiAppSplatRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/w/$slug/$': typeof WSlugSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/invite/$token': typeof InviteTokenRoute
+  '/onboarding/company': typeof OnboardingCompanyRoute
+  '/onboarding/profile': typeof OnboardingProfileRoute
+  '/w/$slug': typeof WSlugRouteWithChildren
+  '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRoute
+  '/api/app/$': typeof ApiAppSplatRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/w/$slug/$': typeof WSlugSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/verify-email'
+    | '/invite/$token'
+    | '/onboarding/company'
+    | '/onboarding/profile'
+    | '/w/$slug'
+    | '/workspace/$workspaceId'
+    | '/api/app/$'
+    | '/api/auth/$'
+    | '/w/$slug/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/verify-email'
+    | '/invite/$token'
+    | '/onboarding/company'
+    | '/onboarding/profile'
+    | '/w/$slug'
+    | '/workspace/$workspaceId'
+    | '/api/app/$'
+    | '/api/auth/$'
+    | '/w/$slug/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/verify-email'
+    | '/invite/$token'
+    | '/onboarding/company'
+    | '/onboarding/profile'
+    | '/w/$slug'
+    | '/workspace/$workspaceId'
+    | '/api/app/$'
+    | '/api/auth/$'
+    | '/w/$slug/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SignInRoute: typeof SignInRoute
+  SignUpRoute: typeof SignUpRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
+  InviteTokenRoute: typeof InviteTokenRoute
+  OnboardingCompanyRoute: typeof OnboardingCompanyRoute
+  OnboardingProfileRoute: typeof OnboardingProfileRoute
+  WSlugRoute: typeof WSlugRouteWithChildren
+  WorkspaceWorkspaceIdRoute: typeof WorkspaceWorkspaceIdRoute
+  ApiAppSplatRoute: typeof ApiAppSplatRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +220,124 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invite/$token': {
+      id: '/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof InviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/company': {
+      id: '/onboarding/company'
+      path: '/onboarding/company'
+      fullPath: '/onboarding/company'
+      preLoaderRoute: typeof OnboardingCompanyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/profile': {
+      id: '/onboarding/profile'
+      path: '/onboarding/profile'
+      fullPath: '/onboarding/profile'
+      preLoaderRoute: typeof OnboardingProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/w/$slug': {
+      id: '/w/$slug'
+      path: '/w/$slug'
+      fullPath: '/w/$slug'
+      preLoaderRoute: typeof WSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workspace/$workspaceId': {
+      id: '/workspace/$workspaceId'
+      path: '/workspace/$workspaceId'
+      fullPath: '/workspace/$workspaceId'
+      preLoaderRoute: typeof WorkspaceWorkspaceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/app/$': {
+      id: '/api/app/$'
+      path: '/api/app/$'
+      fullPath: '/api/app/$'
+      preLoaderRoute: typeof ApiAppSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/w/$slug/$': {
+      id: '/w/$slug/$'
+      path: '/$'
+      fullPath: '/w/$slug/$'
+      preLoaderRoute: typeof WSlugSplatRouteImport
+      parentRoute: typeof WSlugRoute
+    }
   }
 }
 
+interface WSlugRouteChildren {
+  WSlugSplatRoute: typeof WSlugSplatRoute
+}
+
+const WSlugRouteChildren: WSlugRouteChildren = {
+  WSlugSplatRoute: WSlugSplatRoute,
+}
+
+const WSlugRouteWithChildren = WSlugRoute._addFileChildren(WSlugRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SignInRoute: SignInRoute,
+  SignUpRoute: SignUpRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
+  InviteTokenRoute: InviteTokenRoute,
+  OnboardingCompanyRoute: OnboardingCompanyRoute,
+  OnboardingProfileRoute: OnboardingProfileRoute,
+  WSlugRoute: WSlugRouteWithChildren,
+  WorkspaceWorkspaceIdRoute: WorkspaceWorkspaceIdRoute,
+  ApiAppSplatRoute: ApiAppSplatRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

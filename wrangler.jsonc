@@ -4,5 +4,11 @@
   "account_id": "f0f101bf2b8415c34b2a1589e4017295",
   "main": "@tanstack/react-start/server-entry",
   "compatibility_date": "2026-09-03",
-  "compatibility_flags": ["nodejs_compat"]
+  "compatibility_flags": ["nodejs_compat"],
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "rekann-media" }],
+  "vars": {
+    "APP_ENV": "production",
+    "EMAIL_DELIVERY": "resend",
+    "BETTER_AUTH_URL": "https://rekann-app.rekann-app.workers.dev",
+  },
 }

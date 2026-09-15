@@ -1,0 +1,642 @@
+[
+  {
+    "src": "/avatars/silk-rose-milk.svg",
+    "name": "Silk · Rose Milk"
+  },
+  {
+    "src": "/avatars/flare-rose-milk.svg",
+    "name": "Flare · Rose Milk"
+  },
+  {
+    "src": "/avatars/nova-rose-milk.svg",
+    "name": "Nova · Rose Milk"
+  },
+  {
+    "src": "/avatars/jade-rose-milk.svg",
+    "name": "Jade · Rose Milk"
+  },
+  {
+    "src": "/avatars/silk-peach-cream.svg",
+    "name": "Silk · Peach Cream"
+  },
+  {
+    "src": "/avatars/flare-peach-cream.svg",
+    "name": "Flare · Peach Cream"
+  },
+  {
+    "src": "/avatars/nova-peach-cream.svg",
+    "name": "Nova · Peach Cream"
+  },
+  {
+    "src": "/avatars/jade-peach-cream.svg",
+    "name": "Jade · Peach Cream"
+  },
+  {
+    "src": "/avatars/silk-mint-milk.svg",
+    "name": "Silk · Mint Milk"
+  },
+  {
+    "src": "/avatars/flare-mint-milk.svg",
+    "name": "Flare · Mint Milk"
+  },
+  {
+    "src": "/avatars/nova-mint-milk.svg",
+    "name": "Nova · Mint Milk"
+  },
+  {
+    "src": "/avatars/jade-mint-milk.svg",
+    "name": "Jade · Mint Milk"
+  },
+  {
+    "src": "/avatars/silk-aurora-pink.svg",
+    "name": "Silk · Aurora Pink"
+  },
+  {
+    "src": "/avatars/flare-aurora-pink.svg",
+    "name": "Flare · Aurora Pink"
+  },
+  {
+    "src": "/avatars/nova-aurora-pink.svg",
+    "name": "Nova · Aurora Pink"
+  },
+  {
+    "src": "/avatars/jade-aurora-pink.svg",
+    "name": "Jade · Aurora Pink"
+  },
+  {
+    "src": "/avatars/silk-lilac-silk.svg",
+    "name": "Silk · Lilac Silk"
+  },
+  {
+    "src": "/avatars/flare-lilac-silk.svg",
+    "name": "Flare · Lilac Silk"
+  },
+  {
+    "src": "/avatars/nova-lilac-silk.svg",
+    "name": "Nova · Lilac Silk"
+  },
+  {
+    "src": "/avatars/jade-lilac-silk.svg",
+    "name": "Jade · Lilac Silk"
+  },
+  {
+    "src": "/avatars/silk-blue-cream.svg",
+    "name": "Silk · Blue Cream"
+  },
+  {
+    "src": "/avatars/flare-blue-cream.svg",
+    "name": "Flare · Blue Cream"
+  },
+  {
+    "src": "/avatars/nova-blue-cream.svg",
+    "name": "Nova · Blue Cream"
+  },
+  {
+    "src": "/avatars/jade-blue-cream.svg",
+    "name": "Jade · Blue Cream"
+  },
+  {
+    "src": "/avatars/silk-jade-cream.svg",
+    "name": "Silk · Jade Cream"
+  },
+  {
+    "src": "/avatars/flare-jade-cream.svg",
+    "name": "Flare · Jade Cream"
+  },
+  {
+    "src": "/avatars/nova-jade-cream.svg",
+    "name": "Nova · Jade Cream"
+  },
+  {
+    "src": "/avatars/jade-jade-cream.svg",
+    "name": "Jade · Jade Cream"
+  },
+  {
+    "src": "/avatars/silk-coral-mist.svg",
+    "name": "Silk · Coral Mist"
+  },
+  {
+    "src": "/avatars/flare-coral-mist.svg",
+    "name": "Flare · Coral Mist"
+  },
+  {
+    "src": "/avatars/nova-coral-mist.svg",
+    "name": "Nova · Coral Mist"
+  },
+  {
+    "src": "/avatars/jade-coral-mist.svg",
+    "name": "Jade · Coral Mist"
+  },
+  {
+    "src": "/avatars/silk-lemon-mint.svg",
+    "name": "Silk · Lemon Mint"
+  },
+  {
+    "src": "/avatars/flare-lemon-mint.svg",
+    "name": "Flare · Lemon Mint"
+  },
+  {
+    "src": "/avatars/nova-lemon-mint.svg",
+    "name": "Nova · Lemon Mint"
+  },
+  {
+    "src": "/avatars/jade-lemon-mint.svg",
+    "name": "Jade · Lemon Mint"
+  },
+  {
+    "src": "/avatars/silk-violet-peach.svg",
+    "name": "Silk · Violet Peach"
+  },
+  {
+    "src": "/avatars/flare-violet-peach.svg",
+    "name": "Flare · Violet Peach"
+  },
+  {
+    "src": "/avatars/nova-violet-peach.svg",
+    "name": "Nova · Violet Peach"
+  },
+  {
+    "src": "/avatars/jade-violet-peach.svg",
+    "name": "Jade · Violet Peach"
+  },
+  {
+    "src": "/avatars/silk-magenta-void.svg",
+    "name": "Silk · Magenta Void"
+  },
+  {
+    "src": "/avatars/flare-magenta-void.svg",
+    "name": "Flare · Magenta Void"
+  },
+  {
+    "src": "/avatars/nova-magenta-void.svg",
+    "name": "Nova · Magenta Void"
+  },
+  {
+    "src": "/avatars/jade-magenta-void.svg",
+    "name": "Jade · Magenta Void"
+  },
+  {
+    "src": "/avatars/silk-teal-void.svg",
+    "name": "Silk · Teal Void"
+  },
+  {
+    "src": "/avatars/flare-teal-void.svg",
+    "name": "Flare · Teal Void"
+  },
+  {
+    "src": "/avatars/nova-teal-void.svg",
+    "name": "Nova · Teal Void"
+  },
+  {
+    "src": "/avatars/jade-teal-void.svg",
+    "name": "Jade · Teal Void"
+  },
+  {
+    "src": "/avatars/silk-amber-dusk.svg",
+    "name": "Silk · Amber Dusk"
+  },
+  {
+    "src": "/avatars/flare-amber-dusk.svg",
+    "name": "Flare · Amber Dusk"
+  },
+  {
+    "src": "/avatars/nova-amber-dusk.svg",
+    "name": "Nova · Amber Dusk"
+  },
+  {
+    "src": "/avatars/jade-amber-dusk.svg",
+    "name": "Jade · Amber Dusk"
+  },
+  {
+    "src": "/avatars/silk-sky-melon.svg",
+    "name": "Silk · Sky Melon"
+  },
+  {
+    "src": "/avatars/flare-sky-melon.svg",
+    "name": "Flare · Sky Melon"
+  },
+  {
+    "src": "/avatars/nova-sky-melon.svg",
+    "name": "Nova · Sky Melon"
+  },
+  {
+    "src": "/avatars/jade-sky-melon.svg",
+    "name": "Jade · Sky Melon"
+  },
+  {
+    "src": "/avatars/silk-grapefruit.svg",
+    "name": "Silk · Grapefruit"
+  },
+  {
+    "src": "/avatars/flare-grapefruit.svg",
+    "name": "Flare · Grapefruit"
+  },
+  {
+    "src": "/avatars/nova-grapefruit.svg",
+    "name": "Nova · Grapefruit"
+  },
+  {
+    "src": "/avatars/jade-grapefruit.svg",
+    "name": "Jade · Grapefruit"
+  },
+  {
+    "src": "/avatars/silk-lavender-lime.svg",
+    "name": "Silk · Lavender Lime"
+  },
+  {
+    "src": "/avatars/flare-lavender-lime.svg",
+    "name": "Flare · Lavender Lime"
+  },
+  {
+    "src": "/avatars/nova-lavender-lime.svg",
+    "name": "Nova · Lavender Lime"
+  },
+  {
+    "src": "/avatars/jade-lavender-lime.svg",
+    "name": "Jade · Lavender Lime"
+  },
+  {
+    "src": "/avatars/silk-aqua-orchid.svg",
+    "name": "Silk · Aqua Orchid"
+  },
+  {
+    "src": "/avatars/flare-aqua-orchid.svg",
+    "name": "Flare · Aqua Orchid"
+  },
+  {
+    "src": "/avatars/nova-aqua-orchid.svg",
+    "name": "Nova · Aqua Orchid"
+  },
+  {
+    "src": "/avatars/jade-aqua-orchid.svg",
+    "name": "Jade · Aqua Orchid"
+  },
+  {
+    "src": "/avatars/silk-honeydew.svg",
+    "name": "Silk · Honeydew"
+  },
+  {
+    "src": "/avatars/flare-honeydew.svg",
+    "name": "Flare · Honeydew"
+  },
+  {
+    "src": "/avatars/nova-honeydew.svg",
+    "name": "Nova · Honeydew"
+  },
+  {
+    "src": "/avatars/jade-honeydew.svg",
+    "name": "Jade · Honeydew"
+  },
+  {
+    "src": "/avatars/silk-plum-gold.svg",
+    "name": "Silk · Plum Gold"
+  },
+  {
+    "src": "/avatars/flare-plum-gold.svg",
+    "name": "Flare · Plum Gold"
+  },
+  {
+    "src": "/avatars/nova-plum-gold.svg",
+    "name": "Nova · Plum Gold"
+  },
+  {
+    "src": "/avatars/jade-plum-gold.svg",
+    "name": "Jade · Plum Gold"
+  },
+  {
+    "src": "/avatars/silk-ice-berry.svg",
+    "name": "Silk · Ice Berry"
+  },
+  {
+    "src": "/avatars/flare-ice-berry.svg",
+    "name": "Flare · Ice Berry"
+  },
+  {
+    "src": "/avatars/nova-ice-berry.svg",
+    "name": "Nova · Ice Berry"
+  },
+  {
+    "src": "/avatars/jade-ice-berry.svg",
+    "name": "Jade · Ice Berry"
+  },
+  {
+    "src": "/avatars/silk-apricot-mint.svg",
+    "name": "Silk · Apricot Mint"
+  },
+  {
+    "src": "/avatars/flare-apricot-mint.svg",
+    "name": "Flare · Apricot Mint"
+  },
+  {
+    "src": "/avatars/nova-apricot-mint.svg",
+    "name": "Nova · Apricot Mint"
+  },
+  {
+    "src": "/avatars/jade-apricot-mint.svg",
+    "name": "Jade · Apricot Mint"
+  },
+  {
+    "src": "/avatars/silk-candy-blue.svg",
+    "name": "Silk · Candy Blue"
+  },
+  {
+    "src": "/avatars/flare-candy-blue.svg",
+    "name": "Flare · Candy Blue"
+  },
+  {
+    "src": "/avatars/nova-candy-blue.svg",
+    "name": "Nova · Candy Blue"
+  },
+  {
+    "src": "/avatars/jade-candy-blue.svg",
+    "name": "Jade · Candy Blue"
+  },
+  {
+    "src": "/avatars/silk-raspberry-cream.svg",
+    "name": "Silk · Raspberry Cream"
+  },
+  {
+    "src": "/avatars/flare-raspberry-cream.svg",
+    "name": "Flare · Raspberry Cream"
+  },
+  {
+    "src": "/avatars/nova-raspberry-cream.svg",
+    "name": "Nova · Raspberry Cream"
+  },
+  {
+    "src": "/avatars/jade-raspberry-cream.svg",
+    "name": "Jade · Raspberry Cream"
+  },
+  {
+    "src": "/avatars/silk-spring-glow.svg",
+    "name": "Silk · Spring Glow"
+  },
+  {
+    "src": "/avatars/flare-spring-glow.svg",
+    "name": "Flare · Spring Glow"
+  },
+  {
+    "src": "/avatars/nova-spring-glow.svg",
+    "name": "Nova · Spring Glow"
+  },
+  {
+    "src": "/avatars/jade-spring-glow.svg",
+    "name": "Jade · Spring Glow"
+  },
+  {
+    "src": "/avatars/silk-sunset-punch.svg",
+    "name": "Silk · Sunset Punch"
+  },
+  {
+    "src": "/avatars/flare-sunset-punch.svg",
+    "name": "Flare · Sunset Punch"
+  },
+  {
+    "src": "/avatars/nova-sunset-punch.svg",
+    "name": "Nova · Sunset Punch"
+  },
+  {
+    "src": "/avatars/jade-sunset-punch.svg",
+    "name": "Jade · Sunset Punch"
+  },
+  {
+    "src": "/avatars/silk-moon-pearl.svg",
+    "name": "Silk · Moon Pearl"
+  },
+  {
+    "src": "/avatars/flare-moon-pearl.svg",
+    "name": "Flare · Moon Pearl"
+  },
+  {
+    "src": "/avatars/nova-moon-pearl.svg",
+    "name": "Nova · Moon Pearl"
+  },
+  {
+    "src": "/avatars/jade-moon-pearl.svg",
+    "name": "Jade · Moon Pearl"
+  },
+  {
+    "src": "/avatars/silk-seafoam-rose.svg",
+    "name": "Silk · Seafoam Rose"
+  },
+  {
+    "src": "/avatars/flare-seafoam-rose.svg",
+    "name": "Flare · Seafoam Rose"
+  },
+  {
+    "src": "/avatars/nova-seafoam-rose.svg",
+    "name": "Nova · Seafoam Rose"
+  },
+  {
+    "src": "/avatars/jade-seafoam-rose.svg",
+    "name": "Jade · Seafoam Rose"
+  },
+  {
+    "src": "/avatars/silk-blueberry-milk.svg",
+    "name": "Silk · Blueberry Milk"
+  },
+  {
+    "src": "/avatars/flare-blueberry-milk.svg",
+    "name": "Flare · Blueberry Milk"
+  },
+  {
+    "src": "/avatars/nova-blueberry-milk.svg",
+    "name": "Nova · Blueberry Milk"
+  },
+  {
+    "src": "/avatars/jade-blueberry-milk.svg",
+    "name": "Jade · Blueberry Milk"
+  },
+  {
+    "src": "/avatars/silk-mango-iris.svg",
+    "name": "Silk · Mango Iris"
+  },
+  {
+    "src": "/avatars/flare-mango-iris.svg",
+    "name": "Flare · Mango Iris"
+  },
+  {
+    "src": "/avatars/nova-mango-iris.svg",
+    "name": "Nova · Mango Iris"
+  },
+  {
+    "src": "/avatars/jade-mango-iris.svg",
+    "name": "Jade · Mango Iris"
+  },
+  {
+    "src": "/avatars/silk-forest-neon.svg",
+    "name": "Silk · Forest Neon"
+  },
+  {
+    "src": "/avatars/flare-forest-neon.svg",
+    "name": "Flare · Forest Neon"
+  },
+  {
+    "src": "/avatars/nova-forest-neon.svg",
+    "name": "Nova · Forest Neon"
+  },
+  {
+    "src": "/avatars/jade-forest-neon.svg",
+    "name": "Jade · Forest Neon"
+  },
+  {
+    "src": "/avatars/silk-cotton-candy.svg",
+    "name": "Silk · Cotton Candy"
+  },
+  {
+    "src": "/avatars/flare-cotton-candy.svg",
+    "name": "Flare · Cotton Candy"
+  },
+  {
+    "src": "/avatars/nova-cotton-candy.svg",
+    "name": "Nova · Cotton Candy"
+  },
+  {
+    "src": "/avatars/jade-cotton-candy.svg",
+    "name": "Jade · Cotton Candy"
+  },
+  {
+    "src": "/avatars/silk-lime-sorbet.svg",
+    "name": "Silk · Lime Sorbet"
+  },
+  {
+    "src": "/avatars/flare-lime-sorbet.svg",
+    "name": "Flare · Lime Sorbet"
+  },
+  {
+    "src": "/avatars/nova-lime-sorbet.svg",
+    "name": "Nova · Lime Sorbet"
+  },
+  {
+    "src": "/avatars/jade-lime-sorbet.svg",
+    "name": "Jade · Lime Sorbet"
+  },
+  {
+    "src": "/avatars/silk-cherry-cola.svg",
+    "name": "Silk · Cherry Cola"
+  },
+  {
+    "src": "/avatars/flare-cherry-cola.svg",
+    "name": "Flare · Cherry Cola"
+  },
+  {
+    "src": "/avatars/nova-cherry-cola.svg",
+    "name": "Nova · Cherry Cola"
+  },
+  {
+    "src": "/avatars/jade-cherry-cola.svg",
+    "name": "Jade · Cherry Cola"
+  },
+  {
+    "src": "/avatars/silk-opal-mint.svg",
+    "name": "Silk · Opal Mint"
+  },
+  {
+    "src": "/avatars/flare-opal-mint.svg",
+    "name": "Flare · Opal Mint"
+  },
+  {
+    "src": "/avatars/nova-opal-mint.svg",
+    "name": "Nova · Opal Mint"
+  },
+  {
+    "src": "/avatars/jade-opal-mint.svg",
+    "name": "Jade · Opal Mint"
+  },
+  {
+    "src": "/avatars/silk-peach-lilac.svg",
+    "name": "Silk · Peach Lilac"
+  },
+  {
+    "src": "/avatars/flare-peach-lilac.svg",
+    "name": "Flare · Peach Lilac"
+  },
+  {
+    "src": "/avatars/nova-peach-lilac.svg",
+    "name": "Nova · Peach Lilac"
+  },
+  {
+    "src": "/avatars/jade-peach-lilac.svg",
+    "name": "Jade · Peach Lilac"
+  },
+  {
+    "src": "/avatars/silk-cyan-flame.svg",
+    "name": "Silk · Cyan Flame"
+  },
+  {
+    "src": "/avatars/flare-cyan-flame.svg",
+    "name": "Flare · Cyan Flame"
+  },
+  {
+    "src": "/avatars/nova-cyan-flame.svg",
+    "name": "Nova · Cyan Flame"
+  },
+  {
+    "src": "/avatars/jade-cyan-flame.svg",
+    "name": "Jade · Cyan Flame"
+  },
+  {
+    "src": "/avatars/silk-orchid-night.svg",
+    "name": "Silk · Orchid Night"
+  },
+  {
+    "src": "/avatars/flare-orchid-night.svg",
+    "name": "Flare · Orchid Night"
+  },
+  {
+    "src": "/avatars/nova-orchid-night.svg",
+    "name": "Nova · Orchid Night"
+  },
+  {
+    "src": "/avatars/jade-orchid-night.svg",
+    "name": "Jade · Orchid Night"
+  },
+  {
+    "src": "/avatars/silk-pistachio-blush.svg",
+    "name": "Silk · Pistachio Blush"
+  },
+  {
+    "src": "/avatars/flare-pistachio-blush.svg",
+    "name": "Flare · Pistachio Blush"
+  },
+  {
+    "src": "/avatars/nova-pistachio-blush.svg",
+    "name": "Nova · Pistachio Blush"
+  },
+  {
+    "src": "/avatars/jade-pistachio-blush.svg",
+    "name": "Jade · Pistachio Blush"
+  },
+  {
+    "src": "/avatars/silk-lagoon-gold.svg",
+    "name": "Silk · Lagoon Gold"
+  },
+  {
+    "src": "/avatars/flare-lagoon-gold.svg",
+    "name": "Flare · Lagoon Gold"
+  },
+  {
+    "src": "/avatars/nova-lagoon-gold.svg",
+    "name": "Nova · Lagoon Gold"
+  },
+  {
+    "src": "/avatars/jade-lagoon-gold.svg",
+    "name": "Jade · Lagoon Gold"
+  },
+  {
+    "src": "/avatars/silk-vanilla-sky.svg",
+    "name": "Silk · Vanilla Sky"
+  },
+  {
+    "src": "/avatars/flare-vanilla-sky.svg",
+    "name": "Flare · Vanilla Sky"
+  },
+  {
+    "src": "/avatars/nova-vanilla-sky.svg",
+    "name": "Nova · Vanilla Sky"
+  },
+  {
+    "src": "/avatars/jade-vanilla-sky.svg",
+    "name": "Jade · Vanilla Sky"
+  }
+]

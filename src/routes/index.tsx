@@ -1,14 +1,55 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
+import { ArrowRight, Plus } from 'lucide-react'
+import { loadViewer } from '../lib/loaders'
+import { AuthLayout } from '../components/auth-layout'
+import { Avatar } from '../components/ui'
+import { roleLabels } from '../shared/contracts'
 
-export const Route = createFileRoute('/')({ component: Home })
-
-function Home() {
+export const Route = createFileRoute('/')({
+  loader: async () => {
+    const data = await loadViewer()
+    if (!data) throw redirect({ to: '/sign-in', search: { email: '', next: '', reset: false } })
+    if (data.workspaces.length === 0) throw redirect({ to: '/onboarding/company' })
+    if (data.workspaces.length === 1) {
+      const company = data.workspaces[0]
+      if (!company.profileCompleted)
+        throw redirect({ href: `/w/${company.slug}/onboarding/profile` })
+      throw redirect({
+        href: `/w/${company.slug}`,
+      })
+    }
+    return data
+  },
+  component: WorkspacePicker,
+})
+function WorkspacePicker() {
+  const data = Route.useLoaderData()
   return (
-    <main className="flex min-h-dvh items-center justify-center p-6">
-      <div className="max-w-lg text-center">
-        <h1 className="text-4xl font-semibold tracking-tight">Rekann</h1>
-        <p className="mt-3 text-base text-neutral-600">Lightweight people workspace for small teams.</p>
+    <AuthLayout title="Choose your workspace" subtitle="Where would you like to work today?">
+      <div className="workspace-picker">
+        {data.workspaces.map((company) => (
+          <a
+            className="workspace-choice"
+            key={company.id}
+            href={
+              company.profileCompleted
+                ? `/w/${company.slug}`
+                : `/w/${company.slug}/onboarding/profile`
+            }
+          >
+            <Avatar name={company.name} />
+            <span>
+              <strong>{company.name}</strong>
+              <small>{roleLabels[company.role]}</small>
+            </span>
+            <ArrowRight size={18} />
+          </a>
+        ))}
+        <a className="button secondary" href="/onboarding/company">
+          <Plus size={16} />
+          Create a workspace
+        </a>
       </div>
-    </main>
+    </AuthLayout>
   )
 }

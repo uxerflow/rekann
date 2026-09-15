@@ -31,6 +31,8 @@ jobs:
         run: pnpm build
       - name: Typecheck
         run: pnpm typecheck
+      - name: Unit tests
+        run: pnpm test:unit
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
