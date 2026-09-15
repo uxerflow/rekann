@@ -1,5 +1,7 @@
 # Auth design foundations
 
+Onboarding Back follows Figma node `288:15500`: white secondary button, 80 × 36 px on desktop, 10 px radius, 1 px `#e5e5e5` border, Inter Medium 14/20 px, and no arrow icon. Reuse the shared secondary hover and focus states; retain the 44 px mobile touch target.
+
 Source: Rekann Figma Auth section, inspected through the local figma-cli bridge on September 15, 2026. The follow-up fidelity pass reads individual component variants, not the extractor's suggested defaults. Shared primitives live in `src/components/ui.tsx`; semantic tokens and layout live in `src/styles.css`.
 
 | Foundation                     | Measured value                                                                            |
@@ -34,7 +36,7 @@ References: login `196:5126`, company filled `209:5295`, profile empty `209:7394
 
 The brand, lanyard, background, and auth/form glyphs are exported from Figma. They are local assets, not approximate CSS drawings. CSS retains the structural card containers because their content must update with the user's input. Lucide remains available for new screens with no supplied icon reference.
 
-The product decisions still apply: Google sign-in is disabled; English copy is edited for clarity; recovery/help links remain available. Email-only auth therefore omits the Google button and separator rather than leaving a nonfunctional control. Auth labels are visually hidden but remain programmatically associated with their fields. Password guidance and validation stay visible where needed. The owner flow has company, profile, and optional personal-details steps; invited employees have the latter two. Workspace time zone initializes from the browser, with UTC during SSR. Required company description, last name, and job title match the supplied field labels and are validated on both client and server.
+The product decisions still apply: Google sign-in is disabled; English copy is edited for clarity; recovery/help links remain available. Email-only auth therefore omits the Google button and separator rather than leaving a nonfunctional control. Auth labels are visually hidden but remain programmatically associated with their fields. Password guidance and validation stay visible where needed. Workspace creators complete exactly two steps: company details, then their profile with “Go to workspace.” Invited employees complete profile and optional employee details in a separate two-step flow, regardless of their assigned role. Workspace time zone initializes from the browser, with UTC during SSR. Required company description, last name, and job title match the supplied field labels and are validated on both client and server.
 
 `tests/visual.spec.ts` compares browser bounds at 1440 × 936 against the values above with a 1 px tolerance, checks exact focus/color/radius properties, captures empty/focused/filled states, and exercises avatar choice and step-back state retention. Mobile is a responsive adaptation: decorative previews are hidden and controls retain 44 px touch height. Raster text rendering may differ by browser/OS; the measured dimensions and color tokens are the review contract.
 

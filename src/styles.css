@@ -355,6 +355,9 @@ input[type='checkbox'] {
   color: var(--color-muted);
   font-size: 13px;
 }
+.onboarding-back {
+  min-width: 80px;
+}
 .notice {
   display: flex;
   align-items: flex-start;

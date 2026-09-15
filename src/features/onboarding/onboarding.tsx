@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { avatarInitials, initialAvatar } from '../../lib/initial-avatar'
-import { ArrowLeft } from 'lucide-react'
 import { api, messageOf, signOut } from '../../lib/api'
+import { loadWorkspace } from '../../lib/loaders'
 import {
   Avatar,
   Brand,
@@ -24,7 +24,7 @@ function OnboardingLayout({
   caption,
   title,
   profile = false,
-  totalSteps = 3,
+  totalSteps = 2,
 }: {
   step: number
   children: React.ReactNode
@@ -88,13 +88,21 @@ const industries = [
   'Technology',
   'Other',
 ]
-export function CompanyOnboarding() {
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [country, setCountry] = useState('')
-  const [industry, setIndustry] = useState('')
-  const [timeZone, setTimeZone] = useState('UTC')
-  useEffect(() => setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone), [])
+export function CompanyOnboarding({
+  company,
+  onContinue,
+}: {
+  company?: WorkspaceDetails['workspace']
+  onContinue?: (company: WorkspaceDetails['workspace']) => void
+} = {}) {
+  const [name, setName] = useState(company?.name || '')
+  const [description, setDescription] = useState(company?.description || '')
+  const [country, setCountry] = useState(company?.country || '')
+  const [industry, setIndustry] = useState(company?.industry || '')
+  const [timeZone, setTimeZone] = useState(company?.timeZone || 'UTC')
+  useEffect(() => {
+    if (!company) setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+  }, [company])
   const [logo, setLogo] = useState('')
   const [createdId, setCreatedId] = useState('')
   const [busy, setBusy] = useState(false)
@@ -109,11 +117,21 @@ export function CompanyOnboarding() {
     }
     setBusy(true)
     try {
-      const result = createdId
-        ? { id: createdId }
-        : await api<{ id: string }>('workspace/create', parsed.data)
-      setCreatedId(result.id)
+      const result = company
+        ? await api<{ id: string }>('workspace/onboarding-update', {
+            ...parsed.data,
+            workspaceId: company.id,
+          })
+        : createdId
+          ? { id: createdId }
+          : await api<{ id: string }>('workspace/create', parsed.data)
+      if (!company) setCreatedId(result.id)
       if (logo) await api('media', { workspaceId: result.id, kind: 'logo', data: logo })
+      if (company && onContinue) {
+        const refreshed = logo ? await loadWorkspace({ data: { id: company.id } }) : null
+        onContinue(refreshed?.workspace || { ...company, ...parsed.data })
+        return
+      }
       window.location.assign(`/onboarding/profile?workspaceId=${result.id}`)
     } catch (error) {
       setError(messageOf(error))
@@ -128,7 +146,7 @@ export function CompanyOnboarding() {
       preview={
         <div className="company-preview">
           <div className="preview-inner">
-            <Avatar name={name} image={logo} large placeholder />
+            <Avatar name={name} image={logo || mediaUrl(company?.logoKey)} large placeholder />
             <h2>{name || 'Company name'}</h2>
             {description ? (
               <p>{description}</p>
@@ -160,7 +178,11 @@ export function CompanyOnboarding() {
       <form onSubmit={submit}>
         <FormFields busy={busy}>
           <Notice>{error}</Notice>
-          <ImagePicker label="Company logo" value={logo} onChange={setLogo} />
+          <ImagePicker
+            label="Company logo"
+            value={logo || mediaUrl(company?.logoKey) || ''}
+            onChange={setLogo}
+          />
           <Field
             label="Company name"
             value={name}
@@ -204,7 +226,14 @@ export function CompanyOnboarding() {
             disabled={!!createdId || busy}
           />
           <div className="form-actions">
-            <Button busy={busy} type="submit">
+            <Button
+              busy={busy}
+              type="submit"
+              disabled={
+                !workspaceInput.safeParse({ name, description, country, industry, timeZone })
+                  .success
+              }
+            >
               Continue
             </Button>
           </div>
@@ -220,8 +249,11 @@ export function ProfileOnboarding({
   data: WorkspaceDetails
   editing?: boolean
 }) {
-  const [detailsStep, setDetailsStep] = useState(editing)
-  const isEmployee = data.employee.role !== 'admin'
+  const [employeeDetailsStep, setDetailsStep] = useState(false)
+  const [companyStep, setCompanyStep] = useState(false)
+  const [company, setCompany] = useState(data.workspace)
+  const isWorkspaceCreator = data.workspace.createdBy === data.employee.userId
+  const detailsStep = editing || (!isWorkspaceCreator && employeeDetailsStep)
   const initial = data.employee
   const [firstName, setFirstName] = useState(initial.firstName)
   const [lastName, setLastName] = useState(initial.lastName)
@@ -254,7 +286,7 @@ export function ProfileOnboarding({
       setError(parsed.error.issues[0].message)
       return
     }
-    if (!editing && !detailsStep) {
+    if (!editing && !isWorkspaceCreator && !detailsStep) {
       setDetailsStep(true)
       window.scrollTo({ top: 0 })
       return
@@ -269,12 +301,23 @@ export function ProfileOnboarding({
       setBusy(false)
     }
   }
+  if (companyStep)
+    return (
+      <CompanyOnboarding
+        company={company}
+        onContinue={(updated) => {
+          setCompany(updated)
+          setCompanyStep(false)
+          window.scrollTo({ top: 0 })
+        }}
+      />
+    )
   return (
     <OnboardingLayout
-      step={editing ? 2 : isEmployee ? (detailsStep ? 2 : 1) : detailsStep ? 3 : 2}
-      totalSteps={isEmployee && !editing ? 2 : 3}
+      step={editing || isWorkspaceCreator ? 2 : detailsStep ? 2 : 1}
+      totalSteps={2}
       profile
-      title={detailsStep && !editing ? 'Personal details' : 'Personal information'}
+      title={detailsStep && !editing ? 'Employee details' : 'Your profile'}
       caption="Your profile helps your team get to know you. This is how your name, photo, and job title will appear in your workspace."
       preview={
         <div className="profile-preview">
@@ -397,27 +440,49 @@ export function ProfileOnboarding({
             </>
           )}
           <div className="form-actions">
+            {isWorkspaceCreator && !editing && (
+              <button
+                type="button"
+                className="button secondary onboarding-back"
+                onClick={() => {
+                  setCompanyStep(true)
+                  setError('')
+                  window.scrollTo({ top: 0 })
+                }}
+              >
+                Back
+              </button>
+            )}
             {detailsStep && !editing && (
               <button
                 type="button"
-                className="text-button back-link"
+                className="button secondary onboarding-back"
                 onClick={() => {
                   setDetailsStep(false)
                   setError('')
                 }}
               >
-                <ArrowLeft size={14} />
                 Back
               </button>
             )}
             {editing && (
-              <a className="back-link" href={`/workspace/${data.workspace.id}`}>
-                <ArrowLeft size={14} />
+              <a
+                className="button secondary onboarding-back"
+                href={`/workspace/${data.workspace.id}`}
+              >
                 Back
               </a>
             )}
-            <Button busy={busy} type="submit">
-              {editing ? 'Save changes' : detailsStep ? 'Go to workspace' : 'Continue'}
+            <Button
+              busy={busy}
+              type="submit"
+              disabled={!firstName.trim() || !lastName.trim() || !jobTitle.trim()}
+            >
+              {editing
+                ? 'Save changes'
+                : isWorkspaceCreator || detailsStep
+                  ? 'Go to workspace'
+                  : 'Continue'}
             </Button>
           </div>
         </FormFields>

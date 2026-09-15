@@ -25,6 +25,7 @@ export const workspaceInput = z
     }, 'Select a valid time zone.'),
   })
   .strict()
+export const workspaceUpdateInput = workspaceInput.extend({ workspaceId: id })
 export const profileInput = z
   .object({
     workspaceId: id,

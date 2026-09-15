@@ -97,6 +97,16 @@ test('workspace isolation, invitations, manager permissions, concurrency, and im
   const otherId = await company(stranger, 'E2E Other ' + crypto.randomUUID().slice(0, 8))
   await profile(admin, workspaceId)
   await profile(stranger, otherId)
+  const companyUpdate = {
+    workspaceId,
+    name: 'Changed company',
+    description: 'Updated details',
+    country: 'Indonesia',
+    industry: 'Technology',
+    timeZone: 'Asia/Jakarta',
+  }
+  await post(admin, 'workspace/onboarding-update', companyUpdate, 403)
+  await post(stranger, 'workspace/onboarding-update', companyUpdate, 403)
   expect((await employee.get(`/api/app/workspace?id=${workspaceId}`)).status()).toBe(403)
   expect((await admin.get(`/api/app/workspace?id=${otherId}`)).status()).toBe(403)
   const token = await invite(admin, workspaceId, employeeEmail)
@@ -106,6 +116,7 @@ test('workspace isolation, invitations, manager permissions, concurrency, and im
     post(employee, 'invitation/accept', { token }),
   ])
   expect(accepted.every((a) => a.workspaceId === workspaceId)).toBe(true)
+  await post(employee, 'workspace/onboarding-update', companyUpdate, 403)
   await profile(employee, workspaceId, 'Taylor')
   let main = await details(admin, workspaceId)
   expect(main.employees).toHaveLength(2)

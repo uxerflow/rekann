@@ -105,6 +105,7 @@ export function WorkspaceScreen({
           <button
             className="icon-button"
             aria-label="Sign out"
+            disabled={!hydrated}
             onClick={() => void signOut().catch((e) => setError(messageOf(e)))}
           >
             <LogOut size={18} />

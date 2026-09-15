@@ -94,12 +94,12 @@ test('Figma desktop dimensions, field states, onboarding cards, and avatar selec
     height: 258,
   })
   await bounds(page.getByLabel('First name'), { x: 720, y: 376, width: 232, height: 36 })
-  await bounds(page.getByRole('button', { name: 'Continue', exact: true }), {
-    x: 1115,
-    y: 522,
-    width: 85,
-    height: 36,
-  })
+  const finishButton = await page
+    .getByRole('button', { name: 'Go to workspace', exact: true })
+    .boundingBox()
+  expect(finishButton!.y).toBe(522)
+  expect(finishButton!.height).toBe(36)
+  expect(finishButton!.x + finishButton!.width).toBe(1200)
   await bounds(page.getByRole('button', { name: 'Choose avatar', exact: true }), {
     x: 808,
     y: 288,
@@ -178,12 +178,8 @@ test('Figma desktop dimensions, field states, onboarding cards, and avatar selec
   await page.getByLabel('Last name').fill('Carter')
   await page.getByRole('heading').first().click()
   await page.screenshot({ path: 'test-results/screens/profile-filled-1440.png' })
-  await page.getByRole('button', { name: 'Continue', exact: true }).click()
-  await expect(page.getByText('Step 3/3')).toBeVisible()
-  await page.getByRole('button', { name: 'Back', exact: true }).click()
-  await expect(page.getByLabel('First name')).toHaveValue('Alex')
-  await expect(page.locator('.profile-preview img[src^="data:image/png"]')).toBeVisible()
-  await page.getByRole('button', { name: 'Continue', exact: true }).click()
+  await expect(page.getByText('Step 2/2')).toBeVisible()
+  await expect(page.getByLabel('Phone number')).toHaveCount(0)
   await page.getByRole('button', { name: 'Go to workspace', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Welcome, Alex' })).toBeVisible()
   await owner.dispose()

@@ -2,6 +2,8 @@
 
 Updated: September 15, 2026.
 
+Workspace onboarding now has exactly two steps: company details → creator profile → workspace. Back reopens saved company details without creating another workspace and retains the profile draft. Primary onboarding actions stay disabled until required fields are filled. Company edits are restricted server-side to the creator before profile completion. Optional phone and birth information belongs to the separate invited Employee flow, which retains profile → employee details. Flow selection compares the membership user with the workspace creator, rather than relying on Admin role. Profile editing still exposes personal details. Existing personal data is preserved.
+
 ## Current phase
 
 Auth & Workspace implemented on `feat/auth-workspace`, following the owner's approval and review of the Figma Auth section. PRD, SRS, and SDD were read from Notion. The owner requested that Resend and remaining production service configuration happen after implementation. The previously deployed foundation is recorded below; this auth branch has not been deployed remotely.

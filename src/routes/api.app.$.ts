@@ -26,6 +26,8 @@ async function handle({ request }: { request: Request }) {
     switch (operation) {
       case 'workspace/create':
         return json(await service.createWorkspace(db, viewer, body))
+      case 'workspace/onboarding-update':
+        return json(await service.updateOnboardingCompany(db, viewer, body))
       case 'profile/save':
         return json(await service.saveProfile(db, viewer, body))
       case 'invitation/create':

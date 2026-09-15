@@ -161,6 +161,17 @@ export async function createWorkspace(db: Database, viewer: Identity, raw: unkno
     return { id }
   })
 }
+export async function updateOnboardingCompany(db: Database, viewer: Identity, raw: unknown) {
+  const { workspaceId, ...data } = inputs.workspaceUpdateInput.parse(raw)
+  return db.transaction(async (tx) => {
+    const { company, employee } = await authorize(tx, viewer.id, workspaceId, true)
+    if (company.createdBy !== viewer.id || employee.profileCompleted)
+      throw new AppError(403, 'Only the workspace creator can update this onboarding step.')
+    await tx.update(workspace).set(data).where(eq(workspace.id, workspaceId))
+    await audit(tx, workspaceId, viewer.id, 'workspace.updated')
+    return { id: workspaceId }
+  })
+}
 export async function saveProfile(db: Database, viewer: Identity, raw: unknown) {
   const { workspaceId, ...data } = inputs.profileInput.parse(raw)
   return db.transaction(async (tx) => {
