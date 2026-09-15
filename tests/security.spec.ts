@@ -130,8 +130,8 @@ test('workspace isolation, invitations, manager permissions, concurrency, and im
     {
       workspaceId,
       firstName: 'Tampered',
-      lastName: '',
-      jobTitle: '',
+      lastName: 'Person',
+      jobTitle: 'Designer',
       phone: '',
       birthDate: '',
       birthPlace: '',

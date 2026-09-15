@@ -14,7 +14,7 @@ cp .env.example .dev.vars
 openssl rand -hex 32
 ```
 
-Set `BETTER_AUTH_SECRET` to the generated value in `.dev.vars`. Set `DATABASE_URL` to a **development** Neon database connection and keep `BETTER_AUTH_URL=http://127.0.0.1:3000`, `APP_ENV=local`, and `EMAIL_DELIVERY=local`. Never commit this file or paste its values into issues or pull requests.
+Set `BETTER_AUTH_SECRET` to the generated value in `.dev.vars`. Set `DATABASE_URL` to a **development** Neon database connection and keep `BETTER_AUTH_URL=http://127.0.0.1:4310`, `APP_ENV=local`, and `EMAIL_DELIVERY=local`. Never commit this file or paste its values into issues or pull requests.
 
 ```sh
 pnpm db:migrate
@@ -31,7 +31,7 @@ pnpm mail:dev
 pnpm dev
 ```
 
-- Application: http://127.0.0.1:3000
+- Application: http://127.0.0.1:4310
 - Local inbox: http://127.0.0.1:8025
 
 Create an account in the application and copy its real verification code from the local inbox. No email is sent externally in local-delivery mode. The inbox holds messages in memory and clears them when stopped. Local R2 images are persisted by Wrangler under ignored `.wrangler/` state.
@@ -52,7 +52,7 @@ pnpm audit
 
 Unit tests require no credentials or browser. End-to-end tests run against the configured local application and development database, use synthetic `@example.test` accounts, and capture email in the local inbox. They exercise real Better Auth handlers, Neon transactions, workspace permissions, and local R2 access. Do not point them at production. Some expiry fixtures update only the test invitation they created. Test-created workspaces/accounts remain in the development branch; screenshots are ignored under `test-results/screens/`.
 
-`pnpm preview` runs the production build locally at port 4173. Its `BETTER_AUTH_URL` must match the preview origin for authentication. To verify the build with the default local configuration, stop the development server and run `pnpm exec vite preview --host 127.0.0.1 --port 3000` instead.
+`pnpm preview` runs the production build locally at port 4310, matching the development auth origin. Stop the development server before starting preview. Rekann uses its own port to avoid colliding with other projects.
 
 `pnpm cf-typegen` regenerates Workers types. TanStack generates `src/routeTree.gen.ts` during build/dev. Do not edit generated files. `pnpm format` and `pnpm format:check` use Prettier.
 

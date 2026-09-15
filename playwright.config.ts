@@ -12,7 +12,7 @@ export default defineConfig({
     { name: 'e2e', testIgnore: '**/unit.spec.ts' },
   ],
   use: {
-    baseURL: 'http://127.0.0.1:3000',
+    baseURL: 'http://127.0.0.1:4310',
     headless: true,
     actionTimeout: 15_000,
     navigationTimeout: 30_000,
@@ -29,7 +29,7 @@ export default defineConfig({
         },
         {
           command: 'corepack pnpm dev',
-          url: 'http://127.0.0.1:3000/sign-in',
+          url: 'http://127.0.0.1:4310/sign-in',
           reuseExistingServer: true,
           timeout: 120_000,
         },

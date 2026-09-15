@@ -7,13 +7,14 @@ test('desktop signup, verification, onboarding, image upload, team, and access s
 }) => {
   test.setTimeout(240_000)
   await page.setExtraHTTPHeaders({ 'x-forwarded-for': '198.51.100.150' })
-  await page.setViewportSize({ width: 1440, height: 1000 })
+  await page.setViewportSize({ width: 1440, height: 936 })
   const errors: string[] = []
   page.on('pageerror', (error) => errors.push(error.message))
   const email = uniqueEmail('browser')
   mkdirSync('test-results/screens', { recursive: true })
   await page.goto('/sign-in')
-  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Welcome to Rekann' })).toBeVisible()
+  await expect(page.getByLabel('Email address')).toBeEnabled()
   await page.screenshot({ path: 'test-results/screens/sign-in-desktop.png', fullPage: true })
   await page.getByRole('link', { name: 'Create an account', exact: true }).click()
   await page.getByLabel('Email address').fill(email)
@@ -34,7 +35,6 @@ test('desktop signup, verification, onboarding, image upload, team, and access s
     .fill('A small design team making thoughtful digital products.')
   await page.getByLabel('Location').selectOption('Indonesia')
   await page.getByLabel('Industry').selectOption('Design studio')
-  await page.getByLabel('Time zone').selectOption('Asia/Jakarta')
   // Exercise the real browser image conversion and private R2 upload path.
   const image = await page.evaluate(() => {
     const c = document.createElement('canvas')
@@ -56,10 +56,15 @@ test('desktop signup, verification, onboarding, image upload, team, and access s
   await page.getByLabel('First name').fill('Alex')
   await page.getByLabel('Last name').fill('Carter')
   await page.getByLabel('Job title').fill('Founder & Designer')
+  await page.screenshot({ path: 'test-results/screens/profile-desktop.png', fullPage: true })
+  await page.getByRole('button', { name: 'Continue', exact: true }).click()
   await page.getByLabel('Phone number').fill('+62 812 3456 7890')
   await page.getByLabel('Place of birth').fill('Surabaya')
   await page.getByLabel('Date of birth').fill('1995-06-12')
-  await page.screenshot({ path: 'test-results/screens/profile-desktop.png', fullPage: true })
+  await page.screenshot({
+    path: 'test-results/screens/personal-details-desktop.png',
+    fullPage: true,
+  })
   await page.getByRole('button', { name: 'Go to workspace', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Welcome, Alex' })).toBeVisible()
   await expect
@@ -87,7 +92,7 @@ test('desktop signup, verification, onboarding, image upload, team, and access s
   await page.screenshot({ path: 'test-results/screens/access-mobile.png', fullPage: true })
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await page.getByRole('button', { name: 'Sign out', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Welcome to Rekann' })).toBeVisible()
   expect(errors).toEqual([])
 })
 
@@ -119,6 +124,7 @@ test('invited employee joins on mobile and recovers their password', async ({ pa
     fullPage: true,
   })
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await page.getByRole('button', { name: 'Continue', exact: true }).click()
   await page.getByRole('button', { name: 'Go to workspace', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Welcome, Taylor' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Roles & access', exact: true })).toHaveCount(0)

@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from '@tanstack/react-router'
 import { AuthLayout } from '../../components/auth-layout'
-import { Button, Field, FormFields, Notice, PasswordField } from '../../components/ui'
+import { Button, Field, FormFields, Notice, PasswordField, OtpInput } from '../../components/ui'
 import { authRequest, messageOf, safeNext } from '../../lib/api'
 
 export type AuthMode = 'sign-in' | 'sign-up' | 'verify-email' | 'forgot-password' | 'reset-password'
@@ -36,7 +36,7 @@ export function AuthScreen({
     return () => clearTimeout(timer)
   }, [remaining])
   const titles = {
-    'sign-in': 'Welcome back',
+    'sign-in': 'Welcome to Rekann',
     'sign-up': 'Create your account',
     'verify-email': 'Check your email',
     'forgot-password': 'Forgot your password?',
@@ -129,11 +129,12 @@ export function AuthScreen({
     <AuthLayout title={titles[mode]} subtitle={subtitles[mode]}>
       <form onSubmit={submit}>
         <FormFields busy={busy}>
-          <Notice>{error}</Notice>
+          {!isVerify && <Notice>{error}</Notice>}
           <Notice success>{notice}</Notice>
           {!isVerify && !isReset && (
             <Field
               label="Email address"
+              compact
               type="email"
               autoComplete="email"
               autoFocus
@@ -141,32 +142,16 @@ export function AuthScreen({
               onChange={(event) => setEmail(event.target.value)}
               required
               maxLength={254}
-              placeholder="you@company.com"
+              placeholder="Work email address"
             />
           )}
-          {(isVerify || isReset) && (
-            <div className="field">
-              <label htmlFor="verification-code">Verification code</label>
-              <input
-                id="verification-code"
-                className="otp-input"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                pattern="[0-9]{6}"
-                maxLength={6}
-                minLength={6}
-                required
-                value={code}
-                onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
-                autoFocus
-                placeholder="000000"
-                aria-label="6-digit verification code"
-              />
-            </div>
-          )}
+          {(isVerify || isReset) && <OtpInput value={code} onChange={setCode} invalid={!!error} />}
+          {isVerify && <Notice>{error}</Notice>}
           {!isForgot && !isVerify && (
             <PasswordField
+              compact
               label={isReset ? 'New password' : 'Password'}
+              placeholder={isReset ? 'New password' : 'Password'}
               required
               minLength={isSignUp || isReset ? 12 : undefined}
               maxLength={128}
@@ -178,7 +163,9 @@ export function AuthScreen({
           )}
           {(isSignUp || isReset) && (
             <PasswordField
+              compact
               label="Confirm password"
+              placeholder="Confirm password"
               required
               autoComplete="new-password"
               value={confirm}

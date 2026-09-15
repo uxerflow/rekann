@@ -47,7 +47,7 @@ Figma file: `jWSy3bCKjtKfyrToW5zyZ5`, Auth section `290:8653`. Read through the 
 
 Reference screens include Login `196:5126`, Signup `209:5559`, Email verification `209:7075`, Invalid code `209:7180`, Company `209:7221`, Profile `209:7394`, and Employee invitation `209:7725`.
 
-Inter typography, 368 px auth forms, 480 px onboarding forms, white surfaces, green brand, and the original decorative assets are preserved. Action green is darkened for readable white text. Recovery, workspace selection, Team, and Roles & access extend the same visual language. On mobile the decorative preview yields space to the form. The setup indicator reflects the two actual input steps.
+Inter typography, 368 px auth forms, 480 px onboarding forms, white surfaces, green brand, and the original decorative assets are preserved. Actions, borders, radii, focus rings, and control dimensions now use the measured Figma component variants. Recovery, workspace selection, Team, and Roles & access extend the same visual language. On mobile the decorative preview yields space to the form. The owner setup has company, profile, and optional personal-details steps; invited employees complete profile and personal details. The indicator reflects the current step. Company description, last name, and job title are required, matching the supplied labels.
 
 ## Operational boundaries
 

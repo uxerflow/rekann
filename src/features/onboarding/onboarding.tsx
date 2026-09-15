@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Building2, MapPin, ArrowLeft, Check, LogOut } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { api, messageOf, signOut } from '../../lib/api'
 import {
   Avatar,
@@ -12,7 +12,6 @@ import {
   Notice,
 } from '../../components/ui'
 import { workspaceInput, profileInput } from '../../shared/contracts'
-import { timeZones } from '../../shared/time-zones'
 import type { WorkspaceDetails } from '../../server/workspaces'
 
 function OnboardingLayout({
@@ -21,22 +20,31 @@ function OnboardingLayout({
   preview,
   caption,
   title,
+  profile = false,
+  totalSteps = 3,
 }: {
   step: number
   children: React.ReactNode
   preview: React.ReactNode
   caption: string
   title: string
+  profile?: boolean
+  totalSteps?: number
 }) {
   const [error, setError] = useState('')
   return (
     <div className="onboarding-shell">
       <header className="onboarding-header">
         <div className="onboarding-brand">
-          <Brand />
+          <Brand compact />
           <span className="step">
-            <span className="step-dot">{step === 2 ? <Check size={12} /> : '1'}</span> Step {step}{' '}
-            of 2
+            <span className="step-indicator" aria-hidden="true">
+              <span
+                className="step-dot"
+                style={{ '--progress': `${(step / totalSteps) * 100}%` } as React.CSSProperties}
+              />
+            </span>{' '}
+            Step {step}/{totalSteps}
           </span>
         </div>
         <span className="header-label">{title}</span>
@@ -44,12 +52,11 @@ function OnboardingLayout({
           className="button secondary small"
           onClick={() => void signOut().catch((e) => setError(messageOf(e)))}
         >
-          <LogOut size={14} />
           Sign out
         </button>
       </header>
       <div className="onboarding-body">
-        <aside className="onboarding-aside">
+        <aside className={`onboarding-aside ${profile ? 'profile' : 'company'}`}>
           <div className="preview-content">
             {preview}
             <p className="preview-caption">{caption}</p>
@@ -134,29 +141,31 @@ export function CompanyOnboarding() {
     <OnboardingLayout
       step={1}
       title="About your company"
-      caption="A shared home for your team. Here’s how your company will appear in Rekann."
+      caption="Your company profile is ready to bring your team together. This is how your company will appear to everyone in your workspace."
       preview={
         <div className="company-preview">
-          <Avatar name={name} image={logo} large />
-          <h2>{name || 'Company name'}</h2>
-          {description ? (
-            <p>{description}</p>
-          ) : (
-            <div className="skeleton-lines">
-              <i />
-              <i />
-              <i />
+          <div className="preview-inner">
+            <Avatar name={name} image={logo} large placeholder />
+            <h2>{name || 'Company name'}</h2>
+            {description ? (
+              <p>{description}</p>
+            ) : (
+              <div className="skeleton-lines">
+                <i />
+                <i />
+                <i />
+              </div>
+            )}
+            <div className="preview-meta">
+              <span>
+                <img src="/icons/location.svg" alt="" />
+                {country || 'Location'}
+              </span>
+              <span>
+                <img src="/icons/building.svg" alt="" />
+                {industry || 'Industry'}
+              </span>
             </div>
-          )}
-          <div className="preview-meta">
-            <span>
-              <MapPin size={13} />
-              {country || 'Location'}
-            </span>
-            <span>
-              <Building2 size={13} />
-              {industry || 'Industry'}
-            </span>
           </div>
         </div>
       }
@@ -180,10 +189,11 @@ export function CompanyOnboarding() {
           />
           <div className="field">
             <label htmlFor="description">
-              Company description <span className="optional">(optional)</span>
+              Company description<span className="required">*</span>
             </label>
             <textarea
               id="description"
+              required
               maxLength={200}
               rows={3}
               value={description}
@@ -227,25 +237,7 @@ export function CompanyOnboarding() {
               ))}
             </select>
           </div>
-          <div className="field">
-            <label htmlFor="time-zone">Time zone</label>
-            <select
-              id="time-zone"
-              value={timeZone}
-              onChange={(e) => setTimeZone(e.target.value)}
-              disabled={!!createdId}
-            >
-              {[...new Set([timeZone, 'UTC', ...timeZones])].map((v) => (
-                <option key={v}>{v}</option>
-              ))}
-            </select>
-            <p className="hint">Used for your workspace’s dates and times.</p>
-          </div>
           <div className="form-actions">
-            <a href="/" className="back-link">
-              <ArrowLeft size={14} />
-              Back
-            </a>
             <Button busy={busy} type="submit">
               Continue
             </Button>
@@ -262,6 +254,8 @@ export function ProfileOnboarding({
   data: WorkspaceDetails
   editing?: boolean
 }) {
+  const [detailsStep, setDetailsStep] = useState(editing)
+  const isEmployee = data.employee.role !== 'admin'
   const initial = data.employee
   const [firstName, setFirstName] = useState(initial.firstName)
   const [lastName, setLastName] = useState(initial.lastName)
@@ -288,6 +282,11 @@ export function ProfileOnboarding({
       setError(parsed.error.issues[0].message)
       return
     }
+    if (!editing && !detailsStep) {
+      setDetailsStep(true)
+      window.scrollTo({ top: 0 })
+      return
+    }
     setBusy(true)
     try {
       if (image) await api('media', { workspaceId: data.workspace.id, kind: 'avatar', data: image })
@@ -300,97 +299,149 @@ export function ProfileOnboarding({
   }
   return (
     <OnboardingLayout
-      step={2}
-      title="Your profile"
-      caption="Put a face to your name. Your teammates will see your name, photo, and job title."
+      step={editing ? 2 : isEmployee ? (detailsStep ? 2 : 1) : detailsStep ? 3 : 2}
+      totalSteps={isEmployee && !editing ? 2 : 3}
+      profile
+      title={detailsStep && !editing ? 'Personal details' : 'Personal information'}
+      caption="Your profile helps your team get to know you. This is how your name, photo, and job title will appear in your workspace."
       preview={
         <div className="profile-preview">
-          <div className="lanyard" aria-hidden="true" />
-          <div className="badge-slot" aria-hidden="true" />
-          <Avatar
-            name={`${firstName} ${lastName}`}
-            image={image || mediaUrl(initial.avatarKey)}
-            large
-          />
-          <h2>{`${firstName} ${lastName}`.trim() || 'Your name'}</h2>
-          <p>{jobTitle || 'Job title'}</p>
-          <span className="badge-company">{data.workspace.name}</span>
+          <img className="lanyard" src="/images/lanyard.svg" alt="" />
+          <div className="preview-inner">
+            <div className="badge-slot" aria-hidden="true" />
+            <Avatar
+              name={`${firstName} ${lastName}`}
+              image={image || mediaUrl(initial.avatarKey)}
+              large
+              placeholder
+            />
+            <h2 className={firstName || lastName ? undefined : 'preview-placeholder'}>
+              {`${firstName} ${lastName}`.trim() || 'Full Name'}
+            </h2>
+            <p className={jobTitle ? undefined : 'preview-placeholder'}>
+              {jobTitle || 'Job Title'}
+            </p>
+          </div>
         </div>
       }
     >
       <div className="onboarding-heading">
-        <h1>{editing ? 'Edit your profile' : 'Tell us about yourself'}</h1>
-        <p>{editing ? 'Keep your information up to date.' : 'Help your team get to know you.'}</p>
+        <h1>
+          {editing
+            ? 'Edit your profile'
+            : detailsStep
+              ? 'A little more about you'
+              : 'Tell us about yourself'}
+        </h1>
+        <p>
+          {editing
+            ? 'Keep your information up to date.'
+            : detailsStep
+              ? 'These details are optional and only visible to you.'
+              : 'Tell your team a little about you.'}
+        </p>
       </div>
       <form onSubmit={submit}>
         <FormFields busy={busy}>
           <Notice>{error}</Notice>
-          <ImagePicker label="Profile photo" value={image} onChange={setImage} />
-          <div className="field-row">
-            <Field
-              label="First name"
-              autoComplete="given-name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-              maxLength={80}
-              placeholder="Alex"
-            />
-            <Field
-              label="Last name"
-              autoComplete="family-name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              maxLength={80}
-              placeholder="Carter"
-            />
-          </div>
-          <Field
-            label="Job title"
-            autoComplete="organization-title"
-            value={jobTitle}
-            onChange={(e) => setJobTitle(e.target.value)}
-            maxLength={100}
-            placeholder="e.g. Product Designer"
-          />
-          <div className="form-divider">
-            <span>Personal details</span>
-            <p className="hint">Optional. Only you can view these details.</p>
-          </div>
-          <Field
-            label="Phone number"
-            type="tel"
-            autoComplete="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            maxLength={30}
-            placeholder="Include country code"
-          />
-          <div className="field-row">
-            <Field
-              label="Place of birth"
-              value={birthPlace}
-              onChange={(e) => setBirthPlace(e.target.value)}
-              maxLength={100}
-              placeholder="City"
-            />
-            <Field
-              label="Date of birth"
-              type="date"
-              autoComplete="bday"
-              value={birthDate}
-              onChange={(e) => setBirthDate(e.target.value)}
-              min="1900-01-01"
-              max={new Date().toISOString().slice(0, 10)}
-            />
-          </div>
+          {(!detailsStep || editing) && (
+            <>
+              <ImagePicker
+                label="Profile photo"
+                value={image || mediaUrl(initial.avatarKey) || ''}
+                onChange={setImage}
+                avatarName={`${firstName} ${lastName}`}
+              />
+              <div className="field-row">
+                <Field
+                  label="First name"
+                  autoComplete="given-name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                  maxLength={80}
+                  placeholder="e.g. Alex"
+                />
+                <Field
+                  label="Last name"
+                  autoComplete="family-name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  maxLength={80}
+                  placeholder="e.g. Carter"
+                  required
+                />
+              </div>
+              <Field
+                label="Job title"
+                autoComplete="organization-title"
+                value={jobTitle}
+                onChange={(e) => setJobTitle(e.target.value)}
+                maxLength={100}
+                placeholder="e.g. Founder"
+                required
+              />
+            </>
+          )}
+          {detailsStep && (
+            <>
+              {editing && (
+                <div className="form-divider">
+                  <span>Personal details</span>
+                  <p className="hint">Optional. Only you can view these details.</p>
+                </div>
+              )}
+              <Field
+                label="Phone number"
+                type="tel"
+                autoComplete="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                maxLength={30}
+                placeholder="Include country code"
+              />
+              <div className="field-row">
+                <Field
+                  label="Place of birth"
+                  value={birthPlace}
+                  onChange={(e) => setBirthPlace(e.target.value)}
+                  maxLength={100}
+                  placeholder="City"
+                />
+                <Field
+                  label="Date of birth"
+                  type="date"
+                  autoComplete="bday"
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  min="1900-01-01"
+                  max={new Date().toISOString().slice(0, 10)}
+                />
+              </div>
+            </>
+          )}
           <div className="form-actions">
-            <a className="back-link" href={editing ? `/workspace/${data.workspace.id}` : '/'}>
-              <ArrowLeft size={14} />
-              Back
-            </a>
+            {detailsStep && !editing && (
+              <button
+                type="button"
+                className="text-button back-link"
+                onClick={() => {
+                  setDetailsStep(false)
+                  setError('')
+                }}
+              >
+                <ArrowLeft size={14} />
+                Back
+              </button>
+            )}
+            {editing && (
+              <a className="back-link" href={`/workspace/${data.workspace.id}`}>
+                <ArrowLeft size={14} />
+                Back
+              </a>
+            )}
             <Button busy={busy} type="submit">
-              {editing ? 'Save changes' : 'Go to workspace'}
+              {editing ? 'Save changes' : detailsStep ? 'Go to workspace' : 'Continue'}
             </Button>
           </div>
         </FormFields>

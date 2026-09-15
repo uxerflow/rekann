@@ -12,7 +12,7 @@ const text = (max: number) => z.string().trim().max(max)
 export const workspaceInput = z
   .object({
     name: text(100).min(2, 'Enter a company name with at least 2 characters.'),
-    description: text(200),
+    description: text(200).min(1, 'Enter a company description.'),
     country: text(80).min(1, 'Select a country.'),
     industry: text(80).min(1, 'Select an industry.'),
     timeZone: text(100).refine((value) => {
@@ -29,8 +29,8 @@ export const profileInput = z
   .object({
     workspaceId: id,
     firstName: text(80).min(1, 'Enter your first name.'),
-    lastName: text(80),
-    jobTitle: text(100),
+    lastName: text(80).min(1, 'Enter your last name.'),
+    jobTitle: text(100).min(1, 'Enter your job title.'),
     phone: text(30).refine(
       (v) => !v || /^[+()\d\s.-]{5,30}$/.test(v),
       'Enter a valid phone number.',

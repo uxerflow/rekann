@@ -1,5 +1,5 @@
 import { expect, request, type APIRequestContext } from '@playwright/test'
-export const origin = 'http://127.0.0.1:3000'
+export const origin = 'http://127.0.0.1:4310'
 export const password = 'Rekann Testing Passphrase 2026!'
 let count = 20
 export async function client() {

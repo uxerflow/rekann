@@ -17,7 +17,7 @@ test('validation and local email cannot weaken production configuration', () => 
   expect(
     workspaceInput.safeParse({
       name: 'Test',
-      description: '',
+      description: 'A test company',
       country: 'Indonesia',
       industry: 'Technology',
       timeZone: 'Fake/Zone',
@@ -27,8 +27,8 @@ test('validation and local email cannot weaken production configuration', () => 
     profileInput.safeParse({
       workspaceId: 'test',
       firstName: 'Test',
-      lastName: '',
-      jobTitle: '',
+      lastName: 'Carter',
+      jobTitle: 'Designer',
       phone: '',
       birthPlace: '',
       birthDate: '2000-02-31',
