@@ -50,7 +50,7 @@ Password requirements are progressive help: show the hint while the password fie
 
 ## Avatar picker
 
-The picker offers 40 solid colors from Avvvatars (20 light backgrounds and 20 solid accent colors), rendered with initials and contrast-aware black/white text. No Avvvatars shape artwork or runtime package is included. Blank names show a “Y” fallback instead of an empty swatch. Oreo options are restricted to Silk, Flare, Nova, and Jade, using each shape's documented light reference palette. These four static SVGs total 14,100 bytes uncompressed and are requested only after opening the picker. The generator is a development dependency; regenerate with `node scripts/generate-avatars.mjs`. Selection is converted locally to PNG and follows the existing private image upload flow. Attribution is in `THIRD_PARTY_NOTICES.md`.
+The picker offers 40 solid colors from Avvvatars (20 light backgrounds and 20 solid accent colors), rendered with initials and contrast-aware black/white text. No Avvvatars shape artwork or runtime package is included. Blank names show a “Y” fallback instead of an empty swatch. Oreo options are restricted to Silk, Flare, Nova, and Jade across all 40 palettes (160 static SVGs). Show 12 options at a time; Shuffle draws a new batch excluding the visible choices and does not change the user's selected avatar. Only the current batch is loaded. Skeletons reflect actual image decoding, with no artificial delay; failed images are disabled and offer retry. The generator is a development dependency; regenerate assets and their manifest with `node scripts/generate-avatars.mjs`. Selection is converted locally to PNG and follows the existing private image upload flow. Attribution is in `THIRD_PARTY_NOTICES.md`.
 
 ## Dropdowns
 

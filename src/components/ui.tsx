@@ -9,6 +9,7 @@ import {
 } from 'react'
 import { EyeOff, LoaderCircle, ImagePlus, X, CircleAlert } from 'lucide-react'
 import { avatarColors } from '../shared/avatar-colors'
+import { GradientPicker } from './gradient-picker'
 
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
@@ -207,11 +208,11 @@ export function ImagePicker({
     .map((word) => word[0])
     .join('')
     .toUpperCase()
-  async function chooseGradient(shape: string) {
+  async function chooseGradient(src: string) {
     setAvatarBusy(true)
     try {
       const image = new Image()
-      image.src = `/avatars/${shape}.svg`
+      image.src = src
       await image.decode()
       const canvas = document.createElement('canvas')
       canvas.width = canvas.height = 320
@@ -350,27 +351,7 @@ export function ImagePicker({
                   </button>
                 ))}
               </div>
-              <h3 className="avatar-section-title">Gradients</h3>
-              <div className="avatar-gradients">
-                {['Silk', 'Flare', 'Nova', 'Jade'].map((shape) => (
-                  <button
-                    key={shape}
-                    type="button"
-                    disabled={avatarBusy}
-                    className="avatar-gradient"
-                    aria-label={`Choose ${shape} avatar`}
-                    onClick={() => void chooseGradient(shape.toLowerCase())}
-                  >
-                    <img
-                      src={`/avatars/${shape.toLowerCase()}.svg`}
-                      alt=""
-                      width={64}
-                      height={64}
-                    />
-                    <span>{shape}</span>
-                  </button>
-                ))}
-              </div>
+              <GradientPicker disabled={avatarBusy} onChoose={(src) => void chooseGradient(src)} />
               <Notice>{error}</Notice>
             </>
           )}

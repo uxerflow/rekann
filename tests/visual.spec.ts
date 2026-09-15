@@ -114,9 +114,31 @@ test('Figma desktop dimensions, field states, onboarding cards, and avatar selec
   await page.getByRole('button', { name: 'Choose avatar', exact: true }).click()
   await expect(page.getByRole('dialog')).toBeVisible()
   await expect(page.locator('.avatar-option')).toHaveCount(40)
-  await expect(page.locator('.avatar-gradient')).toHaveCount(4)
+  await expect(page.locator('.avatar-gradient')).toHaveCount(12)
+  await expect(page.getByRole('button', { name: 'Shuffle', exact: true })).toBeEnabled()
+  const previousGradients = await page
+    .locator('.avatar-gradient')
+    .evaluateAll((items) => items.map((item) => item.getAttribute('aria-label')))
+  let releaseImages!: () => void
+  const imagesReady = new Promise<void>((resolve) => {
+    releaseImages = resolve
+  })
+  await page.route('**/avatars/*.svg', async (route) => {
+    await imagesReady
+    await route.continue()
+  })
+  await page.getByRole('button', { name: 'Shuffle', exact: true }).click()
+  await expect(page.locator('.avatar-skeleton')).toHaveCount(12)
+  await expect(page.getByRole('button', { name: 'Loading…', exact: true })).toBeDisabled()
+  releaseImages()
+  await expect(page.getByRole('button', { name: 'Shuffle', exact: true })).toBeEnabled()
+  await page.unroute('**/avatars/*.svg')
+  const nextGradients = await page
+    .locator('.avatar-gradient')
+    .evaluateAll((items) => items.map((item) => item.getAttribute('aria-label')))
+  expect(nextGradients.every((name) => !previousGradients.includes(name))).toBe(true)
   await page.screenshot({ path: 'test-results/screens/avatar-picker.png' })
-  await page.getByRole('button', { name: 'Choose Jade avatar', exact: true }).click()
+  await page.locator('.avatar-gradient').first().click()
   await expect(page.getByRole('dialog')).not.toBeVisible()
   await expect(page.locator('.profile-preview img[src^="data:image/png"]')).toBeVisible()
   await page.getByRole('button', { name: 'Choose avatar', exact: true }).click()
