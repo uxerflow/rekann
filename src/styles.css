@@ -1216,7 +1216,7 @@ select {
   place-items: center;
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 50%;
+  border-radius: 12px;
   background: #ededed;
 }
 .avatar-skeleton {
@@ -1239,9 +1239,7 @@ select {
 .avatar-gradient:hover .avatar-gradient-visual,
 .avatar-gradient:focus-visible .avatar-gradient-visual {
   border-color: var(--color-brand);
-  box-shadow:
-    0 0 0 2px #fff,
-    0 0 0 4px var(--color-brand);
+  box-shadow: 0 0 0 2px var(--color-brand);
 }
 .avatar-option:hover {
   box-shadow: 0 0 0 2px var(--color-brand);

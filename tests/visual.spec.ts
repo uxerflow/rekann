@@ -120,6 +120,11 @@ test('Figma desktop dimensions, field states, onboarding cards, and avatar selec
   await firstGradient.focus()
   await expect(firstGradient).toHaveCSS('outline-style', 'none')
   await expect(firstGradient.locator('.avatar-gradient-visual')).toHaveCSS('border-radius', '12px')
+  const firstColor = page.locator('.avatar-option').first()
+  await firstColor.hover()
+  const colorHover = await firstColor.evaluate((element) => getComputedStyle(element).boxShadow)
+  await firstGradient.hover()
+  await expect(firstGradient.locator('.avatar-gradient-visual')).toHaveCSS('box-shadow', colorHover)
   const previousGradients = await page
     .locator('.avatar-gradient')
     .evaluateAll((items) => items.map((item) => item.getAttribute('aria-label')))
