@@ -52,6 +52,9 @@ importers:
       '@cloudflare/vite-plugin':
         specifier: 1.54.4
         version: 1.54.4(@types/node@24.13.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.13))(wrangler@4.129.0(@types/node@24.13.3))
+      '@oreo-design/avatar':
+        specifier: 0.1.0
+        version: 0.1.0(react@19.2.8)
       '@playwright/test':
         specifier: 1.62.1
         version: 1.62.1
@@ -845,6 +848,16 @@ packages:
   '@opentelemetry/semantic-conventions@1.43.0':
     resolution: {integrity: sha512-eSYWTm620tTk45EKSedaUL8MFYI8hW164hIXsgIHyxu3VobUB3fFCu5t0hQby6OoWRPsG1KkKUG2M5UadiLiVg==}
     engines: {node: '>=14'}
+
+  '@oreo-design/avatar@0.1.0':
+    resolution: {integrity: sha512-+CF6a5r7C0tuDu2+dFlwj/txrrVvmZbKD9BiBzGGIjrwJxHV/qs3Y/6q2jpgo8on1GVOpv9HvTg/g6Fk/zEUSw==}
+    engines: {node: '>=20'}
+    hasBin: true
+    peerDependencies:
+      react: '>=18'
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   '@oxc-project/types@0.148.0':
     resolution: {integrity: sha512-Nm4s/jB+4FpFsPhWGEC4h7rzksesmtnMXomo6rCMcg/b8zLQuOziRgkCS1fxDCXOlJB/6Q8oABOZ/OP6RIPj9A==}
@@ -2711,6 +2724,10 @@ snapshots:
   '@oozcitak/util@10.0.0': {}
 
   '@opentelemetry/semantic-conventions@1.43.0': {}
+
+  '@oreo-design/avatar@0.1.0(react@19.2.8)':
+    optionalDependencies:
+      react: 19.2.8
 
   '@oxc-project/types@0.148.0': {}
 

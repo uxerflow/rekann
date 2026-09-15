@@ -48,6 +48,10 @@ Use semantic cursors for every interactive state. Links, enabled buttons, select
 
 Password requirements are progressive help: show the hint while the password field or its visibility toggle is focused. After leaving, keep it visible only when a visited, nonempty password is below the minimum length. Empty untouched forms stay compact. Valid or cleared passwords hide the hint on blur. Apply the same behavior to account creation and password recovery, retaining the input's accessible description while help is visible.
 
+## Avatar picker
+
+The picker offers 40 solid colors from Avvvatars (20 light backgrounds and 20 solid accent colors), rendered with initials and contrast-aware black/white text. No Avvvatars shape artwork or runtime package is included. Blank names show a “Y” fallback instead of an empty swatch. Oreo options are restricted to Silk, Flare, Nova, and Jade, using each shape's documented light reference palette. These four static SVGs total 14,100 bytes uncompressed and are requested only after opening the picker. The generator is a development dependency; regenerate with `node scripts/generate-avatars.mjs`. Selection is converted locally to PNG and follows the existing private image upload flow. Attribution is in `THIRD_PARTY_NOTICES.md`.
+
 ## Dropdowns
 
 Interaction follow-up: [Fluid scrollbars](https://www.fluidfunctionalism.com/docs/scrollbars), [motion](https://www.fluidfunctionalism.com/docs/motion), and [fluid hover](https://www.fluidfunctionalism.com/docs/fluid-hover) inform the implementation. Rekann adapts these patterns with Radix ScrollArea and Framer Motion, rather than importing the entire Fluid component registry. Desktop scroll thumbs rest at 3 px and expand to 6 px within a 10 px hit area; the track stays transparent. Overflow edges fade only when content remains in that direction. Touch scrolling keeps native physics and hides the custom track.

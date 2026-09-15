@@ -1123,7 +1123,10 @@ select {
   margin-top: 5px;
 }
 .avatar-dialog {
-  width: min(400px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  width: min(480px, calc(100% - 32px));
   padding: 24px;
   border: 1px solid #e5e5e5;
   border-radius: 16px;
@@ -1134,15 +1137,50 @@ select {
 }
 .avatar-options {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin: 24px 0;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  margin: 12px 0 20px;
 }
 .avatar-option {
   aspect-ratio: 1;
   border-radius: 12px;
   border: 1px solid #e5e5e5;
-  font-size: 24px;
+  font-size: 18px;
+}
+.avatar-section-title {
+  margin-top: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.avatar-gradients {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 12px 0 24px;
+}
+.avatar-gradient {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 10px;
+  padding: 4px;
+  background: transparent;
+}
+.avatar-gradient img {
+  width: 100%;
+  height: auto;
+}
+.avatar-gradient:hover {
+  background: var(--color-surface);
+}
+.avatar-option:hover {
+  box-shadow: 0 0 0 2px var(--color-brand);
+}
+@media (max-width: 700px) {
+  .avatar-options {
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
 .workspace-picker {
   display: flex;

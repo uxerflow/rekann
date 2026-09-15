@@ -8,6 +8,7 @@ import {
   type ButtonHTMLAttributes,
 } from 'react'
 import { EyeOff, LoaderCircle, ImagePlus, X, CircleAlert } from 'lucide-react'
+import { avatarColors } from '../shared/avatar-colors'
 
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
@@ -198,37 +199,43 @@ export function ImagePicker({
   const id = useId()
   const [error, setError] = useState('')
   const dialog = useRef<HTMLDialogElement>(null)
-  const colors = [
-    '#1da578',
-    '#5078b8',
-    '#9b68a8',
-    '#c07f3e',
-    '#377e85',
-    '#b86471',
-    '#68734a',
-    '#555d75',
-  ]
-  function chooseAvatar(color: string) {
+  const [avatarPickerOpened, setAvatarPickerOpened] = useState(false)
+  const [avatarBusy, setAvatarBusy] = useState(false)
+  const initials = (avatarName?.trim() || 'You')
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join('')
+    .toUpperCase()
+  async function chooseGradient(shape: string) {
+    setAvatarBusy(true)
+    try {
+      const image = new Image()
+      image.src = `/avatars/${shape}.svg`
+      await image.decode()
+      const canvas = document.createElement('canvas')
+      canvas.width = canvas.height = 320
+      canvas.getContext('2d')!.drawImage(image, 0, 0, 320, 320)
+      onChange(canvas.toDataURL('image/png'))
+      setError('')
+      dialog.current?.close()
+    } catch {
+      setError('Unable to load this avatar. Please try again.')
+    } finally {
+      setAvatarBusy(false)
+    }
+  }
+  function chooseAvatar(color: { background: string; foreground: string }) {
     const canvas = document.createElement('canvas')
     canvas.width = canvas.height = 320
     const context = canvas.getContext('2d')!
-    context.fillStyle = color
+    context.fillStyle = color.background
     context.fillRect(0, 0, 320, 320)
-    context.fillStyle = '#fff'
+    context.fillStyle = color.foreground
     context.font = '500 120px Inter'
     context.textAlign = 'center'
     context.textBaseline = 'middle'
-    context.fillText(
-      (avatarName || 'You')
-        .trim()
-        .split(/\s+/)
-        .slice(0, 2)
-        .map((v) => v[0])
-        .join('')
-        .toUpperCase(),
-      160,
-      166,
-    )
+    context.fillText(initials, 160, 166)
     onChange(canvas.toDataURL('image/png'))
     dialog.current?.close()
   }
@@ -283,7 +290,10 @@ export function ImagePicker({
               <Button
                 className="secondary small"
                 type="button"
-                onClick={() => dialog.current?.showModal()}
+                onClick={() => {
+                  setAvatarPickerOpened(true)
+                  dialog.current?.showModal()
+                }}
               >
                 Choose avatar
               </Button>
@@ -321,26 +331,49 @@ export function ImagePicker({
           }}
         >
           <h2 id={`${id}-avatar-title`}>Choose an avatar</h2>
-          <div className="avatar-options">
-            {colors.map((color, index) => (
-              <button
-                key={color}
-                type="button"
-                className="avatar-option"
-                style={{ background: color, color: '#fff' }}
-                aria-label={`Choose avatar ${index + 1}`}
-                onClick={() => chooseAvatar(color)}
-              >
-                {(avatarName || 'You')
-                  .trim()
-                  .split(/\s+/)
-                  .slice(0, 2)
-                  .map((v) => v[0])
-                  .join('')
-                  .toUpperCase()}
-              </button>
-            ))}
-          </div>
+          <p className="hint">Choose a color or gradient for your profile.</p>
+          {avatarPickerOpened && (
+            <>
+              <h3 className="avatar-section-title">Colors</h3>
+              <div className="avatar-options">
+                {avatarColors.map((color, index) => (
+                  <button
+                    key={color.background}
+                    type="button"
+                    className="avatar-option"
+                    style={{ background: color.background, color: color.foreground }}
+                    disabled={avatarBusy}
+                    aria-label={`Choose avatar ${index + 1}`}
+                    onClick={() => chooseAvatar(color)}
+                  >
+                    {initials}
+                  </button>
+                ))}
+              </div>
+              <h3 className="avatar-section-title">Gradients</h3>
+              <div className="avatar-gradients">
+                {['Silk', 'Flare', 'Nova', 'Jade'].map((shape) => (
+                  <button
+                    key={shape}
+                    type="button"
+                    disabled={avatarBusy}
+                    className="avatar-gradient"
+                    aria-label={`Choose ${shape} avatar`}
+                    onClick={() => void chooseGradient(shape.toLowerCase())}
+                  >
+                    <img
+                      src={`/avatars/${shape.toLowerCase()}.svg`}
+                      alt=""
+                      width={64}
+                      height={64}
+                    />
+                    <span>{shape}</span>
+                  </button>
+                ))}
+              </div>
+              <Notice>{error}</Notice>
+            </>
+          )}
           <Button type="button" className="secondary small" onClick={() => dialog.current?.close()}>
             Cancel
           </Button>
