@@ -1238,7 +1238,6 @@ select {
 }
 .avatar-gradient:hover .avatar-gradient-visual,
 .avatar-gradient:focus-visible .avatar-gradient-visual {
-  border-color: var(--color-brand);
   box-shadow: 0 0 0 2px var(--color-brand);
 }
 .avatar-option:hover {
