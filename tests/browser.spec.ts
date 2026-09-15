@@ -33,8 +33,10 @@ test('desktop signup, verification, onboarding, image upload, team, and access s
   await page
     .getByLabel('Company description')
     .fill('A small design team making thoughtful digital products.')
-  await page.getByLabel('Location').selectOption('Indonesia')
-  await page.getByLabel('Industry').selectOption('Design studio')
+  await page.getByLabel('Location', { exact: false }).click()
+  await page.getByRole('option', { name: 'Indonesia', exact: true }).click()
+  await page.getByRole('combobox', { name: /Industry/ }).click()
+  await page.getByRole('option', { name: 'Design studio', exact: true }).click()
   // Exercise the real browser image conversion and private R2 upload path.
   const image = await page.evaluate(() => {
     const c = document.createElement('canvas')

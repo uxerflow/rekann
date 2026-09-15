@@ -57,3 +57,5 @@ The owner requested a detailed fidelity correction on September 15, 2026. The sa
 Local dev and preview now use port 4310, keeping Rekann separate from other projects using port 3000. The local auth origin and browser tests use the same address.
 
 Newly verified owners with no workspace are routed directly to company onboarding. The workspace chooser only appears when an account has multiple workspaces; invitation redirects remain unchanged.
+
+The owner approved new Location and Industry dropdown designs in Figma on September 15, 2026. Company onboarding now uses these custom menus. Location has searchable ISO country/territory coverage, Indonesia first, then English alphabetical ordering; no IP lookup or automatic selection. Menu states and Figma links are recorded in `docs/DESIGN_SYSTEM.md`.

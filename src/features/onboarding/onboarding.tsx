@@ -12,6 +12,8 @@ import {
   Notice,
 } from '../../components/ui'
 import { workspaceInput, profileInput } from '../../shared/contracts'
+import { countries } from '../../shared/countries'
+import { SelectField } from '../../components/select-field'
 import type { WorkspaceDetails } from '../../server/workspaces'
 
 function OnboardingLayout({
@@ -83,26 +85,6 @@ const industries = [
   'Nonprofit',
   'Retail',
   'Technology',
-  'Other',
-]
-const countries = [
-  'Australia',
-  'Canada',
-  'France',
-  'Germany',
-  'India',
-  'Indonesia',
-  'Japan',
-  'Malaysia',
-  'Netherlands',
-  'New Zealand',
-  'Philippines',
-  'Singapore',
-  'South Korea',
-  'Thailand',
-  'United Kingdom',
-  'United States',
-  'Vietnam',
   'Other',
 ]
 export function CompanyOnboarding() {
@@ -203,40 +185,23 @@ export function CompanyOnboarding() {
             />
             <span className="character-count">{description.length}/200</span>
           </div>
-          <div className="field">
-            <label htmlFor="country">
-              Location <span className="required">*</span>
-            </label>
-            <select
-              id="country"
-              required
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              disabled={!!createdId}
-            >
-              <option value="">Select a country</option>
-              {countries.map((v) => (
-                <option key={v}>{v}</option>
-              ))}
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="industry">
-              Industry <span className="required">*</span>
-            </label>
-            <select
-              id="industry"
-              required
-              value={industry}
-              onChange={(e) => setIndustry(e.target.value)}
-              disabled={!!createdId}
-            >
-              <option value="">Select an industry</option>
-              {industries.map((v) => (
-                <option key={v}>{v}</option>
-              ))}
-            </select>
-          </div>
+          <SelectField
+            label="Location"
+            placeholder="Select a country"
+            value={country}
+            options={countries}
+            onChange={setCountry}
+            searchable
+            disabled={!!createdId || busy}
+          />
+          <SelectField
+            label="Industry"
+            placeholder="Select an industry"
+            value={industry}
+            options={industries}
+            onChange={setIndustry}
+            disabled={!!createdId || busy}
+          />
           <div className="form-actions">
             <Button busy={busy} type="submit">
               Continue

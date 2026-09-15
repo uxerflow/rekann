@@ -70,8 +70,10 @@ test('Figma desktop dimensions, field states, onboarding cards, and avatar selec
   await page
     .getByLabel('Company description')
     .fill('We’re a technology company building products that help people work better together')
-  await page.getByLabel('Location').selectOption('Indonesia')
-  await page.getByLabel('Industry').selectOption('Technology')
+  await page.getByLabel('Location', { exact: false }).click()
+  await page.getByRole('option', { name: 'Indonesia', exact: true }).click()
+  await page.getByRole('combobox', { name: /Industry/ }).click()
+  await page.getByRole('option', { name: 'Technology', exact: true }).click()
   await expect(page.getByLabel('Location')).toHaveCSS('cursor', 'pointer')
   await page.getByRole('heading').first().click()
   await bounds(page.getByRole('button', { name: 'Continue', exact: true }), {
