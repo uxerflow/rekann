@@ -32,10 +32,10 @@ test('Figma desktop dimensions, field states, onboarding cards, and avatar selec
   await expect(email).toHaveCSS('font-family', 'Inter, sans-serif')
   await expect(email).toHaveCSS('font-size', '14px')
   await expect(email).toHaveCSS('border-color', 'rgb(229, 229, 229)')
-  await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toHaveCSS(
-    'background-color',
-    'rgb(29, 165, 120)',
-  )
+  await expect(email).toHaveCSS('cursor', 'text')
+  const signIn = page.getByRole('button', { name: 'Sign in', exact: true })
+  await expect(signIn).toHaveCSS('background-color', 'rgb(29, 165, 120)')
+  await expect(signIn).toHaveCSS('cursor', 'pointer')
   await page.screenshot({ path: 'test-results/screens/auth-default-1440.png' })
   await email.focus()
   await expect(email).toHaveCSS(
@@ -72,6 +72,7 @@ test('Figma desktop dimensions, field states, onboarding cards, and avatar selec
     .fill('We’re a technology company building products that help people work better together')
   await page.getByLabel('Location').selectOption('Indonesia')
   await page.getByLabel('Industry').selectOption('Technology')
+  await expect(page.getByLabel('Location')).toHaveCSS('cursor', 'pointer')
   await page.getByRole('heading').first().click()
   await bounds(page.getByRole('button', { name: 'Continue', exact: true }), {
     x: 1115,

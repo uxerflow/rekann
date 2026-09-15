@@ -3,6 +3,8 @@ dist
 .wrangler
 .tanstack
 .neon
+.agents
+.codex
 .dev.vars*
 .env*
 pnpm-lock.yaml
