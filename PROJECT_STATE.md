@@ -65,3 +65,5 @@ Dropdown interactions now adapt Fluid Functionalism scrollbar, motion, and neare
 Avatar picker now includes 40 Avvvatars-derived solid colors with initials and only four Oreo gradients: Silk, Flare, Nova, and Jade. No avatar generator ships in browser JavaScript; the Oreo generator is development-only, and generated SVGs load on picker opening. Selection retains the existing PNG/private upload path. Source licenses are preserved in THIRD_PARTY_NOTICES.md.
 
 Gradient expansion: the four allowed families now span all 40 Oreo palettes (160 combinations). The picker loads 12 per batch, supports Shuffle without changing the selected avatar, displays real loading skeletons, and offers retry for failed images. Browser validation covers disjoint shuffled batches, delayed image loading, and selection/persistence.
+
+Solid-color avatars selected during onboarding now follow live name initials in both previews, retaining the color through the optional-details step and submitting the final PNG. Gradient/photo choices remain independent of the name. Existing image-only selections require color reselection to enable the live behavior.

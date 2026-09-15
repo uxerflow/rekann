@@ -1,4 +1,5 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { avatarInitials, initialAvatar } from '../../lib/initial-avatar'
 import { ArrowLeft } from 'lucide-react'
 import { api, messageOf, signOut } from '../../lib/api'
 import {
@@ -228,7 +229,13 @@ export function ProfileOnboarding({
   const [phone, setPhone] = useState(initial.phone)
   const [birthDate, setBirthDate] = useState(initial.birthDate || '')
   const [birthPlace, setBirthPlace] = useState(initial.birthPlace)
-  const [image, setImage] = useState('')
+  const [uploadedImage, setImage] = useState('')
+  const [avatarColor, setAvatarColor] = useState<number | null>(null)
+  const initials = avatarInitials(`${firstName} ${lastName}`)
+  const image = useMemo(
+    () => (avatarColor === null ? uploadedImage : initialAvatar(avatarColor, initials)),
+    [avatarColor, initials, uploadedImage],
+  )
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   async function submit(event: FormEvent) {
@@ -314,7 +321,11 @@ export function ProfileOnboarding({
               <ImagePicker
                 label="Profile photo"
                 value={image || mediaUrl(initial.avatarKey) || ''}
-                onChange={setImage}
+                onChange={(value) => {
+                  setAvatarColor(null)
+                  setImage(value)
+                }}
+                onColorChange={setAvatarColor}
                 avatarName={`${firstName} ${lastName}`}
               />
               <div className="field-row">

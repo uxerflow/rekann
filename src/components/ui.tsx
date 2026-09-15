@@ -10,6 +10,7 @@ import {
 import { EyeOff, LoaderCircle, ImagePlus, X, CircleAlert } from 'lucide-react'
 import { avatarColors } from '../shared/avatar-colors'
 import { GradientPicker } from './gradient-picker'
+import { avatarInitials, initialAvatar } from '../lib/initial-avatar'
 
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
@@ -168,7 +169,7 @@ export function Avatar({
   return (
     <div className={`avatar ${large ? 'large' : ''}`}>
       {image ? (
-        <img src={image} alt="" />
+        <img key={image} src={image} alt="" className="avatar-image" />
       ) : placeholder ? null : (
         <span>
           {name
@@ -191,23 +192,20 @@ export function ImagePicker({
   value,
   onChange,
   avatarName,
+  onColorChange,
 }: {
   label: string
   value: string
   onChange: (value: string) => void
   avatarName?: string
+  onColorChange?: (index: number) => void
 }) {
   const id = useId()
   const [error, setError] = useState('')
   const dialog = useRef<HTMLDialogElement>(null)
   const [avatarPickerOpened, setAvatarPickerOpened] = useState(false)
   const [avatarBusy, setAvatarBusy] = useState(false)
-  const initials = (avatarName?.trim() || 'You')
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase()
+  const initials = avatarInitials(avatarName || '')
   async function chooseGradient(src: string) {
     setAvatarBusy(true)
     try {
@@ -226,18 +224,9 @@ export function ImagePicker({
       setAvatarBusy(false)
     }
   }
-  function chooseAvatar(color: { background: string; foreground: string }) {
-    const canvas = document.createElement('canvas')
-    canvas.width = canvas.height = 320
-    const context = canvas.getContext('2d')!
-    context.fillStyle = color.background
-    context.fillRect(0, 0, 320, 320)
-    context.fillStyle = color.foreground
-    context.font = '500 120px Inter'
-    context.textAlign = 'center'
-    context.textBaseline = 'middle'
-    context.fillText(initials, 160, 166)
-    onChange(canvas.toDataURL('image/png'))
+  function chooseAvatar(index: number) {
+    if (onColorChange) onColorChange(index)
+    else onChange(initialAvatar(index, initials))
     dialog.current?.close()
   }
   async function read(file?: File) {
@@ -355,7 +344,7 @@ export function ImagePicker({
                     style={{ background: color.background, color: color.foreground }}
                     disabled={avatarBusy}
                     aria-label={`Choose avatar ${index + 1}`}
-                    onClick={() => chooseAvatar(color)}
+                    onClick={() => chooseAvatar(index)}
                   >
                     {initials}
                   </button>

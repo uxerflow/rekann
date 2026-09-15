@@ -1043,6 +1043,17 @@ select {
   height: 100%;
   object-fit: cover;
 }
+.avatar-image {
+  animation: avatar-image-in 160ms ease-out;
+}
+@keyframes avatar-image-in {
+  from {
+    opacity: 0.65;
+  }
+  to {
+    opacity: 1;
+  }
+}
 .avatar.large {
   width: 80px;
   height: 80px;
