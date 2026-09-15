@@ -1218,7 +1218,13 @@ select {
   }
 }
 .avatar-gradient:hover {
-  background: var(--color-surface);
+  background: transparent;
+}
+.avatar-gradient:hover img,
+.avatar-gradient:focus-visible img {
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px var(--color-brand);
 }
 .avatar-option:hover {
   box-shadow: 0 0 0 2px var(--color-brand);

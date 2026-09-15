@@ -214,7 +214,10 @@ export function ImagePicker({
       await image.decode()
       const canvas = document.createElement('canvas')
       canvas.width = canvas.height = 320
-      canvas.getContext('2d')!.drawImage(image, 0, 0, 320, 320)
+      // Oreo assets are circular. Enlarge and center-crop them so square
+      // profile frames do not expose the SVG's white outer corners.
+      const size = 480
+      canvas.getContext('2d')!.drawImage(image, (320 - size) / 2, (320 - size) / 2, size, size)
       onChange(canvas.toDataURL('image/png'))
       setError('')
       dialog.current?.close()
