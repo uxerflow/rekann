@@ -116,6 +116,10 @@ test('Figma desktop dimensions, field states, onboarding cards, and avatar selec
   await expect(page.locator('.avatar-option')).toHaveCount(40)
   await expect(page.locator('.avatar-gradient')).toHaveCount(12)
   await expect(page.getByRole('button', { name: 'Shuffle', exact: true })).toBeEnabled()
+  const firstGradient = page.locator('.avatar-gradient').first()
+  await firstGradient.focus()
+  await expect(firstGradient).toHaveCSS('outline-style', 'none')
+  await expect(firstGradient.locator('.avatar-gradient-visual')).toHaveCSS('border-radius', '12px')
   const previousGradients = await page
     .locator('.avatar-gradient')
     .evaluateAll((items) => items.map((item) => item.getAttribute('aria-label')))

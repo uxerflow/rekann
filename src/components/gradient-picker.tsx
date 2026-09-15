@@ -63,16 +63,17 @@ export function GradientPicker({
             className="avatar-gradient"
             disabled={disabled || !loaded[index]}
             aria-label={`Choose ${item.name} avatar`}
-            title={item.name}
             onClick={() => onChoose(item.src)}
           >
-            {loading ? (
-              <span className="avatar-skeleton" />
-            ) : loaded[index] ? (
-              <img src={item.src} alt="" width={64} height={64} />
-            ) : (
-              <span className="avatar-unavailable">Unavailable</span>
-            )}
+            <span className="avatar-gradient-visual">
+              {loading ? (
+                <span className="avatar-skeleton" />
+              ) : loaded[index] ? (
+                <img src={item.src} alt="" width={64} height={64} />
+              ) : (
+                <span className="avatar-unavailable">Unavailable</span>
+              )}
+            </span>
             <span>{item.name.split(' · ')[0]}</span>
           </button>
         ))}

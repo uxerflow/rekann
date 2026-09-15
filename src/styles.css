@@ -1184,9 +1184,22 @@ select {
   padding: 4px;
   background: transparent;
 }
+.avatar-gradient-visual {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  transition:
+    box-shadow var(--interaction-duration) var(--interaction-easing),
+    border-color var(--interaction-duration) var(--interaction-easing);
+}
 .avatar-gradient img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  transform: scale(1.5);
 }
 .avatar-section-header {
   display: flex;
@@ -1220,8 +1233,12 @@ select {
 .avatar-gradient:hover {
   background: transparent;
 }
-.avatar-gradient:hover img,
-.avatar-gradient:focus-visible img {
+.avatar-gradient:focus-visible {
+  outline: none;
+}
+.avatar-gradient:hover .avatar-gradient-visual,
+.avatar-gradient:focus-visible .avatar-gradient-visual {
+  border-color: var(--color-brand);
   box-shadow:
     0 0 0 2px #fff,
     0 0 0 4px var(--color-brand);
