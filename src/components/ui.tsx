@@ -93,9 +93,24 @@ export function PasswordField({
   ...props
 }: InputHTMLAttributes<HTMLInputElement> & { label?: string; hint?: string; compact?: boolean }) {
   const [visible, setVisible] = useState(false)
+  const [focused, setFocused] = useState(false)
+  const [visited, setVisited] = useState(false)
+  const input = useRef<HTMLInputElement>(null)
+  const value = String(props.value ?? input.current?.value ?? '')
+  const incomplete = visited && value.length > 0 && value.length < (props.minLength ?? 0)
+  const showHint = !!hint && (focused || incomplete)
   const id = useId()
   return (
-    <div className="field">
+    <div
+      className="field"
+      onFocusCapture={() => {
+        setFocused(true)
+        setVisited(true)
+      }}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false)
+      }}
+    >
       <label htmlFor={id} className={compact ? 'sr-only' : undefined}>
         {label}
       </label>
@@ -103,9 +118,10 @@ export function PasswordField({
         {compact && <img src="/icons/password.svg" alt="" className="input-icon" />}
         <input
           {...props}
+          ref={input}
           id={id}
           type={visible ? 'text' : 'password'}
-          aria-describedby={hint ? `${id}-hint` : undefined}
+          aria-describedby={showHint ? `${id}-hint` : undefined}
         />
         <button
           type="button"
@@ -121,7 +137,7 @@ export function PasswordField({
         </button>
       </div>
       {hint && (
-        <p id={`${id}-hint`} className="hint">
+        <p id={`${id}-hint`} className="hint" hidden={!showHint}>
           {hint}
         </p>
       )}

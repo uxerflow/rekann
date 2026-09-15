@@ -43,3 +43,5 @@ Forms and interactive Button components wait for hydration before accepting inpu
 ## Interaction standard
 
 Text links and text buttons never add an underline on hover. Use a subtle darker foreground on hover and press instead, with a shared 160 ms ease-out transition for color, background, border, and shadow. Brand actions use `#1da578` → `#127857` → `#0e6348`; muted and destructive controls retain their semantic color family. Buttons, icons, navigation, and clickable cards use the same smooth transition where relevant, without movement or scaling. Disabled controls do not react. Keep keyboard focus visible and respect reduced-motion preferences. Apply this standard to future relevant components.
+
+Password requirements are progressive help: show the hint while the password field or its visibility toggle is focused. After leaving, keep it visible only when a visited, nonempty password is below the minimum length. Empty untouched forms stay compact. Valid or cleared passwords hide the hint on blur. Apply the same behavior to account creation and password recovery, retaining the input's accessible description while help is visible.
