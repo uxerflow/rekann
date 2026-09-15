@@ -4,26 +4,48 @@ Updated: September 15, 2026.
 
 ## Current phase
 
-Phase 0 application foundation rebuilt from an empty directory at the owner's request. No source archive was imported. Notion remains canonical; the workspace index and SDD baseline were read during setup. PRD/SRS links are provided but were not separately reviewed in this foundation task. Notion was not modified.
+Auth & Workspace implemented on `feat/auth-workspace`, following the owner's approval and review of the Figma Auth section. PRD, SRS, and SDD were read from Notion. The owner requested that Resend and remaining production service configuration happen after implementation. The previously deployed foundation is recorded below; this auth branch has not been deployed remotely.
 
-One package runs TanStack Start 1.168.49, React Router 1.170.32, React 19.2.8, TypeScript 5.9.3, Tailwind 4.3.3, Vite 8.2.2, Cloudflare Vite plugin 1.54.4, and Wrangler 4.129.0. Compatibility date: 2026-09-03, with nodejs_compat and no service bindings. Direct dependencies are pinned and a fresh lockfile was generated.
+The implementation includes email/password signup and sign-in, six-digit verification, password reset, company/profile onboarding, private company/profile images, create/join/switch workspaces, invitations, Team, and Roles & access. Google OAuth is disabled. Interface and email copy are English. Admin is workspace-scoped; Manager / HR is optional with individually delegated invitation/removal permissions; Employee is the default non-admin role. See `docs/AUTH_WORKSPACE.md` and `docs/DESIGN_SYSTEM.md`.
 
-Node 24.21.0 was downloaded through npm exec and used for build/typecheck/runtime checks; global Node 26.8.1 was left unchanged. pnpm 11.19.0 was already available. See README for the npm exec alternative to NVM.
+## Database and runtime
 
-## Verification on this computer
+- Neon organization/project: Rekann / Rekann App (`bold-flower-53962598`), Singapore.
+- Created development branch `auth-development` (`br-holy-feather-b33zppyv`) from the empty production branch. Applied tracked migration `0000_thankful_groot.sql` to development only.
+- Nine tables cover Better Auth identity/sessions/verification/rate limits and workspace/membership/invitations/audit.
+- The application uses `rekann_runtime`, verified unable to create tables or delete audit events. Runtime credentials are in ignored `.dev.vars`; migration owner credentials are separate in ignored `.env.migrations`, both with restrictive file permissions.
+- Neon CLI `.neon` context remains production. Use the explicit development branch name when requesting CLI connection strings.
+- R2 is bound as `MEDIA` for local private image tests. A production R2 bucket has not been provisioned in this task.
+- Development email goes to a loopback-only, in-memory inbox. No real verification, reset, or invitation email was sent externally.
+- Temporary connection-string files were removed. Secrets were scanned against source candidates and browser output without exposing their values.
 
-- Frozen lockfile installation, production build, Workers type generation, and strict typecheck passed.
-- pnpm audit reports no known vulnerabilities after a targeted Miniflare → sharp 0.35.4 override for GHSA-rgj7-g3m4-5g8c. Remove the override after upstream includes the fix; image-processing functionality itself was not exercised.
-- Development and Workers production preview both returned HTTP 200.
-- Preview checks confirmed SSR product copy, English document language, successful CSS/JS responses, and HTTP 404 for an unknown route.
-- Local Workers explorer identified rekann-app with no service bindings.
-- Desktop visual inspection passed at 1280 × 720. Mobile visual QA and browser console inspection were not run. Server logs show the expected missing favicon 404.
-- No temporary diagnostic route exists. Verification servers were stopped after checks.
+## Verification
 
-## Repository and boundaries
+Completed checks for the implementation:
 
-Local Git uses `main` as its only long-lived branch, with short-lived work branches merged through pull requests. Staging and production are deployment environments rather than Git branches. The public canonical repository is `https://github.com/uxerflow/rekann`. The project is published under Apache-2.0 with contribution, conduct, security-reporting, issue/PR templates, Dependabot, and passing build/typecheck CI foundations. Generated dependencies/build/runtime state and graphify-out are ignored. AGENTS.md, CLAUDE.md, and Notion navigation docs are present. Graphify was not installed or configured in this fresh application bootstrap.
+- Frozen dependency installation, production build, strict TypeScript, and formatting checks.
+- Unit tests for production/local-email configuration boundaries, invalid dates/time zones, safe invitation redirects, and bounded streamed JSON.
+- Seven end-to-end scenarios against the local **production Workers build**, actual Neon development PostgreSQL, and local private R2.
+- Browser coverage: desktop signup, code verification, company/profile onboarding, image upload, workspace entry, Team, persisted manager settings, sign-out; mobile invitation signup/acceptance/profile, password recovery and sign-in; keyboard navigation, password visibility, invalid invitation screen, and horizontal-overflow checks.
+- API coverage: unverified access denial, password policy, single-use OTP, reset session revocation, sign-out, unknown-account recovery response, database rate limits, blocked unused auth endpoints, cross-workspace denial, employee escalation attempts, manager restrictions, immediate role/removal effects, invitation rotation/revocation/expiry, concurrent invitation acceptance, concurrent last-admin protection, private image authorization, invalid image rejection, and CSRF rejection.
+- Visual inspection of desktop auth/company/profile/workspace and mobile profile/access screens. Screenshots remain under ignored `test-results/screens/`.
+- Dependency audit reports no known vulnerabilities. Targeted overrides address the inherited Miniflare image library and drizzle-kit legacy esbuild dependency.
+- No credential values found in version-controlled candidates or the complete browser bundle.
 
-The local Wrangler profile `rekann` is bound to this application and targets the Rekann Cloudflare account through the account ID in `wrangler.jsonc`. Foundation commit `df0b9183342b27e1773e1a234f6fac7ddebdc0c4` was deployed manually as Worker version `7df8dfc8-077e-4ca5-a6c7-5f153807ebd2` at `https://rekann-app.rekann-app.workers.dev`. The GitHub `production` environment stores the scoped Cloudflare credentials, and continuous deployment from `main` passed its first production run. The local Neon CLI profile `rekann` is linked through `.neon` to the Rekann organization, the `Rekann App` project in Singapore, and its `production` database branch. No connection string has been pulled and no schema has been created. There is no application authentication, storage, email integration, production application secret, or implemented product workflow. The bootstrap is not production-security validation. No local foundation blocker remains.
+These checks establish local implementation behavior. They do not establish real email deliverability, production CPU capacity, or disaster recovery readiness.
 
-Next: review Auth & Workspace scope and open SDD decisions before implementation. Mobile QA remains pending.
+## Final integration phase
+
+1. Configure a verified Resend sender and its Worker secrets.
+2. Provision the private production R2 bucket and production runtime database role.
+3. Apply the reviewed migration to production with the migration owner credentials; set production application secrets and the exact HTTPS auth origin.
+4. Deploy after integration review, then test real verification/recovery/invitation emails and private images on the public Worker. Measure actual Workers CPU/usage against the selected plan.
+5. Verify database recovery before using real employee data. Replace the provisional logo when the final brand is ready.
+
+Do not merge this integration-incomplete branch into automatic production deployment. Keep the branch reviewable while the final service setup is pending.
+
+## Foundation history
+
+The empty-directory rebuild used TanStack Start 1.168.49, React Router 1.170.32, React 19.2.8, TypeScript 5.9.3, Tailwind 4.3.3, Vite 8.2.2, Cloudflare Vite plugin 1.54.4, and Wrangler 4.129.0. Framework versions remain pinned. Auth dependencies and testing/formatting tools were added with pinned versions and the lockfile.
+
+The public canonical repository is `https://github.com/uxerflow/rekann`, Apache-2.0, managed via `barlydesign`. `main` is the only long-lived branch; PRs use short-lived work branches. The recorded foundation deployment is commit `df0b9183342b27e1773e1a234f6fac7ddebdc0c4`, Worker version `7df8dfc8-077e-4ca5-a6c7-5f153807ebd2`, at `https://rekann-app.rekann-app.workers.dev`. GitHub Actions deploys `main` after CI passes using the `production` environment. Account routing is documented in `AGENTS.md`.

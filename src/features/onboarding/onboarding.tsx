@@ -1,0 +1,400 @@
+import { useEffect, useState, type FormEvent } from 'react'
+import { Building2, MapPin, ArrowLeft, Check, LogOut } from 'lucide-react'
+import { api, messageOf, signOut } from '../../lib/api'
+import {
+  Avatar,
+  Brand,
+  Button,
+  Field,
+  FormFields,
+  ImagePicker,
+  mediaUrl,
+  Notice,
+} from '../../components/ui'
+import { workspaceInput, profileInput } from '../../shared/contracts'
+import { timeZones } from '../../shared/time-zones'
+import type { WorkspaceDetails } from '../../server/workspaces'
+
+function OnboardingLayout({
+  step,
+  children,
+  preview,
+  caption,
+  title,
+}: {
+  step: number
+  children: React.ReactNode
+  preview: React.ReactNode
+  caption: string
+  title: string
+}) {
+  const [error, setError] = useState('')
+  return (
+    <div className="onboarding-shell">
+      <header className="onboarding-header">
+        <div className="onboarding-brand">
+          <Brand />
+          <span className="step">
+            <span className="step-dot">{step === 2 ? <Check size={12} /> : '1'}</span> Step {step}{' '}
+            of 2
+          </span>
+        </div>
+        <span className="header-label">{title}</span>
+        <button
+          className="button secondary small"
+          onClick={() => void signOut().catch((e) => setError(messageOf(e)))}
+        >
+          <LogOut size={14} />
+          Sign out
+        </button>
+      </header>
+      <div className="onboarding-body">
+        <aside className="onboarding-aside">
+          <div className="preview-content">
+            {preview}
+            <p className="preview-caption">{caption}</p>
+          </div>
+        </aside>
+        <main className="onboarding-main">
+          <div className="onboarding-form">
+            <Notice>{error}</Notice>
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
+  )
+}
+const industries = [
+  'Agency & consulting',
+  'Design studio',
+  'Education',
+  'Finance',
+  'Healthcare',
+  'Hospitality',
+  'Manufacturing',
+  'Nonprofit',
+  'Retail',
+  'Technology',
+  'Other',
+]
+const countries = [
+  'Australia',
+  'Canada',
+  'France',
+  'Germany',
+  'India',
+  'Indonesia',
+  'Japan',
+  'Malaysia',
+  'Netherlands',
+  'New Zealand',
+  'Philippines',
+  'Singapore',
+  'South Korea',
+  'Thailand',
+  'United Kingdom',
+  'United States',
+  'Vietnam',
+  'Other',
+]
+export function CompanyOnboarding() {
+  const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
+  const [country, setCountry] = useState('')
+  const [industry, setIndustry] = useState('')
+  const [timeZone, setTimeZone] = useState('UTC')
+  useEffect(() => setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone), [])
+  const [logo, setLogo] = useState('')
+  const [createdId, setCreatedId] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  async function submit(event: FormEvent) {
+    event.preventDefault()
+    setError('')
+    const parsed = workspaceInput.safeParse({ name, description, country, industry, timeZone })
+    if (!parsed.success) {
+      setError(parsed.error.issues[0].message)
+      return
+    }
+    setBusy(true)
+    try {
+      const result = createdId
+        ? { id: createdId }
+        : await api<{ id: string }>('workspace/create', parsed.data)
+      setCreatedId(result.id)
+      if (logo) await api('media', { workspaceId: result.id, kind: 'logo', data: logo })
+      window.location.assign(`/onboarding/profile?workspaceId=${result.id}`)
+    } catch (error) {
+      setError(messageOf(error))
+      setBusy(false)
+    }
+  }
+  return (
+    <OnboardingLayout
+      step={1}
+      title="About your company"
+      caption="A shared home for your team. Here’s how your company will appear in Rekann."
+      preview={
+        <div className="company-preview">
+          <Avatar name={name} image={logo} large />
+          <h2>{name || 'Company name'}</h2>
+          {description ? (
+            <p>{description}</p>
+          ) : (
+            <div className="skeleton-lines">
+              <i />
+              <i />
+              <i />
+            </div>
+          )}
+          <div className="preview-meta">
+            <span>
+              <MapPin size={13} />
+              {country || 'Location'}
+            </span>
+            <span>
+              <Building2 size={13} />
+              {industry || 'Industry'}
+            </span>
+          </div>
+        </div>
+      }
+    >
+      <div className="onboarding-heading">
+        <h1>Tell us about your company</h1>
+        <p>Let’s start with a few details to personalize your workspace.</p>
+      </div>
+      <form onSubmit={submit}>
+        <FormFields busy={busy}>
+          <Notice>{error}</Notice>
+          <ImagePicker label="Company logo" value={logo} onChange={setLogo} />
+          <Field
+            label="Company name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            maxLength={100}
+            placeholder="e.g. Acme Inc."
+            disabled={!!createdId}
+          />
+          <div className="field">
+            <label htmlFor="description">
+              Company description <span className="optional">(optional)</span>
+            </label>
+            <textarea
+              id="description"
+              maxLength={200}
+              rows={3}
+              value={description}
+              disabled={!!createdId}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Tell your team a little about your company."
+            />
+            <span className="character-count">{description.length}/200</span>
+          </div>
+          <div className="field">
+            <label htmlFor="country">
+              Location <span className="required">*</span>
+            </label>
+            <select
+              id="country"
+              required
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              disabled={!!createdId}
+            >
+              <option value="">Select a country</option>
+              {countries.map((v) => (
+                <option key={v}>{v}</option>
+              ))}
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="industry">
+              Industry <span className="required">*</span>
+            </label>
+            <select
+              id="industry"
+              required
+              value={industry}
+              onChange={(e) => setIndustry(e.target.value)}
+              disabled={!!createdId}
+            >
+              <option value="">Select an industry</option>
+              {industries.map((v) => (
+                <option key={v}>{v}</option>
+              ))}
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="time-zone">Time zone</label>
+            <select
+              id="time-zone"
+              value={timeZone}
+              onChange={(e) => setTimeZone(e.target.value)}
+              disabled={!!createdId}
+            >
+              {[...new Set([timeZone, 'UTC', ...timeZones])].map((v) => (
+                <option key={v}>{v}</option>
+              ))}
+            </select>
+            <p className="hint">Used for your workspace’s dates and times.</p>
+          </div>
+          <div className="form-actions">
+            <a href="/" className="back-link">
+              <ArrowLeft size={14} />
+              Back
+            </a>
+            <Button busy={busy} type="submit">
+              Continue
+            </Button>
+          </div>
+        </FormFields>
+      </form>
+    </OnboardingLayout>
+  )
+}
+export function ProfileOnboarding({
+  data,
+  editing = false,
+}: {
+  data: WorkspaceDetails
+  editing?: boolean
+}) {
+  const initial = data.employee
+  const [firstName, setFirstName] = useState(initial.firstName)
+  const [lastName, setLastName] = useState(initial.lastName)
+  const [jobTitle, setJobTitle] = useState(initial.jobTitle)
+  const [phone, setPhone] = useState(initial.phone)
+  const [birthDate, setBirthDate] = useState(initial.birthDate || '')
+  const [birthPlace, setBirthPlace] = useState(initial.birthPlace)
+  const [image, setImage] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  async function submit(event: FormEvent) {
+    event.preventDefault()
+    setError('')
+    const parsed = profileInput.safeParse({
+      workspaceId: data.workspace.id,
+      firstName,
+      lastName,
+      jobTitle,
+      phone,
+      birthDate,
+      birthPlace,
+    })
+    if (!parsed.success) {
+      setError(parsed.error.issues[0].message)
+      return
+    }
+    setBusy(true)
+    try {
+      if (image) await api('media', { workspaceId: data.workspace.id, kind: 'avatar', data: image })
+      await api('profile/save', parsed.data)
+      window.location.assign(`/workspace/${data.workspace.id}`)
+    } catch (error) {
+      setError(messageOf(error))
+      setBusy(false)
+    }
+  }
+  return (
+    <OnboardingLayout
+      step={2}
+      title="Your profile"
+      caption="Put a face to your name. Your teammates will see your name, photo, and job title."
+      preview={
+        <div className="profile-preview">
+          <div className="lanyard" aria-hidden="true" />
+          <div className="badge-slot" aria-hidden="true" />
+          <Avatar
+            name={`${firstName} ${lastName}`}
+            image={image || mediaUrl(initial.avatarKey)}
+            large
+          />
+          <h2>{`${firstName} ${lastName}`.trim() || 'Your name'}</h2>
+          <p>{jobTitle || 'Job title'}</p>
+          <span className="badge-company">{data.workspace.name}</span>
+        </div>
+      }
+    >
+      <div className="onboarding-heading">
+        <h1>{editing ? 'Edit your profile' : 'Tell us about yourself'}</h1>
+        <p>{editing ? 'Keep your information up to date.' : 'Help your team get to know you.'}</p>
+      </div>
+      <form onSubmit={submit}>
+        <FormFields busy={busy}>
+          <Notice>{error}</Notice>
+          <ImagePicker label="Profile photo" value={image} onChange={setImage} />
+          <div className="field-row">
+            <Field
+              label="First name"
+              autoComplete="given-name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+              maxLength={80}
+              placeholder="Alex"
+            />
+            <Field
+              label="Last name"
+              autoComplete="family-name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              maxLength={80}
+              placeholder="Carter"
+            />
+          </div>
+          <Field
+            label="Job title"
+            autoComplete="organization-title"
+            value={jobTitle}
+            onChange={(e) => setJobTitle(e.target.value)}
+            maxLength={100}
+            placeholder="e.g. Product Designer"
+          />
+          <div className="form-divider">
+            <span>Personal details</span>
+            <p className="hint">Optional. Only you can view these details.</p>
+          </div>
+          <Field
+            label="Phone number"
+            type="tel"
+            autoComplete="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            maxLength={30}
+            placeholder="Include country code"
+          />
+          <div className="field-row">
+            <Field
+              label="Place of birth"
+              value={birthPlace}
+              onChange={(e) => setBirthPlace(e.target.value)}
+              maxLength={100}
+              placeholder="City"
+            />
+            <Field
+              label="Date of birth"
+              type="date"
+              autoComplete="bday"
+              value={birthDate}
+              onChange={(e) => setBirthDate(e.target.value)}
+              min="1900-01-01"
+              max={new Date().toISOString().slice(0, 10)}
+            />
+          </div>
+          <div className="form-actions">
+            <a className="back-link" href={editing ? `/workspace/${data.workspace.id}` : '/'}>
+              <ArrowLeft size={14} />
+              Back
+            </a>
+            <Button busy={busy} type="submit">
+              {editing ? 'Save changes' : 'Go to workspace'}
+            </Button>
+          </div>
+        </FormFields>
+      </form>
+    </OnboardingLayout>
+  )
+}
