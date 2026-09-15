@@ -49,6 +49,8 @@ Reference screens include Login `196:5126`, Signup `209:5559`, Email verificatio
 
 Inter typography, 368 px auth forms, 480 px onboarding forms, white surfaces, green brand, and the original decorative assets are preserved. Actions, borders, radii, focus rings, and control dimensions now use the measured Figma component variants. Recovery, workspace selection, Team, and Roles & access extend the same visual language. On mobile the decorative preview yields space to the form. The owner setup has company, profile, and optional personal-details steps; invited employees complete profile and personal details. The indicator reflects the current step. Company description, last name, and job title are required, matching the supplied labels.
 
+After email verification, an account with no workspace goes directly to company onboarding. A single workspace opens directly, while the workspace chooser is reserved for accounts with multiple workspaces. Invitation links continue their invitation flow before owner onboarding.
+
 ## Operational boundaries
 
 Use a separate Neon development branch for synthetic test accounts. Apply tracked SQL migrations before running the application. Production needs its own runtime database credentials, auth secret, trusted HTTPS URL, private R2 bucket, and verified Resend sender. Environment secrets must not be committed.

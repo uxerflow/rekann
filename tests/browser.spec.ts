@@ -27,8 +27,8 @@ test('desktop signup, verification, onboarding, image upload, team, and access s
   await expect(page.getByRole('heading', { name: 'Check your email' })).toBeVisible()
   await page.getByLabel('6-digit verification code').fill(await otp(email))
   await page.getByRole('button', { name: 'Verify email', exact: true }).click()
-  await expect(page.getByRole('link', { name: 'Create a workspace', exact: true })).toBeVisible()
-  await page.getByRole('link', { name: 'Create a workspace', exact: true }).click()
+  await expect(page).toHaveURL(/\/onboarding\/company$/)
+  await expect(page.getByRole('heading', { name: 'Tell us about your company' })).toBeVisible()
   await page.getByLabel('Company name').fill('Northstar Studio')
   await page
     .getByLabel('Company description')

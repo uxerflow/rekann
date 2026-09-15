@@ -55,3 +55,5 @@ The public canonical repository is `https://github.com/uxerflow/rekann`, Apache-
 The owner requested a detailed fidelity correction on September 15, 2026. The same feature branch now uses the exact green/hover tokens, 10 px control radii, 36 px desktop controls, layered focus rings, original compact brand/lanyard/icons, 48 px onboarding header, and measured card/form geometry. OTP uses six visual cells over a native input. Profile and optional private details are separate steps, and Choose avatar is functional. `docs/DESIGN_SYSTEM.md` records node IDs, dimensions, responsive exceptions, and product-copy decisions. The added visual scenario checks exact CSS tokens and Figma bounds with a 1 px tolerance. Production integration and deployment remain pending.
 
 Local dev and preview now use port 4310, keeping Rekann separate from other projects using port 3000. The local auth origin and browser tests use the same address.
+
+Newly verified owners with no workspace are routed directly to company onboarding. The workspace chooser only appears when an account has multiple workspaces; invitation redirects remain unchanged.

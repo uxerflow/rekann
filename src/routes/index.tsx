@@ -9,6 +9,7 @@ export const Route = createFileRoute('/')({
   loader: async () => {
     const data = await loadViewer()
     if (!data) throw redirect({ to: '/sign-in', search: { email: '', next: '', reset: false } })
+    if (data.workspaces.length === 0) throw redirect({ to: '/onboarding/company' })
     if (data.workspaces.length === 1) {
       const company = data.workspaces[0]
       if (!company.profileCompleted)
@@ -26,14 +27,7 @@ export const Route = createFileRoute('/')({
 function WorkspacePicker() {
   const data = Route.useLoaderData()
   return (
-    <AuthLayout
-      title={data.workspaces.length ? 'Choose your workspace' : 'Welcome to Rekann'}
-      subtitle={
-        data.workspaces.length
-          ? 'Where would you like to work today?'
-          : 'Create a workspace for your team, or open the invitation link from your email.'
-      }
-    >
+    <AuthLayout title="Choose your workspace" subtitle="Where would you like to work today?">
       <div className="workspace-picker">
         {data.workspaces.map((company) => (
           <a
