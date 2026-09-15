@@ -87,6 +87,7 @@ export type Role = 'admin' | 'manager' | 'employee'
 export type ManagerPermission = 'invite_employees' | 'manage_employees'
 export const workspace = pgTable('workspace', {
   id: text('id').primaryKey(),
+  slug: text('slug').notNull().unique(),
   name: text('name').notNull(),
   description: text('description').notNull().default(''),
   country: text('country').notNull(),

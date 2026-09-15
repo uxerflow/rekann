@@ -2,7 +2,13 @@ import { createServerFn } from '@tanstack/react-start'
 import { getRequestHeaders } from '@tanstack/react-start/server'
 import { z } from 'zod'
 import { withRuntime, json } from '../server/runtime'
-import { bootstrap, identity, invitationDetails, workspaceDetails } from '../server/workspaces'
+import {
+  bootstrap,
+  identity,
+  invitationDetails,
+  workspaceDetails,
+  workspaceBySlug,
+} from '../server/workspaces'
 import type { Bootstrap, WorkspaceDetails } from '../server/workspaces'
 
 export const loadViewer = createServerFn({ method: 'GET' }).handler(
@@ -31,6 +37,17 @@ export const loadWorkspace = createServerFn({ method: 'GET' })
     const headers = getRequestHeaders()
     const response = await withRuntime(async ({ db, auth }) =>
       json(await workspaceDetails(db, await identity(auth, headers), data.id)),
+    )
+    if ([401, 403, 404].includes(response.status)) return null
+    if (!response.ok) throw new Error('Unable to load your workspace. Please try again.')
+    return response.json() as Promise<WorkspaceDetails>
+  })
+export const loadWorkspaceSlug = createServerFn({ method: 'GET' })
+  .validator(z.object({ slug: z.string().min(1).max(100) }))
+  .handler(async ({ data }): Promise<WorkspaceDetails | null> => {
+    const headers = getRequestHeaders()
+    const response = await withRuntime(async ({ db, auth }) =>
+      json(await workspaceBySlug(db, await identity(auth, headers), data.slug)),
     )
     if ([401, 403, 404].includes(response.status)) return null
     if (!response.ok) throw new Error('Unable to load your workspace. Please try again.')

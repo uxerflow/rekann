@@ -2,6 +2,8 @@
 
 ## Approved scope
 
+Workspace navigation uses `/w/:slug`, `/w/:slug/team`, `/w/:slug/access`, and `/w/:slug/profile`. Creation steps use `/w/:slug/onboarding/company` and `/w/:slug/onboarding/profile` after the initial company is created. Back/Continue update the URL through the router and retain the current profile draft. Slugs are unique and stable across company-name edits, with numbered collision suffixes. The database UUID remains the identity for all protected operations; slug lookup still requires active membership. Legacy `/workspace/:id?view=...` and `/onboarding/profile?workspaceId=...` links redirect to their canonical destinations.
+
 The owner authorized end-to-end auth implementation on September 15, 2026, following the Figma auth review. Email-provider and production integration configuration are the final phase. These decisions supersede the earlier Phase 0-only restriction for this task.
 
 - Email/password sign-up and sign-in; six-digit email verification; password recovery.

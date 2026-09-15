@@ -2,6 +2,8 @@
 
 Updated: September 15, 2026.
 
+Workspace URLs now use a unique, stable name-based slug under `/w/:slug`, with `/team`, `/access`, `/profile`, and `/onboarding/company` or `/onboarding/profile`. UUIDs remain internal authorization/database identifiers. Existing UUID links redirect after membership checks. Slugs gain numeric suffixes on collisions and do not change when the company name is edited. Migrations 0001–0003 add, backfill, and require slugs; applied only to the development database. Production still requires the normal migration phase before deployment.
+
 Workspace onboarding now has exactly two steps: company details → creator profile → workspace. Back reopens saved company details without creating another workspace and retains the profile draft. Primary onboarding actions stay disabled until required fields are filled. Company edits are restricted server-side to the creator before profile completion. Optional phone and birth information belongs to the separate invited Employee flow, which retains profile → employee details. Flow selection compares the membership user with the workspace creator, rather than relying on Admin role. Profile editing still exposes personal details. Existing personal data is preserved.
 
 ## Current phase

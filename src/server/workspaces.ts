@@ -88,6 +88,7 @@ export async function bootstrap(db: Database, viewer: Identity) {
   const workspaces = await db
     .select({
       id: workspace.id,
+      slug: workspace.slug,
       name: workspace.name,
       role: workspaceMember.role,
       profileCompleted: workspaceMember.profileCompleted,
@@ -142,23 +143,46 @@ export async function workspaceDetails(db: Database, viewer: Identity, workspace
     },
   }
 }
+export async function workspaceBySlug(db: Database, viewer: Identity, slug: string) {
+  const [found] = await db
+    .select({ id: workspace.id })
+    .from(workspace)
+    .where(eq(workspace.slug, slug))
+  if (!found) throw new AppError(404, 'Workspace not found.')
+  return workspaceDetails(db, viewer, found.id)
+}
 export async function createWorkspace(db: Database, viewer: Identity, raw: unknown) {
   const data = inputs.workspaceInput.parse(raw)
   return db.transaction(async (tx) => {
     // Serialize creation per identity so retries cannot create duplicate workspaces.
     await tx.select({ id: user.id }).from(user).where(eq(user.id, viewer.id)).for('update')
     const [existing] = await tx
-      .select({ id: workspace.id })
+      .select({ id: workspace.id, slug: workspace.slug })
       .from(workspace)
       .where(and(eq(workspace.createdBy, viewer.id), eq(workspace.name, data.name)))
     if (existing) return existing
     const id = crypto.randomUUID()
-    await tx.insert(workspace).values({ id, ...data, createdBy: viewer.id })
+    // Serialize slug allocation across creators; the unique constraint is the final guard.
+    await tx.execute(sql`select pg_advisory_xact_lock(726356011)`)
+    const base =
+      data.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .slice(0, 48)
+        .replace(/^-|-$/g, '') || 'workspace'
+    let slug = base
+    let suffix = 2
+    while (
+      (await tx.select({ id: workspace.id }).from(workspace).where(eq(workspace.slug, slug))).length
+    ) {
+      slug = `${base}-${suffix++}`
+    }
+    await tx.insert(workspace).values({ id, slug, ...data, createdBy: viewer.id })
     await tx
       .insert(workspaceMember)
       .values({ id: crypto.randomUUID(), workspaceId: id, userId: viewer.id, role: 'admin' })
     await audit(tx, id, viewer.id, 'workspace.created')
-    return { id }
+    return { id, slug }
   })
 }
 export async function updateOnboardingCompany(db: Database, viewer: Identity, raw: unknown) {

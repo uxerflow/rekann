@@ -34,7 +34,7 @@ export function WorkspaceScreen({
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [busy, setBusy] = useState(false)
-  const base = `/workspace/${workspace.id}`
+  const base = `/w/${workspace.slug}`
   async function mutate(operation: string, body: Record<string, unknown>, message: string) {
     setBusy(true)
     setError('')
@@ -58,11 +58,11 @@ export function WorkspaceScreen({
           <span className="sr-only">Switch workspace</span>
           <Avatar name={workspace.name} image={mediaUrl(workspace.logoKey)} />
           <select
-            value={workspace.id}
-            onChange={(e) => window.location.assign(`/workspace/${e.target.value}`)}
+            value={workspace.slug}
+            onChange={(e) => window.location.assign(`/w/${e.target.value}`)}
           >
             {viewer.workspaces.map((w) => (
-              <option key={w.id} value={w.id}>
+              <option key={w.id} value={w.slug}>
                 {w.name}
               </option>
             ))}
@@ -74,17 +74,17 @@ export function WorkspaceScreen({
             <House size={18} />
             Overview
           </a>
-          <a aria-current={view === 'team' ? 'page' : undefined} href={`${base}?view=team`}>
+          <a aria-current={view === 'team' ? 'page' : undefined} href={`${base}/team`}>
             <Users size={18} />
             Team
           </a>
           {permissions.admin && (
-            <a aria-current={view === 'access' ? 'page' : undefined} href={`${base}?view=access`}>
+            <a aria-current={view === 'access' ? 'page' : undefined} href={`${base}/access`}>
               <Settings2 size={18} />
               Roles & access
             </a>
           )}
-          <a href={`/onboarding/profile?workspaceId=${workspace.id}`}>
+          <a href={`${base}/profile`}>
             <UserRound size={18} />
             My profile
           </a>
@@ -134,7 +134,7 @@ export function WorkspaceScreen({
                   </span>
                   <h2>You’re all set</h2>
                   <p>Your account is verified and your profile is ready.</p>
-                  <a href={`/onboarding/profile?workspaceId=${workspace.id}`}>
+                  <a href={`${base}/profile`}>
                     View your profile <ArrowRight size={15} />
                   </a>
                 </div>
@@ -147,7 +147,7 @@ export function WorkspaceScreen({
                 </div>
               </div>
               <div className="overview-grid">
-                <a className="overview-card" href={`${base}?view=team`}>
+                <a className="overview-card" href={`${base}/team`}>
                   <Users size={22} />
                   <h2>Your team</h2>
                   <p>
@@ -160,7 +160,7 @@ export function WorkspaceScreen({
                   </span>
                 </a>
                 {permissions.admin && (
-                  <a className="overview-card" href={`${base}?view=access`}>
+                  <a className="overview-card" href={`${base}/access`}>
                     <ShieldCheck size={22} />
                     <h2>Roles & access</h2>
                     <p>Choose how your team manages this workspace.</p>

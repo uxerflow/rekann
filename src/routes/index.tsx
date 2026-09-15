@@ -13,11 +13,9 @@ export const Route = createFileRoute('/')({
     if (data.workspaces.length === 1) {
       const company = data.workspaces[0]
       if (!company.profileCompleted)
-        throw redirect({ to: '/onboarding/profile', search: { workspaceId: company.id } })
+        throw redirect({ href: `/w/${company.slug}/onboarding/profile` })
       throw redirect({
-        to: '/workspace/$workspaceId',
-        params: { workspaceId: company.id },
-        search: { view: 'overview' },
+        href: `/w/${company.slug}`,
       })
     }
     return data
@@ -35,8 +33,8 @@ function WorkspacePicker() {
             key={company.id}
             href={
               company.profileCompleted
-                ? `/workspace/${company.id}`
-                : `/onboarding/profile?workspaceId=${company.id}`
+                ? `/w/${company.slug}`
+                : `/w/${company.slug}/onboarding/profile`
             }
           >
             <Avatar name={company.name} />

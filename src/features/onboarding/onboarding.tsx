@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { avatarInitials, initialAvatar } from '../../lib/initial-avatar'
 import { api, messageOf, signOut } from '../../lib/api'
 import { loadWorkspace } from '../../lib/loaders'
@@ -132,7 +133,9 @@ export function CompanyOnboarding({
         onContinue(refreshed?.workspace || { ...company, ...parsed.data })
         return
       }
-      window.location.assign(`/onboarding/profile?workspaceId=${result.id}`)
+      const saved = await loadWorkspace({ data: { id: result.id } })
+      if (!saved) throw new Error('Unable to load your workspace. Please try again.')
+      window.location.assign(`/w/${saved.workspace.slug}/onboarding/profile`)
     } catch (error) {
       setError(messageOf(error))
       setBusy(false)
@@ -245,12 +248,14 @@ export function CompanyOnboarding({
 export function ProfileOnboarding({
   data,
   editing = false,
+  companyStep = false,
 }: {
   data: WorkspaceDetails
   editing?: boolean
+  companyStep?: boolean
 }) {
+  const navigate = useNavigate()
   const [employeeDetailsStep, setDetailsStep] = useState(false)
-  const [companyStep, setCompanyStep] = useState(false)
   const [company, setCompany] = useState(data.workspace)
   const isWorkspaceCreator = data.workspace.createdBy === data.employee.userId
   const detailsStep = editing || (!isWorkspaceCreator && employeeDetailsStep)
@@ -295,7 +300,7 @@ export function ProfileOnboarding({
     try {
       if (image) await api('media', { workspaceId: data.workspace.id, kind: 'avatar', data: image })
       await api('profile/save', parsed.data)
-      window.location.assign(`/workspace/${data.workspace.id}`)
+      window.location.assign(`/w/${data.workspace.slug}`)
     } catch (error) {
       setError(messageOf(error))
       setBusy(false)
@@ -307,7 +312,7 @@ export function ProfileOnboarding({
         company={company}
         onContinue={(updated) => {
           setCompany(updated)
-          setCompanyStep(false)
+          void navigate({ href: `/w/${data.workspace.slug}/onboarding/profile` })
           window.scrollTo({ top: 0 })
         }}
       />
@@ -445,7 +450,7 @@ export function ProfileOnboarding({
                 type="button"
                 className="button secondary onboarding-back"
                 onClick={() => {
-                  setCompanyStep(true)
+                  void navigate({ href: `/w/${data.workspace.slug}/onboarding/company` })
                   setError('')
                   window.scrollTo({ top: 0 })
                 }}
@@ -466,10 +471,7 @@ export function ProfileOnboarding({
               </button>
             )}
             {editing && (
-              <a
-                className="button secondary onboarding-back"
-                href={`/workspace/${data.workspace.id}`}
-              >
+              <a className="button secondary onboarding-back" href={`/w/${data.workspace.slug}`}>
                 Back
               </a>
             )}

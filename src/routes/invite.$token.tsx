@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { CheckCircle2, Mail } from 'lucide-react'
-import { loadInvitation, loadViewer } from '../lib/loaders'
+import { loadInvitation, loadViewer, loadWorkspace } from '../lib/loaders'
 import { AuthLayout } from '../components/auth-layout'
 import { Button, Notice } from '../components/ui'
 import { api, messageOf, signOut } from '../lib/api'
@@ -29,10 +29,12 @@ function Invitation() {
         'invitation/accept',
         { token },
       )
+      const workspace = await loadWorkspace({ data: { id: result.workspaceId } })
+      if (!workspace) throw new Error('Unable to load your workspace. Please try again.')
       window.location.assign(
         result.profileCompleted
-          ? `/workspace/${result.workspaceId}`
-          : `/onboarding/profile?workspaceId=${result.workspaceId}`,
+          ? `/w/${workspace.workspace.slug}`
+          : `/w/${workspace.workspace.slug}/onboarding/profile`,
       )
     } catch (error) {
       setError(messageOf(error))

@@ -18,9 +18,11 @@ import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as OnboardingCompanyRouteImport } from './routes/onboarding.company'
 import { Route as OnboardingProfileRouteImport } from './routes/onboarding.profile'
+import { Route as WSlugRouteImport } from './routes/w.$slug'
 import { Route as WorkspaceWorkspaceIdRouteImport } from './routes/workspace.$workspaceId'
 import { Route as ApiAppSplatRouteImport } from './routes/api.app.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
+import { Route as WSlugSplatRouteImport } from './routes/w.$slug.$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -67,6 +69,11 @@ const OnboardingProfileRoute = OnboardingProfileRouteImport.update({
   path: '/onboarding/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WSlugRoute = WSlugRouteImport.update({
+  id: '/w/$slug',
+  path: '/w/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WorkspaceWorkspaceIdRoute = WorkspaceWorkspaceIdRouteImport.update({
   id: '/workspace/$workspaceId',
   path: '/workspace/$workspaceId',
@@ -82,6 +89,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WSlugSplatRoute = WSlugSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => WSlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -93,9 +105,11 @@ export interface FileRoutesByFullPath {
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
+  '/w/$slug': typeof WSlugRouteWithChildren
   '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRoute
   '/api/app/$': typeof ApiAppSplatRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/w/$slug/$': typeof WSlugSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -107,9 +121,11 @@ export interface FileRoutesByTo {
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
+  '/w/$slug': typeof WSlugRouteWithChildren
   '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRoute
   '/api/app/$': typeof ApiAppSplatRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/w/$slug/$': typeof WSlugSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -122,9 +138,11 @@ export interface FileRoutesById {
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
+  '/w/$slug': typeof WSlugRouteWithChildren
   '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRoute
   '/api/app/$': typeof ApiAppSplatRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/w/$slug/$': typeof WSlugSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -138,9 +156,11 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/onboarding/company'
     | '/onboarding/profile'
+    | '/w/$slug'
     | '/workspace/$workspaceId'
     | '/api/app/$'
     | '/api/auth/$'
+    | '/w/$slug/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -152,9 +172,11 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/onboarding/company'
     | '/onboarding/profile'
+    | '/w/$slug'
     | '/workspace/$workspaceId'
     | '/api/app/$'
     | '/api/auth/$'
+    | '/w/$slug/$'
   id:
     | '__root__'
     | '/'
@@ -166,9 +188,11 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/onboarding/company'
     | '/onboarding/profile'
+    | '/w/$slug'
     | '/workspace/$workspaceId'
     | '/api/app/$'
     | '/api/auth/$'
+    | '/w/$slug/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -181,6 +205,7 @@ export interface RootRouteChildren {
   InviteTokenRoute: typeof InviteTokenRoute
   OnboardingCompanyRoute: typeof OnboardingCompanyRoute
   OnboardingProfileRoute: typeof OnboardingProfileRoute
+  WSlugRoute: typeof WSlugRouteWithChildren
   WorkspaceWorkspaceIdRoute: typeof WorkspaceWorkspaceIdRoute
   ApiAppSplatRoute: typeof ApiAppSplatRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -251,6 +276,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/w/$slug': {
+      id: '/w/$slug'
+      path: '/w/$slug'
+      fullPath: '/w/$slug'
+      preLoaderRoute: typeof WSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/workspace/$workspaceId': {
       id: '/workspace/$workspaceId'
       path: '/workspace/$workspaceId'
@@ -272,8 +304,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/w/$slug/$': {
+      id: '/w/$slug/$'
+      path: '/$'
+      fullPath: '/w/$slug/$'
+      preLoaderRoute: typeof WSlugSplatRouteImport
+      parentRoute: typeof WSlugRoute
+    }
   }
 }
+
+interface WSlugRouteChildren {
+  WSlugSplatRoute: typeof WSlugSplatRoute
+}
+
+const WSlugRouteChildren: WSlugRouteChildren = {
+  WSlugSplatRoute: WSlugSplatRoute,
+}
+
+const WSlugRouteWithChildren = WSlugRoute._addFileChildren(WSlugRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -285,6 +334,7 @@ const rootRouteChildren: RootRouteChildren = {
   InviteTokenRoute: InviteTokenRoute,
   OnboardingCompanyRoute: OnboardingCompanyRoute,
   OnboardingProfileRoute: OnboardingProfileRoute,
+  WSlugRoute: WSlugRouteWithChildren,
   WorkspaceWorkspaceIdRoute: WorkspaceWorkspaceIdRoute,
   ApiAppSplatRoute: ApiAppSplatRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
