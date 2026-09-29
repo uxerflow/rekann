@@ -275,7 +275,12 @@ export function LeavesScreen({ workspaceId, admin }: { workspaceId: string; admi
           </Button>
         </div>
       ) : state && tab === 'Leaves' ? (
-        <LeaveCalendar state={state} onRequest={setRequest} onRequests={() => setTab('Request')} />
+        <LeaveCalendar
+          state={state}
+          onRequest={setRequest}
+          onRequests={() => setTab('Request')}
+          onPolicy={(value) => setPolicy({ kind: value.kind, value })}
+        />
       ) : (
         <>
           {tab === 'Leave policy' &&

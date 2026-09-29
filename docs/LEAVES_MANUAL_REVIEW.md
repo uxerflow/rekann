@@ -4,7 +4,11 @@ Target: https://preview-f3d09c858192da81b6d6.rekann.app/w/pavel-hub/leaves
 
 Use the existing Demo employees. These checks are intentionally left for owner manual testing.
 
-- [ ] Week and Month: click a leave or closure chip. Check compact text, employee, date range, status, and View request. Close with Escape and by clicking outside.
+- [ ] Week and Month: open an approved leave. Employee and Approved status appear first, followed by leave type, Dates, Duration, and a full-width View request button. The button opens that request.
+- [ ] Open a pending leave. The status reads Pending; the primary Review request button opens the correct request.
+- [ ] Open a company closure. Check the policy name, dates, and Applies to. View policy opens that closure policy; close it without saving when only reviewing.
+- [ ] Check a long employee name, half-day request, and a date range across months. Text wraps without overlapping status or leaving the popover. Escape and clicking outside close it; the popover stays within the viewport.
+- [ ] Week grid styling stays unchanged in staging while the revised Figma grid is under review.
 - [ ] Year: click each available leave, pending approval, and company closure badge. A compact list opens without changing the calendar view. Open a request from its row.
 - [ ] Dropdowns: check calendar mode, employee search, leave type, policy fields, and AI model. Selected items have a fill and thin check, with no green border. Open near the bottom of a dialog and scroll the menu: nothing clips. Click elsewhere and reopen.
 - [ ] Keyboard: Tab to a dropdown, open it, move with arrows, select with Enter, then close with Escape. Keyboard focus remains visible. Escape from a popup must not discard its parent form.

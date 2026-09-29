@@ -8,7 +8,7 @@ import { DetailMenu } from '../team/detail-menu'
 import { DetailDialog } from '../team/detail-dialog'
 import { dayInZone } from '../../shared/employee-detail'
 import { addDays, dateDays } from '../../shared/leaves'
-import type { AdminLeaves, LeaveRequest } from '../../server/leaves'
+import type { AdminLeaves, LeavePolicy, LeaveRequest } from '../../server/leaves'
 import { daysText, prettyDate } from './leave-dialogs'
 
 const monthName = (date: string) =>
@@ -35,16 +35,19 @@ type CalendarEvent = {
   pending: boolean
   request?: LeaveRequest
   countAs: string
+  policy?: LeavePolicy
   coveredIds?: string[]
 }
 export function LeaveCalendar({
   state,
   onRequest,
   onRequests,
+  onPolicy,
 }: {
   state: AdminLeaves
   onRequest: (r: LeaveRequest) => void
   onRequests: () => void
+  onPolicy: (policy: LeavePolicy) => void
 }) {
   const [mode, setMode] = useState('Week'),
     [date, setDate] = useState(state.today),
@@ -80,6 +83,7 @@ export function LeaveCalendar({
         pending: false,
         countAs: p.rules.countAs,
         coveredIds: p.coveredMemberIds,
+        policy: p,
       })),
   ]
   const pending = state.requests.filter((r) => r.status === 'pending')
@@ -535,33 +539,64 @@ export function LeaveCalendar({
           anchor={anchor}
           onClose={closeEvent}
           label={event.name}
-          width={288}
+          width={320}
           className="leave-event-popover"
         >
-          <span className="leave-popover-heading">
-            {event.request ? 'Leave details' : 'Company closure'}
-          </span>
-          <strong className={`leave-popover-type ${tone(event.name)}`}>{event.name}</strong>
-          <p>
-            {event.memberId
-              ? state.people.find((p) => p.id === event.memberId)?.name
-              : `${event.coveredIds?.length ?? 0} employees covered`}
-          </p>
-          <p>
-            {prettyDate(event.start)} – {prettyDate(event.end)}
-          </p>
-          {event.request && <LeavePopoverStatus pending={event.pending} />}
-          {event.request && (
-            <button
-              onClick={() => {
-                onRequest(event.request!)
-                setEvent(null)
-                setDay(null)
-              }}
-            >
-              View request
-            </button>
-          )}
+          <div className="leave-popover-identity">
+            <div className="leave-popover-person">
+              <strong>
+                {event.request
+                  ? state.people.find((person) => person.id === event.memberId)?.name || 'Employee'
+                  : 'Company closure'}
+              </strong>
+              <span className={`leave-popover-status ${event.pending ? 'pending' : 'approved'}`}>
+                {event.pending ? 'Pending' : event.request ? 'Approved' : 'Active'}
+              </span>
+            </div>
+            <div className="leave-popover-kind">
+              <i
+                className={`leave-popover-type ${event.policy ? 'closure' : tone(event.name)}`}
+                aria-hidden="true"
+              />
+              <span>{event.name}</span>
+            </div>
+          </div>
+          <div className="leave-popover-divider" />
+          <dl className="leave-popover-details">
+            <div>
+              <dt>Dates</dt>
+              <dd>
+                {new Intl.DateTimeFormat('en-GB', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                  timeZone: 'UTC',
+                }).formatRange(new Date(event.start), new Date(event.end))}
+              </dd>
+            </div>
+            <div>
+              <dt>{event.request ? 'Duration' : 'Applies to'}</dt>
+              <dd>
+                {event.request
+                  ? `${event.request.halfDays / 2} ${event.countAs === 'Working days' ? 'working ' : 'calendar '}${event.request.halfDays === 2 ? 'day' : 'days'}`
+                  : event.policy?.rules.coverage === 'All employees'
+                    ? 'All employees'
+                    : `${event.coveredIds?.length ?? 0} employees`}
+              </dd>
+            </div>
+          </dl>
+          <Button
+            type="button"
+            className={event.pending ? '' : 'secondary'}
+            onClick={() => {
+              closeEvent()
+              setDay(null)
+              if (event.request) onRequest(event.request)
+              else if (event.policy) onPolicy(event.policy)
+            }}
+          >
+            {event.pending ? 'Review request' : event.request ? 'View request' : 'View policy'}
+          </Button>
         </DetailMenu>
       )}
       {summary && anchor && (
@@ -618,13 +653,5 @@ export function LeaveCalendar({
         </DetailMenu>
       )}
     </div>
-  )
-}
-
-function LeavePopoverStatus({ pending }: { pending: boolean }) {
-  return (
-    <span className={`leave-popover-status ${pending ? 'pending' : 'approved'}`}>
-      {pending ? 'Pending approval' : 'Approved'}
-    </span>
   )
 }
