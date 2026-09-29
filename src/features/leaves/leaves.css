@@ -562,7 +562,7 @@
 }
 .leave-timeline {
   --leave-grid-line: rgb(229 229 229 / 35%);
-  min-width: 820px;
+  min-width: 688px;
   position: relative;
 }
 .leave-timeline-header {
