@@ -433,20 +433,6 @@ export function LeaveCalendar({
             monthGrid(date)
           ) : (
             <div className="leave-year">
-              <div className="leave-year-legend" aria-label="Calendar dot meanings">
-                <span>
-                  <i className="approved" />
-                  Approved leave
-                </span>
-                <span>
-                  <i className="pending" />
-                  Pending approval
-                </span>
-                <span>
-                  <i className="closure" />
-                  Company closure
-                </span>
-              </div>
               {Array.from({ length: 12 }, (_, i) => {
                 const m = `${date.slice(0, 4)}-${String(i + 1).padStart(2, '0')}-01`
                 const monthEvents = events.filter(

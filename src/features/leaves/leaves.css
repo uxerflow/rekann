@@ -2254,33 +2254,6 @@
   }
 }
 
-.leave-year-legend {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 16px;
-  color: #707070;
-  font-size: 12px;
-  line-height: 16px;
-}
-.leave-year-legend > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.leave-year-legend i {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ff4d4f;
-}
-.leave-year-legend .pending {
-  background: #ffbf00;
-}
-.leave-year-legend .closure {
-  background: #1685ff;
-}
 .leave-summary-empty {
   margin: 0;
   padding: 6px 8px 8px;

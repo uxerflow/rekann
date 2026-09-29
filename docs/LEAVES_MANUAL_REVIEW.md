@@ -35,6 +35,6 @@ Automated verification for this change is limited to dependency integrity, TypeS
 ## Year date popovers
 
 - [ ] In Year, click a date with dots. Its dated popover opens and the calendar stays in Year.
-- [ ] Check the legend: red is approved leave, yellow is pending approval, blue is company closure. A mixed date uses the matching dot for each row.
+- [ ] Check the summary dots: red is approved leave, yellow is pending approval, blue is company closure. A mixed date uses the matching dot for each row.
 - [ ] Click a date without events; it shows a short empty message without switching views.
 - [ ] Month badges open compact 320 px lists. Check long names, dates crossing months, Escape, outside click, and scrolling a long list.
