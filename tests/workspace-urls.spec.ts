@@ -45,7 +45,7 @@ test('workspace slugs stay unique, stable, authorized, and compatible with old l
   await page.getByRole('button', { name: 'Continue', exact: true }).click()
   await expect(page).toHaveURL(`/w/${first.slug}/onboarding/profile`)
   await page.goto(`/w/${second.slug}`)
-  await expect(page.getByRole('heading', { name: 'Welcome, Alex' })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Welcome to Rekann, Alex' })).toHaveCount(0)
   await expect(page.getByText(name, { exact: true })).toHaveCount(0)
   await profile(owner, first.id)
   await page.goto(`/workspace/${first.id}?view=team`)
@@ -54,7 +54,19 @@ test('workspace slugs stay unique, stable, authorized, and compatible with old l
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Team', exact: true })).toBeVisible()
   await page.goto(`/onboarding/profile?workspaceId=${first.id}`)
-  await expect(page).toHaveURL(`/w/${first.slug}/profile`)
+  await expect(page).toHaveURL(`/w/${first.slug}`)
+  for (const path of [
+    '/onboarding/company',
+    `/w/${first.slug}/onboarding/company`,
+    `/w/${first.slug}/onboarding/profile`,
+  ]) {
+    await page.goto(path)
+    await expect(page).toHaveURL(`/w/${first.slug}`)
+  }
+  await post(owner, 'workspace/onboarding-update', { ...input, workspaceId: first.id }, 403)
+  await page.goto('/onboarding/company?newWorkspace=true')
+  await expect(page.getByLabel('Company name')).toHaveValue('')
+  await page.goto(`/w/${first.slug}/profile`)
   await expect(page.getByRole('heading', { name: 'Edit your profile' })).toBeVisible()
   await context.close()
   await owner.dispose()

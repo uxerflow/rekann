@@ -192,6 +192,7 @@ export function CompanyOnboarding({
             onChange={(e) => setName(e.target.value)}
             required
             maxLength={100}
+            hint={`${name.length}/100 characters`}
             placeholder="e.g. Acme Inc."
             disabled={!!createdId}
           />
@@ -383,7 +384,8 @@ export function ProfileOnboarding({
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   required
-                  maxLength={80}
+                  maxLength={40}
+                  hint={`${firstName.length}/40 characters`}
                   placeholder="e.g. Alex"
                 />
                 <Field
@@ -391,7 +393,8 @@ export function ProfileOnboarding({
                   autoComplete="family-name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  maxLength={80}
+                  maxLength={40}
+                  hint={`${lastName.length}/40 characters`}
                   placeholder="e.g. Carter"
                   required
                 />
@@ -401,7 +404,8 @@ export function ProfileOnboarding({
                 autoComplete="organization-title"
                 value={jobTitle}
                 onChange={(e) => setJobTitle(e.target.value)}
-                maxLength={100}
+                maxLength={60}
+                hint={`${jobTitle.length}/60 characters`}
                 placeholder="e.g. Founder"
                 required
               />

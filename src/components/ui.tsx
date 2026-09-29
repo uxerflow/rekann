@@ -10,6 +10,7 @@ import {
 import { EyeOff, LoaderCircle, ImagePlus, X, CircleAlert } from 'lucide-react'
 import { avatarColors } from '../shared/avatar-colors'
 import { GradientPicker } from './gradient-picker'
+import { ScrollArea } from './scroll-area'
 import { avatarInitials, initialAvatar } from '../lib/initial-avatar'
 
 export function Brand({ compact = false }: { compact?: boolean }) {
@@ -17,7 +18,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
     <a href="/" aria-label="Rekann home" className="brand">
       <img
         src={compact ? '/brand/rekann-compact.svg' : '/brand/rekann.svg'}
-        width={compact ? 77 : 114}
+        width={compact ? 90.5668 : 108.4801}
         height={compact ? 20 : 24}
         alt="Rekann"
       />
@@ -323,40 +324,45 @@ export function ImagePicker({
             if (event.target === event.currentTarget) dialog.current?.close()
           }}
         >
-          <div className="avatar-dialog-header">
-            <h2 id={`${id}-avatar-title`}>Choose an avatar</h2>
-            <button
-              type="button"
-              className="icon-button"
-              aria-label="Close avatar picker"
-              onClick={() => dialog.current?.close()}
-            >
-              <X size={18} aria-hidden="true" />
-            </button>
-          </div>
-          <p className="hint">Choose a color or gradient for your profile.</p>
-          {avatarPickerOpened && (
-            <>
-              <h3 className="avatar-section-title">Colors</h3>
-              <div className="avatar-options">
-                {avatarColors.map((color, index) => (
-                  <button
-                    key={color.background}
-                    type="button"
-                    className="avatar-option"
-                    style={{ background: color.background, color: color.foreground }}
-                    disabled={avatarBusy}
-                    aria-label={`Choose avatar ${index + 1}`}
-                    onClick={() => chooseAvatar(index)}
-                  >
-                    {initials}
-                  </button>
-                ))}
-              </div>
-              <GradientPicker disabled={avatarBusy} onChoose={(src) => void chooseGradient(src)} />
-              <Notice>{error}</Notice>
-            </>
-          )}
+          <ScrollArea className="avatar-dialog-scroll">
+            <div className="avatar-dialog-header">
+              <h2 id={`${id}-avatar-title`}>Choose an avatar</h2>
+              <button
+                type="button"
+                className="icon-button"
+                aria-label="Close avatar picker"
+                onClick={() => dialog.current?.close()}
+              >
+                <X size={18} aria-hidden="true" />
+              </button>
+            </div>
+            <p className="hint">Choose a color or gradient for your profile.</p>
+            {avatarPickerOpened && (
+              <>
+                <h3 className="avatar-section-title">Colors</h3>
+                <div className="avatar-options">
+                  {avatarColors.map((color, index) => (
+                    <button
+                      key={color.background}
+                      type="button"
+                      className="avatar-option"
+                      style={{ background: color.background, color: color.foreground }}
+                      disabled={avatarBusy}
+                      aria-label={`Choose avatar ${index + 1}`}
+                      onClick={() => chooseAvatar(index)}
+                    >
+                      {initials}
+                    </button>
+                  ))}
+                </div>
+                <GradientPicker
+                  disabled={avatarBusy}
+                  onChoose={(src) => void chooseGradient(src)}
+                />
+                <Notice>{error}</Notice>
+              </>
+            )}
+          </ScrollArea>
         </dialog>
       )}
     </div>

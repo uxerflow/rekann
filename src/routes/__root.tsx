@@ -11,7 +11,12 @@ export const Route = createRootRoute({
       { title: 'Rekann' },
       { name: 'description', content: 'Lightweight people workspace for small teams.' },
     ],
-    links: [{ rel: 'stylesheet', href: stylesheet }],
+    links: [
+      { rel: 'stylesheet', href: stylesheet },
+      { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png' },
+      { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+      { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+    ],
   }),
   component: () => <Outlet />,
   pendingComponent: Loading,

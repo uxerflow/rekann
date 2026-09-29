@@ -29,9 +29,9 @@ export const workspaceUpdateInput = workspaceInput.extend({ workspaceId: id })
 export const profileInput = z
   .object({
     workspaceId: id,
-    firstName: text(80).min(1, 'Enter your first name.'),
-    lastName: text(80).min(1, 'Enter your last name.'),
-    jobTitle: text(100).min(1, 'Enter your job title.'),
+    firstName: text(40).min(1, 'Enter your first name.'),
+    lastName: text(40).min(1, 'Enter your last name.'),
+    jobTitle: text(60).min(1, 'Enter your job title.'),
     phone: text(30).refine(
       (v) => !v || /^[+()\d\s.-]{5,30}$/.test(v),
       'Enter a valid phone number.',
@@ -67,7 +67,12 @@ export const employeeRemoveInput = z.object({ workspaceId: id, employeeId: id })
 export const revokeInviteInput = z.object({ workspaceId: id, invitationId: id }).strict()
 export const acceptInviteInput = z.object({ token: z.string().regex(/^[a-f0-9]{64}$/) }).strict()
 export const mediaInput = z
-  .object({ workspaceId: id, kind: z.enum(['logo', 'avatar']), data: z.string().max(350_000) })
+  .object({
+    workspaceId: id,
+    kind: z.enum(['logo', 'avatar']),
+    employeeRecordId: z.uuid().optional(),
+    data: z.string().max(350_000),
+  })
   .strict()
 
 export type WorkspaceInput = z.infer<typeof workspaceInput>

@@ -1,22 +1,13 @@
-import { useRef, useState, type FormEvent } from 'react'
+import { TeamDirectory } from '../team/team-directory'
+import { Dashboard, type DashboardState } from './dashboard'
+import { DashboardShell } from './dashboard-shell'
+import { useRef, useState, useEffect, type FormEvent } from 'react'
 import { useRouter } from '@tanstack/react-router'
-import {
-  ArrowRight,
-  Check,
-  ChevronDown,
-  House,
-  LogOut,
-  Plus,
-  Settings2,
-  ShieldCheck,
-  UserRound,
-  Users,
-  X,
-} from 'lucide-react'
+import { Plus, ShieldCheck, UserRound, X } from 'lucide-react'
 import type { Bootstrap, WorkspaceDetails } from '../../server/workspaces'
 import type { ManagerPermission, Role } from '../../server/schema'
-import { api, messageOf, signOut } from '../../lib/api'
-import { Avatar, Brand, Button, Field, mediaUrl, Notice, useHydrated } from '../../components/ui'
+import { api, messageOf } from '../../lib/api'
+import { Avatar, Button, Field, mediaUrl, Notice, useHydrated } from '../../components/ui'
 import { managerPermissions, permissionLabels, roleLabels } from '../../shared/contracts'
 
 export function WorkspaceScreen({
@@ -28,7 +19,7 @@ export function WorkspaceScreen({
   viewer: Bootstrap
   view: string
 }) {
-  const { workspace, employee, permissions } = data
+  const { workspace, permissions } = data
   const router = useRouter()
   const hydrated = useHydrated()
   const [error, setError] = useState('')
@@ -50,156 +41,87 @@ export function WorkspaceScreen({
       setBusy(false)
     }
   }
+  const [preview, setPreview] = useState<DashboardState | null>(null)
+  useEffect(() => {
+    if (!import.meta.env.DEV) return
+    const state = new URLSearchParams(window.location.search).get('dashboardPreview')
+    if (
+      state &&
+      [
+        'filled',
+        'empty',
+        'loading',
+        'error',
+        'setup',
+        'welcome',
+        'setup-progress',
+        'setup-complete',
+      ].includes(state)
+    )
+      setPreview(state as DashboardState)
+  }, [])
+  const [announcement, setAnnouncement] = useState('')
   return (
-    <div className="workspace-shell">
-      <aside className="workspace-sidebar">
-        <Brand />
-        <label className="workspace-switcher">
-          <span className="sr-only">Switch workspace</span>
-          <Avatar name={workspace.name} image={mediaUrl(workspace.logoKey)} />
-          <select
-            value={workspace.slug}
-            onChange={(e) => window.location.assign(`/w/${e.target.value}`)}
-          >
-            {viewer.workspaces.map((w) => (
-              <option key={w.id} value={w.slug}>
-                {w.name}
-              </option>
-            ))}
-          </select>
-          <ChevronDown size={14} />
-        </label>
-        <nav aria-label="Workspace navigation">
-          <a aria-current={view === 'overview' ? 'page' : undefined} href={base}>
-            <House size={18} />
-            Overview
-          </a>
-          <a aria-current={view === 'team' ? 'page' : undefined} href={`${base}/team`}>
-            <Users size={18} />
-            Team
-          </a>
-          {permissions.admin && (
-            <a aria-current={view === 'access' ? 'page' : undefined} href={`${base}/access`}>
-              <Settings2 size={18} />
-              Roles & access
-            </a>
-          )}
-          <a href={`${base}/profile`}>
-            <UserRound size={18} />
-            My profile
-          </a>
-        </nav>
-        <a className="new-workspace" href="/onboarding/company">
-          <Plus size={15} />
-          New workspace
-        </a>
-        <div className="sidebar-bottom">
-          <Avatar
-            name={`${employee.firstName} ${employee.lastName}`}
-            image={mediaUrl(employee.avatarKey)}
-          />
-          <div>
-            <strong>{employee.firstName || viewer.user.name}</strong>
-            <small>{roleLabels[employee.role]}</small>
-          </div>
+    <DashboardShell
+      data={data}
+      viewer={viewer}
+      view={view}
+      onUnavailable={(name) => setAnnouncement(`${name} is not available yet.`)}
+    >
+      {announcement && (
+        <div className="dashboard-notice" role="status">
+          <span>{announcement}</span>
           <button
             className="icon-button"
-            aria-label="Sign out"
-            disabled={!hydrated}
-            onClick={() => void signOut().catch((e) => setError(messageOf(e)))}
+            aria-label="Dismiss message"
+            onClick={() => setAnnouncement('')}
           >
-            <LogOut size={18} />
+            <X size={16} />
           </button>
         </div>
-      </aside>
-      <div className="workspace-content">
-        <header className="workspace-topbar">
-          <span>{workspace.name}</span>
-          <span className="role-badge">{roleLabels[employee.role]}</span>
-        </header>
-        <main className="workspace-main">
-          <Notice>{error}</Notice>
-          <Notice success>{success}</Notice>
-          {view === 'overview' && (
-            <>
-              <div className="page-heading">
-                <p className="eyebrow">YOUR WORKSPACE</p>
-                <h1>Welcome, {employee.firstName || viewer.user.name}</h1>
-                <p>Your people, in one place. Let’s make this workspace yours.</p>
-              </div>
-              <div className="welcome-banner">
-                <div>
-                  <span className="banner-icon">
-                    <Check size={20} />
-                  </span>
-                  <h2>You’re all set</h2>
-                  <p>Your account is verified and your profile is ready.</p>
-                  <a href={`${base}/profile`}>
-                    View your profile <ArrowRight size={15} />
-                  </a>
-                </div>
-                <div className="welcome-card">
-                  <Avatar name={workspace.name} image={mediaUrl(workspace.logoKey)} large />
-                  <strong>{workspace.name}</strong>
-                  <span>
-                    {workspace.country} · {workspace.industry}
-                  </span>
-                </div>
-              </div>
-              <div className="overview-grid">
-                <a className="overview-card" href={`${base}/team`}>
-                  <Users size={22} />
-                  <h2>Your team</h2>
-                  <p>
-                    {data.employees.length} {data.employees.length === 1 ? 'person' : 'people'} in
-                    your workspace
-                  </p>
-                  <span>
-                    {permissions.invite ? 'Invite your teammates' : 'Meet your teammates'}{' '}
-                    <ArrowRight size={16} />
-                  </span>
-                </a>
-                {permissions.admin && (
-                  <a className="overview-card" href={`${base}/access`}>
-                    <ShieldCheck size={22} />
-                    <h2>Roles & access</h2>
-                    <p>Choose how your team manages this workspace.</p>
-                    <span>
-                      Manage permissions <ArrowRight size={16} />
-                    </span>
-                  </a>
-                )}
-                <div className="overview-card">
-                  <UserRound size={22} />
-                  <h2>Account security</h2>
-                  <p>Need a new password? We’ll verify your email first.</p>
-                  <a href={`/forgot-password?email=${encodeURIComponent(viewer.user.email)}`}>
-                    Reset password <ArrowRight size={16} />
-                  </a>
-                </div>
-              </div>
-            </>
-          )}
-          {view === 'team' && <Team data={data} busy={busy || !hydrated} mutate={mutate} />}
-          {view === 'access' &&
-            (permissions.admin ? (
+      )}
+      <Notice>{error}</Notice>
+      <Notice success>{success}</Notice>
+      {view === 'overview' && (
+        <Dashboard
+          data={data}
+          key={`${workspace.id}-${preview || 'default'}`}
+          state={preview || (permissions.admin ? 'welcome' : 'empty')}
+          onUnavailable={(name) => setAnnouncement(`${name} is not available yet.`)}
+        />
+      )}
+      {view === 'team' && (
+        <TeamDirectory
+          key={workspace.id}
+          data={data}
+          onAdd={() => window.location.assign(`${base}/team/add`)}
+        />
+      )}
+      {view === 'access' &&
+        (permissions.admin || permissions.invite || permissions.remove ? (
+          <>
+            {permissions.admin && (
               <Access
                 key={`${workspace.managersEnabled}-${workspace.managerPermissions.join(',')}`}
                 data={data}
                 busy={busy || !hydrated}
                 mutate={mutate}
               />
-            ) : (
-              <div className="empty-state">
-                <ShieldCheck size={30} />
-                <h1>Admin access required</h1>
-                <p>Only an admin can manage roles and workspace permissions.</p>
-                <a href={base}>Back to your workspace</a>
-              </div>
-            ))}
-        </main>
-      </div>
-    </div>
+            )}
+            <details className="panel">
+              <summary>Team access</summary>
+              <Team data={data} busy={busy || !hydrated} mutate={mutate} />
+            </details>
+          </>
+        ) : (
+          <div className="empty-state">
+            <ShieldCheck size={30} />
+            <h1>Admin access required</h1>
+            <p>Only an admin can manage roles and workspace permissions.</p>
+            <a href={base}>Back to your workspace</a>
+          </div>
+        ))}
+    </DashboardShell>
   )
 }
 type Mutation = (operation: string, body: Record<string, unknown>, message: string) => Promise<void>

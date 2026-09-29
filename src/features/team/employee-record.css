@@ -1,0 +1,298 @@
+.employee-record-page {
+  padding: 20px 40px 20px 20px;
+  font-size: 14px;
+  line-height: 20px;
+}
+.employee-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: #707070;
+  font-size: 13px;
+}
+.employee-record-columns {
+  display: grid;
+  grid-template-columns: 324px minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+.employee-personal-card {
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.employee-personal-card > h2 {
+  padding: 14px 16px;
+  margin: 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+.employee-personal-body {
+  padding: 24px 16px;
+}
+.employee-personal-body > .avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  font-size: 24px;
+  margin: 0 auto;
+}
+.employee-status {
+  display: table;
+  margin: -12px auto 20px;
+  position: relative;
+  background: #fffae8;
+  border: 1px solid #f2dea5;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 12px;
+  color: #926200;
+}
+.employee-status.active {
+  background: #ecfbf3;
+  color: #127857;
+  border-color: #c3ead7;
+}
+.employee-personal-name {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.employee-personal-name h1 {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.employee-personal-id {
+  text-align: center;
+  font-size: 13px;
+  color: #707070;
+  margin: 8px 0 16px;
+  overflow-wrap: anywhere;
+}
+.employee-profile-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.employee-record-page .button {
+  font-size: 14px;
+  min-height: 32px;
+  height: 32px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+.employee-personal-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 16px 0 0;
+  font-size: 13px;
+}
+.employee-personal-details > div {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 8px;
+}
+.employee-record-page dt {
+  color: #707070;
+}
+.employee-record-page dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.employee-record-content {
+  min-width: 0;
+}
+.employee-profile-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 28px;
+  overflow: auto;
+}
+.employee-profile-tabs button {
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: white;
+  font-size: 14px;
+  white-space: nowrap;
+  color: #707070;
+}
+.employee-profile-tabs button[aria-current] {
+  background: #f5f5f5;
+  color: #292929;
+  border-color: #d4d4d4;
+}
+.employee-invitation-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #aeddfd;
+  background: #ecf8ff;
+  border-radius: 18px;
+  margin-bottom: 36px;
+}
+.employee-invitation-banner > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.employee-invitation-banner h2 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  margin: 0;
+}
+.employee-invitation-banner p {
+  line-height: 22px;
+  margin: 0;
+  color: #707070;
+  overflow-wrap: anywhere;
+}
+.employee-invitation-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  background: #fff;
+  color: #007bd9;
+  flex-shrink: 0;
+}
+.employee-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.employee-record-content h2 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+}
+.employee-section-heading h2 {
+  margin: 0;
+}
+.employee-work-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.employee-work-cards article {
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  padding: 16px;
+  position: relative;
+  min-height: 110px;
+}
+.employee-work-cards > article > img {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  color: var(--color-brand);
+}
+.employee-work-cards h3 {
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 400;
+  margin: 0 30px 4px 0;
+}
+.employee-work-cards strong {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+}
+.employee-work-cards p {
+  font-size: 13px;
+  color: #707070;
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+.employee-details-section {
+  margin-top: 40px;
+}
+.employee-details-section article {
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  padding: 20px;
+  margin-top: 20px;
+}
+.employee-details-section h3 {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  margin: 0 0 24px;
+}
+.employee-details-section dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 32px;
+  font-size: 13px;
+  margin: 0;
+}
+.employee-details-section dl > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 1100px) {
+  .employee-record-columns {
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 24px;
+  }
+  .employee-work-cards {
+    grid-template-columns: 1fr;
+  }
+  .employee-invitation-banner {
+    flex-wrap: wrap;
+  }
+  .employee-details-section dl {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 700px) {
+  .employee-record-page {
+    padding: 16px;
+  }
+  .employee-record-columns {
+    grid-template-columns: 1fr;
+  }
+  .employee-record-page .button {
+    height: 44px;
+    min-height: 44px;
+  }
+  .employee-personal-card {
+    max-width: none;
+  }
+  .employee-profile-tabs button {
+    min-height: 44px;
+  }
+  .employee-invitation-banner > div:nth-child(2) {
+    flex-basis: 70%;
+  }
+  .employee-details-section dl > div {
+    grid-template-columns: 1fr 1fr;
+  }
+  .employee-dialog-actions > .button {
+    min-height: 44px;
+  }
+}
+
+.employee-details-section > h2 {
+  margin: 0;
+}
+.employee-invitation-banner > div {
+  flex: 1;
+  min-width: 0;
+}

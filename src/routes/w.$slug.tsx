@@ -1,3 +1,6 @@
+import { AddEmployee } from '../features/team/add-employee'
+import { EmployeeRecordScreen } from '../features/team/employee-record'
+import { DashboardRouteState } from '../features/workspace/dashboard'
 import { createFileRoute, redirect, useLocation, notFound } from '@tanstack/react-router'
 import { loadViewer, loadWorkspaceSlug } from '../lib/loaders'
 import { WorkspaceScreen } from '../features/workspace/workspace-screen'
@@ -12,9 +15,15 @@ export const Route = createFileRoute('/w/$slug')({
     const base = `/w/${data.workspace.slug}`
     const section = location.pathname.slice(base.length).replace(/\/$/, '')
     if (
-      !['', '/team', '/access', '/profile', '/onboarding/company', '/onboarding/profile'].includes(
-        section,
-      )
+      !/^\/team\/(?:add|records\/[a-f0-9-]{36}(?:\/edit)?)$/.test(section) &&
+      ![
+        '',
+        '/team',
+        '/access',
+        '/profile',
+        '/onboarding/company',
+        '/onboarding/profile',
+      ].includes(section)
     )
       throw notFound()
     const onboarding = section.startsWith('/onboarding/')
@@ -26,11 +35,20 @@ export const Route = createFileRoute('/w/$slug')({
     return { viewer, data }
   },
   component: WorkspaceRoute,
+  pendingComponent: () => <DashboardRouteState />,
+  errorComponent: () => <DashboardRouteState error />,
   head: () => ({ meta: [{ title: 'Your workspace · Rekann' }] }),
 })
 function WorkspaceRoute() {
   const { viewer, data } = Route.useRouteContext()
   const pathname = useLocation({ select: (location) => location.pathname })
+  const recordMatch = pathname.match(/\/team\/records\/([a-f0-9-]{36})(\/edit)?$/)
+  if (pathname.endsWith('/team/add') || recordMatch?.[2])
+    return <AddEmployee key={pathname} data={data} recordId={recordMatch?.[1]} />
+  if (recordMatch)
+    return (
+      <EmployeeRecordScreen key={pathname} data={data} viewer={viewer} recordId={recordMatch[1]} />
+    )
   if (pathname.endsWith('/profile') || pathname.endsWith('/onboarding/company'))
     return (
       <ProfileOnboarding
@@ -44,7 +62,11 @@ function WorkspaceRoute() {
       viewer={viewer}
       data={data}
       view={
-        pathname.endsWith('/team') ? 'team' : pathname.endsWith('/access') ? 'access' : 'overview'
+        pathname.endsWith('/team')
+            ? 'team'
+            : pathname.endsWith('/access')
+              ? 'access'
+              : 'overview'
       }
     />
   )

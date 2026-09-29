@@ -1,58 +1,87 @@
 # Project State
 
-Updated: September 15, 2026.
+Updated: September 27, 2026.
 
-Workspace URLs now use a unique, stable name-based slug under `/w/:slug`, with `/team`, `/access`, `/profile`, and `/onboarding/company` or `/onboarding/profile`. UUIDs remain internal authorization/database identifiers. Existing UUID links redirect after membership checks. Slugs gain numeric suffixes on collisions and do not change when the company name is edited. Migrations 0001–0003 add, backfill, and require slugs; applied only to the development database. Production still requires the normal migration phase before deployment.
+## Current status
 
-Workspace onboarding now has exactly two steps: company details → creator profile → workspace. Back reopens saved company details without creating another workspace and retains the profile draft. Primary onboarding actions stay disabled until required fields are filled. Company edits are restricted server-side to the creator before profile completion. Optional phone and birth information belongs to the separate invited Employee flow, which retains profile → employee details. Flow selection compares the membership user with the workspace creator, rather than relying on Admin role. Profile editing still exposes personal details. Existing personal data is preserved.
+Auth & Workspace and the dashboard UI are deployed to https://preview-f3d09c858192da81b6d6.rekann.app. The current local branch is `feat/auth-workspace`; deployment does not mean the local changes have been committed, reviewed, or merged. The waitlist is live at https://rekann.app with production database persistence. Resend Contacts, the dedicated waitlist segment, welcome delivery and signed unsubscribe synchronization are configured and tested live.
 
-## Current phase
+Notion remains the canonical product source. Follow the owner's approved Figma designs and implement in small phases. Team Directory phase one is implemented locally following the September 26 design review. Add Employee was authorized on September 27 and is implemented in development with three steps, saved drafts and invitation handling. Employee Detail is now implemented and deployed to staging: profile/work/personal edits, account access and reactivation, persisted attendance, leave requests/allowances/reviews and private documents with Undo. See docs/TEAM_DIRECTORY.md for permissions, policy boundaries and verification; this work was deployed to staging on September 27; production remains the waitlist.
 
-Auth & Workspace implemented on `feat/auth-workspace`, following the owner's approval and review of the Figma Auth section. PRD, SRS, and SDD were read from Notion. The owner requested that Resend and remaining production service configuration happen after implementation. The previously deployed foundation is recorded below; this auth branch has not been deployed remotely.
+## Implemented
 
-The implementation includes email/password signup and sign-in, six-digit verification, password reset, company/profile onboarding, private company/profile images, create/join/switch workspaces, invitations, Team, and Roles & access. Google OAuth is disabled. Interface and email copy are English. Admin is workspace-scoped; Manager / HR is optional with individually delegated invitation/removal permissions; Employee is the default non-admin role. See `docs/AUTH_WORKSPACE.md` and `docs/DESIGN_SYSTEM.md`.
+- Email/password signup and sign-in, six-digit verification, password reset, sessions, and sign-out. Google OAuth remains disabled.
+- Company/profile onboarding, private company logos and profile images, create/join/switch workspaces, invitations, basic Team, and Roles & access.
+- Workspace-scoped Admin, optional Manager / HR with delegated permissions, and Employee. Protected operations enforce membership and permissions on the server.
+- Stable, unique workspace URLs under `/w/:slug`. Legacy UUID links redirect after authorization; collisions receive numeric suffixes.
+- Creator onboarding has two steps: company details and profile. Back preserves entered data; primary actions require valid required fields. Invited employees retain their separate profile/details flow.
+- Completed onboarding redirects to the workspace, including legacy profile URLs. The generic company URL resumes the existing workspace flow. Another workspace requires the explicit Create a workspace action (`?newWorkspace=true`). The server rejects company onboarding changes after completion; normal profile editing remains available.
+- Updated Rekann branding and favicon SVG/PNG plus Apple touch icon exported from Figma node `387:12176`.
+- Shared motion, scrollbars, focus, reduced-motion behavior, field limits, and overflow protections are documented in `docs/DESIGN_SYSTEM.md`.
 
-## Database and runtime
+## Dashboard and remaining feature boundaries
 
-- Neon organization/project: Rekann / Rekann App (`bold-flower-53962598`), Singapore.
-- Created development branch `auth-development` (`br-holy-feather-b33zppyv`) from the empty production branch. Applied tracked migration `0000_thankful_groot.sql` to development only.
-- Nine tables cover Better Auth identity/sessions/verification/rate limits and workspace/membership/invitations/audit.
-- The application uses `rekann_runtime`, verified unable to create tables or delete audit events. Runtime credentials are in ignored `.dev.vars`; migration owner credentials are separate in ignored `.env.migrations`, both with restrictive file permissions.
-- Neon CLI `.neon` context remains production. Use the explicit development branch name when requesting CLI connection strings.
-- R2 is bound as `MEDIA` for local private image tests. A production R2 bucket has not been provisioned in this task.
-- Development email goes to a loopback-only, in-memory inbox. No real verification, reset, or invitation email was sent externally.
-- Temporary connection-string files were removed. Secrets were scanned against source candidates and browser output without exposing their values.
+The dashboard shell, welcome card, setup checklist, widget layouts, responsive presentation, and Assistant UI exist. This is not a complete live HR backend:
 
-## Verification
+- Dashboard metrics and preview states use sample values rather than attendance, time-off, and approval data.
+- Setup completion is not fully connected to saved company settings and leave policies.
+- Quick notes/checklists use browser local storage rather than server persistence.
+- The Assistant is a development-only visual preview with simulated responses; provider execution is not included in this baseline.
+- The local Team Directory now has live workspace-scoped list/grid browsing, search, combined department/type filters, sort, pagination, personal browser-local pins, and loading/empty/error recovery states. Nullable employment fields were added with migration 0006 in development only. Existing invitation/access management is preserved in Settings → Team access. Add Employee and its saved-record/invitation screens now follow as the next local phase, with migrations 0007–0008 applied in development. Employee Detail follows with migration 0009, also development only.
 
-Completed checks for the implementation:
+## Staging resources
 
-- Frozen dependency installation, production build, strict TypeScript, and formatting checks.
-- Unit tests for production/local-email configuration boundaries, invalid dates/time zones, safe invitation redirects, and bounded streamed JSON.
-- Eight end-to-end scenarios against the local **production Workers build**, actual Neon development PostgreSQL, and local private R2.
-- Browser coverage: desktop signup, code verification, company/profile onboarding, image upload, workspace entry, Team, persisted manager settings, sign-out; mobile invitation signup/acceptance/profile, password recovery and sign-in; keyboard navigation, password visibility, invalid invitation screen, and horizontal-overflow checks.
-- API coverage: unverified access denial, password policy, single-use OTP, reset session revocation, sign-out, unknown-account recovery response, database rate limits, blocked unused auth endpoints, cross-workspace denial, employee escalation attempts, manager restrictions, immediate role/removal effects, invitation rotation/revocation/expiry, concurrent invitation acceptance, concurrent last-admin protection, private image authorization, invalid image rejection, and CSRF rejection.
-- Visual inspection of desktop auth/company/profile/workspace and mobile profile/access screens. Screenshots remain under ignored `test-results/screens/`.
-- Dependency audit reports no known vulnerabilities. Targeted overrides address the inherited Miniflare image library and drizzle-kit legacy esbuild dependency.
-- No credential values found in version-controlled candidates or the complete browser bundle.
+- Cloudflare account: Rekann (`f0f101bf2b8415c34b2a1589e4017295`), Wrangler profile `rekann`.
+- Worker: `rekann-staging`; custom domain: `preview-f3d09c858192da81b6d6.rekann.app`; private R2 bucket: `rekann-staging-media`.
+- Neon project: `bold-flower-53962598`, Singapore; staging branch: `br-nameless-salad-b3p61oq1`. Tracked migrations were applied to an initially empty branch; staging now may contain owner test accounts and must not be reset.
+- Restricted runtime role: `rekann_runtime`. Development and staging use separate database branches. The local `.neon` context still targets production; specify the intended branch explicitly.
+- Resend domain `updates.rekann.app` is verified. Sender: `Rekann <noreply@updates.rekann.app>`.
+- Database, auth, and email credentials are Worker secrets, with ignored local configuration. Never print or commit credentials.
+- Staging is internet-accessible, with authenticated application data. Use test data. Build with `CLOUDFLARE_ENV=staging`; see `docs/STAGING.md` for deployment instructions.
+- Latest verified deployment: `97c4e427-0701-4f95-a231-dcc647351de3` on September 27, 2026. Team Directory, Add Employee and Employee Detail are included; migrations through 0009 are applied. Live authenticated staging smoke checks passed and temporary test data was cleaned up.
 
-These checks establish local implementation behavior. They do not establish real email deliverability, production CPU capacity, or disaster recovery readiness.
+## Verification and limits
 
-## Final integration phase
+Latest staging work passed typecheck, build, and the targeted workspace URL/onboarding browser test. It covers completed-onboarding redirects, forbidden company onboarding updates after completion, explicit creation of another workspace, legacy links, and normal profile editing. The test used the local mailbox and development database.
 
-1. Configure a verified Resend sender and its Worker secrets.
-2. Provision the private production R2 bucket and production runtime database role.
-3. Apply the reviewed migration to production with the migration owner credentials; set production application secrets and the exact HTTPS auth origin.
-4. Deploy after integration review, then test real verification/recovery/invitation emails and private images on the public Worker. Measure actual Workers CPU/usage against the selected plan.
-5. Verify database recovery before using real employee data. Replace the provisional logo when the final brand is ready.
+Staging smoke checks verified HTTPS auth pages, unauthenticated session/API behavior, and a database-backed invitation lookup. Desktop/mobile auth page checks found no JavaScript errors or horizontal overflow. All three deployed favicon assets returned HTTP 200 and matched their source exports.
 
-Do not merge this integration-incomplete branch into automatic production deployment. Keep the branch reviewable while the final service setup is pending.
+The owner confirmed an actual verification email arrived in Gmail from the configured Resend sender. This confirms that delivery example; it does not establish every auth or invitation flow on staging.
 
-## Foundation history
+Earlier local Auth & Workspace validation covered signup/onboarding, private uploads, recovery, invitation acceptance/rotation/revocation/expiry, role restrictions, cross-workspace denial, concurrent last-admin protection, CSRF, and rate limits. These are historical local results, not a claim that the entire suite was rerun against staging.
 
-The empty-directory rebuild used TanStack Start 1.168.49, React Router 1.170.32, React 19.2.8, TypeScript 5.9.3, Tailwind 4.3.3, Vite 8.2.2, Cloudflare Vite plugin 1.54.4, and Wrangler 4.129.0. Framework versions remain pinned. Auth dependencies and testing/formatting tools were added with pinned versions and the lockfile.
+### Preview login latency investigation
 
-The public canonical repository is `https://github.com/uxerflow/rekann`, Apache-2.0, managed via `barlydesign`. `main` is the only long-lived branch; PRs use short-lived work branches. The recorded foundation deployment is commit `df0b9183342b27e1773e1a234f6fac7ddebdc0c4`, Worker version `7df8dfc8-077e-4ca5-a6c7-5f153807ebd2`, at `https://rekann-app.rekann-app.workers.dev`. GitHub Actions deploys `main` after CI passes using the `production` environment. Account routing is documented in `AGENTS.md`.
+On September 24, the owner reported a roughly one-minute sign-in followed by a workspace load error on the new preview hostname. Follow-up tests measured a successful login through company onboarding at 1.7 seconds and through an existing completed workspace at 2.0 seconds (auth requests approximately 395–822 ms). Temporary test identities/workspaces were removed; no external test email was sent. A read-only check confirmed the affected account remained verified with an active membership and completed profile. The owner retried and confirmed login was fast and successful.
+
+The original failure was not reproduced and its cause remains unconfirmed. No performance code change or database migration was made during this investigation. These samples do not establish cold-start or sustained-load performance. If it recurs, capture request timing and the failing response before assigning a cause.
+
+## Waitlist — public release, September 25
+
+- Approved Figma waitlist `1024:60322`, Updates `1047:56211`, and OG `989:109950` are implemented with the original assets and design font. Desktop/mobile use the email-only 40px form, success/duplicate states, two scrollable product updates and `https://x.com/rekannapp`.
+- Neon production branch `br-purple-water-b3gx5d4v` has migrations 0000–0005; development has 0004–0005. The restricted `rekann_waitlist_runtime` role cannot read auth users/workspaces. Atomic deduplication, consent recording, IP rate limiting, signed unsubscribe, verified suppression webhooks and durable Resend delivery retries are implemented separately from app accounts.
+- Public `SITE_MODE=waitlist` serves `/` without an auth/database bootstrap and blocks app registration/workspace routes. App mode preserves the current preview behavior and offers `/waitlist` for review.
+- Frozen install, strict typecheck, the waitlist environment build, 11 unit/database/security tests and 10 browser scenarios passed locally. Browser coverage includes 1440px, 392px and 320px layouts, update navigation/scroll, original screenshot aspect ratio, submit/error/duplicate states, focus restoration and unsubscribe confirmation. The local marketing environment also returned the correct root/robots and blocked auth routes.
+- Live cold-network comparison: first paint 3.64 → 2.52 seconds; enabled signup 4.09 → 2.80 seconds at 1.6 Mbps / 150 ms. Initial transferred resources decreased by about 42%; motion/overlay chunks are absent until interaction. No blank-green frame, partial preview or layout shift was observed.
+- Initial payload is reduced: waitlist CSS is 49.92 kB gzip (from 156.04 kB), the dashboard is a lossless 60 KiB WebP (from 135 KiB PNG), and decorative preview requests have low priority. Updates/dialogs and their motion dependency load on interaction. Ten browser scenarios, typecheck and production build passed.
+- Cold loading is stabilized: optimized background and critical fonts are embedded in the initial waitlist CSS, while dashboard preview motion waits for image decoding. Ten browser scenarios cover delayed images, no-JavaScript rendering and focus stability; the throttled cold production build recorded no plain-green frame, partial preview or layout shift.
+- Signup controls stay stationary after a focus/blur regression fix. Typing, clearing, tabbing to the submit button and clicking outside the form no longer replay the entrance. Eight browser tests and the waitlist build passed.
+- Waitlist motion polish is live: staggered hero/dashboard entrances, reversible Updates panel transitions, shared modal exits and success feedback. Eight browser scenarios, typecheck and the waitlist build passed; reduced-motion preferences and rapid close/reopen are covered. Live update navigation was verified.
+- Owner-authorized public deployment: `rekann-waitlist`, version `ebca3c9c-bf9e-4325-90a5-6dff4d4b9c01`. Worker Routes cover apex/www using existing proxied DNS; www redirects to the apex. Favicon/Apple icon/OG assets match source bytes. App/auth endpoints are blocked and preview sign-in remains available. Scrollbar is outside update cards and the 40px white input uses auth border/focus styling.
+- Live signup (761ms sample), duplicate detection (314ms), persisted consent, signed one-click unsubscribe, invalid-token rejection, non-mutating GET and preserved unsubscribe all passed. All three synthetic test recipients remain unsubscribed and their sync queue is drained. Resend confirmed welcome delivery with one message per recipient; real provider unsubscribe webhooks and the actual email unsubscribe link synchronized both directions. No real user inbox or campaign was messaged. Input now inherits shared auth input styling directly, verified by computed-style comparison and six browser scenarios. No commit or push was made. See `docs/WAITLIST.md`.
+
+## Next work
+
+1. Complete staging acceptance: password reset, invitation through acceptance, private logo/avatar upload, sign-out/sign-in, and role/access checks. The owner plans to perform real-email testing.
+2. Owner review of local Team Directory and Add Employee, followed by the separately scoped active-member detail modules.
+3. Connect dashboard widgets and setup progress to real module data as those modules are implemented; decide server persistence for Quick notes.
+4. Scope Assistant integration separately with the owner and current Notion requirements before implementing provider access or data-changing actions.
+5. Owner acceptance of the live waitlist in a real inbox; Resend test-recipient delivery and both unsubscribe directions already passed. Operational details and queue checks are in `docs/WAITLIST.md`.
+6. Reconcile documentation and review local changes before a GitHub PR/merge. The existing CI deploys `main` to the default production Worker; staging deployment does not establish production readiness. Verify production resources, recovery, and deployment targeting before release or real employee data.
+
+## Historical design work
+
+The following records describe earlier local implementation work. Any statements about pending production integration refer to that earlier phase; current staging status is recorded above.
 
 ## Figma fidelity follow-up
 
@@ -71,3 +100,18 @@ Avatar picker now includes 40 Avvvatars-derived solid colors with initials and o
 Gradient expansion: the four allowed families now span all 40 Oreo palettes (160 combinations). The picker loads 12 per batch, supports Shuffle without changing the selected avatar, displays real loading skeletons, and offers retry for failed images. Browser validation covers disjoint shuffled batches, delayed image loading, and selection/persistence.
 
 Solid-color avatars selected during onboarding now follow live name initials in both previews, retaining the color through the optional-details step and submitting the final PNG. Gradient/photo choices remain independent of the name. Existing image-only selections require color reselection to enable the live behavior.
+
+## Team Directory development verification — September 26
+
+- Desktop bounds were checked against Figma section 938:49767: sidebar/header/toolbars, search field, table rows, and grid cards.
+- Browser verification covers real authorized directory reads, cross-workspace rejection, populated visual fixtures, combined filters, search, sorting by keyboard, page-size changes, pin/view persistence, empty/error/retry/loading and reduced motion. Grid and table were checked down to 320px without document overflow.
+- Test fixtures use isolated identities and are cleaned up; no sample employees were inserted into the owner's workspace.
+- Build/typecheck and focused tests are recorded in docs/TEAM_DIRECTORY.md. No staging/production release, commit or push was performed for this phase.
+
+## Add Employee development verification — September 27
+
+- Figma section 951:67790 implemented as Personal → Employment → Additional, with corrected copy/placeholders, shared controls, original backdrop/icons and responsive layout. Saved-record and invitation screens show actual employee/workspace data.
+- Drafts and ready records are persisted independently of auth accounts. Invitation acceptance links the record to one workspace membership without duplicating the directory entry. Duplicate email/ID, stale edits, permission boundaries, private media targeting and failure retries are covered.
+- Generated migrations 0007–0008 are applied to development only. No sample employees remain in the owner's workspace; browser-test identities are cleaned up.
+- Frozen dependencies, TypeScript, build, 15 unit tests and focused directory/Add Employee browser checks passed. Invitation transport was mocked for service tests; no external invitation email was sent during this validation.
+- Full active-member editing, attendance/leave/documents and statistics remain deferred. See docs/TEAM_DIRECTORY.md for precise scope and checks. No deploy, commit or push performed.

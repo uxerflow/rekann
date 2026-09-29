@@ -1,4 +1,12 @@
-import { useEffect, useLayoutEffect, useId, useRef, useState, type KeyboardEvent } from 'react'
+import {
+  useEffect,
+  useLayoutEffect,
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from 'react'
 import { createPortal } from 'react-dom'
 import { Check, Search, X } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
@@ -16,6 +24,16 @@ export function SelectField({
   onChange,
   searchable = false,
   disabled = false,
+  compact = false,
+  prefix,
+  displayValue,
+  menuWidth,
+  required = true,
+  allowCustom = false,
+  disabledOptions = [],
+  menuDescription,
+  menuAction,
+  onOpen,
 }: {
   label: string
   placeholder: string
@@ -24,11 +42,28 @@ export function SelectField({
   onChange: (value: string) => void
   searchable?: boolean
   disabled?: boolean
+  compact?: boolean
+  prefix?: ReactNode
+  displayValue?: ReactNode
+  menuWidth?: number
+  required?: boolean
+  allowCustom?: boolean
+  disabledOptions?: readonly string[]
+  menuDescription?: ReactNode
+  menuAction?: {
+    section: string
+    label: string
+    icon?: ReactNode
+    disabled?: boolean
+    onSelect: () => void
+  }
+  onOpen?: () => void
 }) {
   const id = useId()
   const ready = useHydrated()
   const trigger = useRef<HTMLButtonElement>(null)
   const popup = useRef<HTMLDivElement>(null)
+  const actionButton = useRef<HTMLButtonElement>(null)
   const search = useRef<HTMLInputElement>(null)
   const list = useRef<HTMLDivElement>(null)
   const keyboardNavigation = useRef(false)
@@ -39,13 +74,18 @@ export function SelectField({
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
   const [position, setPosition] = useState({ left: 0, top: 0, width: 0, maxHeight: 300 })
-  const filtered = options.filter((option) => normalize(option).includes(normalize(query.trim())))
+  const matches = options.filter((option) => normalize(option).includes(normalize(query.trim())))
+  const filtered =
+    allowCustom && query.trim() && !options.some((o) => normalize(o) === normalize(query.trim()))
+      ? [...matches, query.trim()]
+      : matches
 
   function close(restoreFocus = false) {
     setOpen(false)
     if (restoreFocus) trigger.current?.focus()
   }
   function choose(option: string) {
+    if (disabledOptions.includes(option)) return
     onChange(option)
     close(true)
   }
@@ -54,8 +94,13 @@ export function SelectField({
     setQuery('')
     keyboardNavigation.current = true
     setHovering(false)
-    setActive(Math.max(0, options.indexOf(value)))
+    setActive(
+      options.includes(value) && !disabledOptions.includes(value)
+        ? options.indexOf(value)
+        : options.findIndex((option) => !disabledOptions.includes(option)),
+    )
     setOpen(true)
+    onOpen?.()
   }
   useLayoutEffect(() => {
     if (!open) return
@@ -67,10 +112,16 @@ export function SelectField({
       const below = bottom - rect.bottom - 8
       const height = Math.min(300, Math.max(above, below) - 8)
       const up = below < Math.min(300, height) && above > below
+      const dialog = trigger.current!.closest('dialog')
+      const origin = dialog?.getBoundingClientRect()
+      const offsetX = origin ? origin.left + (dialog?.clientLeft ?? 0) : 0
+      const offsetY = origin ? origin.top + (dialog?.clientTop ?? 0) : 0
       setPosition({
-        left: rect.left,
-        top: up ? rect.top - 8 : rect.bottom + 8,
-        width: rect.width,
+        left:
+          Math.max(8, Math.min(rect.left, window.innerWidth - (menuWidth ?? rect.width) - 8)) -
+          offsetX,
+        top: (up ? rect.top - 8 : rect.bottom + 8) - offsetY,
+        width: menuWidth ?? rect.width,
         maxHeight: Math.max(100, height),
       })
       popup.current?.setAttribute('data-side', up ? 'top' : 'bottom')
@@ -97,14 +148,16 @@ export function SelectField({
       window.removeEventListener('scroll', scrolled, true)
       window.visualViewport?.removeEventListener('resize', place)
     }
-  }, [open, searchable])
+  }, [open, searchable, menuWidth])
   useEffect(() => {
     if (disabled) setOpen(false)
   }, [disabled])
   useLayoutEffect(() => {
     if (!open) return
     const row = document.getElementById(`${id}-option-${active}`)
-    if (row) {
+    if (!row) return
+    function measure() {
+      if (!row) return
       setHighlight({ y: row.offsetTop, height: row.offsetHeight })
       if (keyboardNavigation.current) {
         const viewport = row.closest<HTMLElement>('.scroll-viewport')
@@ -115,6 +168,10 @@ export function SelectField({
         }
       }
     }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(row)
+    return () => observer.disconnect()
   }, [active, open, id, query])
 
   function keyboard(event: KeyboardEvent) {
@@ -125,21 +182,30 @@ export function SelectField({
       event.preventDefault()
       close(true)
     } else if (event.key === 'Tab') {
-      // Return to the trigger before normal tab navigation leaves the widget.
-      if (open) close(true)
+      if (open && !event.shiftKey && menuAction && !menuAction.disabled) {
+        event.preventDefault()
+        actionButton.current?.focus()
+      } else if (open) close(true)
     } else if (['ArrowDown', 'ArrowUp'].includes(event.key)) {
       event.preventDefault()
       if (!open) show()
       else
-        setActive((index) =>
-          Math.max(0, Math.min(filtered.length - 1, index + (event.key === 'ArrowDown' ? 1 : -1))),
-        )
+        setActive((index) => {
+          const step = event.key === 'ArrowDown' ? 1 : -1
+          for (let next = index + step; next >= 0 && next < filtered.length; next += step) {
+            if (!disabledOptions.includes(filtered[next])) return next
+          }
+          return index
+        })
     } else if (event.key === 'Enter' && open) {
       event.preventDefault()
       if (filtered[active]) choose(filtered[active])
     } else if (!searchable && open && ['Home', 'End'].includes(event.key)) {
       event.preventDefault()
-      setActive(event.key === 'Home' ? 0 : filtered.length - 1)
+      const enabled = filtered
+        .map((option, index) => ({ option, index }))
+        .filter(({ option }) => !disabledOptions.includes(option))
+      setActive((event.key === 'Home' ? enabled[0] : enabled.at(-1))?.index ?? -1)
     } else if (
       !searchable &&
       event.key.length === 1 &&
@@ -150,23 +216,30 @@ export function SelectField({
       event.preventDefault()
       if (!open) show()
       const index = options.findIndex(
-        (option, i) => i > active && normalize(option).startsWith(normalize(event.key)),
+        (option, i) =>
+          i > active &&
+          !disabledOptions.includes(option) &&
+          normalize(option).startsWith(normalize(event.key)),
       )
       setActive(
         index >= 0
           ? index
           : Math.max(
               0,
-              options.findIndex((option) => normalize(option).startsWith(normalize(event.key))),
+              options.findIndex(
+                (option) =>
+                  !disabledOptions.includes(option) &&
+                  normalize(option).startsWith(normalize(event.key)),
+              ),
             ),
       )
     }
   }
   return (
-    <div className="field">
-      <label id={`${id}-label`} htmlFor={id}>
+    <div className={compact ? 'field select-compact' : 'field'}>
+      <label id={`${id}-label`} htmlFor={id} className={compact ? 'sr-only' : undefined}>
         {label}
-        <span className="required"> *</span>
+        {!compact && required && <span className="required"> *</span>}
       </label>
       <button
         id={id}
@@ -175,8 +248,9 @@ export function SelectField({
         className="select-trigger"
         disabled={!ready || disabled}
         role={searchable ? undefined : 'combobox'}
-        aria-required={searchable ? undefined : true}
+        aria-required={required && !compact ? true : undefined}
         aria-labelledby={`${id}-label ${id}-value`}
+        aria-description={displayValue !== undefined ? value : undefined}
         aria-haspopup={searchable ? 'dialog' : 'listbox'}
         aria-expanded={open}
         aria-controls={open ? `${id}-${searchable ? 'popup' : 'list'}` : undefined}
@@ -186,7 +260,8 @@ export function SelectField({
         onClick={() => (open ? close() : show())}
         onKeyDown={keyboard}
       >
-        <span id={`${id}-value`}>{value || placeholder}</span>
+        {prefix}
+        <span id={`${id}-value`}>{displayValue ?? (value || placeholder)}</span>
         <img src="/icons/chevron-down.svg" alt="" width={16} height={16} />
       </button>
       {ready &&
@@ -196,7 +271,7 @@ export function SelectField({
               <motion.div
                 ref={popup}
                 id={`${id}-popup`}
-                className="select-popup"
+                className={compact ? 'select-popup select-popup-compact' : 'select-popup'}
                 style={position}
                 initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -211,8 +286,17 @@ export function SelectField({
                     <input
                       ref={search}
                       role="combobox"
-                      aria-label="Search countries"
-                      placeholder="Search countries…"
+                      aria-label={
+                        label === 'Location' ? 'Search countries' : `Search ${label.toLowerCase()}`
+                      }
+                      maxLength={160}
+                      placeholder={
+                        allowCustom
+                          ? 'Search or enter a new value…'
+                          : label === 'Location'
+                            ? 'Search countries…'
+                            : `Search ${label.toLowerCase()}…`
+                      }
                       aria-autocomplete="list"
                       aria-expanded={open}
                       aria-controls={`${id}-list`}
@@ -243,7 +327,7 @@ export function SelectField({
                     )}
                   </div>
                 )}
-                <ScrollArea>
+                <ScrollArea type="auto" gutter>
                   <div
                     ref={list}
                     id={`${id}-list`}
@@ -266,8 +350,9 @@ export function SelectField({
                         }
                       })
                       keyboardNavigation.current = false
-                      setHovering(true)
-                      setActive(nearest)
+                      const enabled = rows[nearest]?.getAttribute('aria-disabled') !== 'true'
+                      setHovering(enabled)
+                      if (enabled) setActive(nearest)
                     }}
                     onClick={(event) => {
                       if (event.target === event.currentTarget && filtered[active])
@@ -291,6 +376,7 @@ export function SelectField({
                         id={`${id}-option-${index}`}
                         role="option"
                         aria-selected={value === option}
+                        aria-disabled={disabledOptions.includes(option) || undefined}
                         className={`select-option ${active === index ? 'active' : ''}`}
                         onMouseDown={(event) => event.preventDefault()}
                         onClick={() => choose(option)}
@@ -301,15 +387,52 @@ export function SelectField({
                     ))}
                   </div>
                 </ScrollArea>
+                {menuDescription && (
+                  <div className="select-menu-description">{menuDescription}</div>
+                )}
+                {menuAction && (
+                  <div className="select-menu-action">
+                    <p>{menuAction.section}</p>
+                    <button
+                      ref={actionButton}
+                      type="button"
+                      disabled={menuAction.disabled}
+                      onClick={() => {
+                        close(true)
+                        menuAction.onSelect()
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Escape') {
+                          event.preventDefault()
+                          event.stopPropagation()
+                          close(true)
+                        } else if (event.key === 'Tab') {
+                          if (event.shiftKey) {
+                            event.preventDefault()
+                            trigger.current?.focus()
+                          } else close(true)
+                        } else if (event.key === 'ArrowUp') {
+                          event.preventDefault()
+                          trigger.current?.focus()
+                        }
+                      }}
+                    >
+                      {menuAction.icon}
+                      <span>{menuAction.label}</span>
+                    </button>
+                  </div>
+                )}
                 {searchable && (
                   <p role="status" className={filtered.length ? 'sr-only' : 'select-empty'}>
-                    {filtered.length ? `${filtered.length} countries found` : 'No countries found'}
+                    {filtered.length
+                      ? `${filtered.length} ${label === 'Location' || label === 'Country' || label === 'Nationality' ? 'countries' : 'options'} found`
+                      : 'No options found'}
                   </p>
                 )}
               </motion.div>
             )}
           </AnimatePresence>,
-          document.body,
+          trigger.current?.closest('dialog') ?? document.body,
         )}
     </div>
   )

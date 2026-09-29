@@ -4,9 +4,13 @@ import { loadViewer } from '../lib/loaders'
 import { AuthLayout } from '../components/auth-layout'
 import { Avatar } from '../components/ui'
 import { roleLabels } from '../shared/contracts'
+import { loadSiteMode } from '../lib/site'
+import { Waitlist } from '../features/waitlist/waitlist'
+import { waitlistHead } from '../features/waitlist/meta'
 
 export const Route = createFileRoute('/')({
   loader: async () => {
+    if (await loadSiteMode()) return { site: 'waitlist' as const, viewer: null }
     const data = await loadViewer()
     if (!data) throw redirect({ to: '/sign-in', search: { email: '', next: '', reset: false } })
     if (data.workspaces.length === 0) throw redirect({ to: '/onboarding/company' })
@@ -18,12 +22,15 @@ export const Route = createFileRoute('/')({
         href: `/w/${company.slug}`,
       })
     }
-    return data
+    return { site: 'app' as const, viewer: data }
   },
+  head: ({ loaderData }) => (loaderData?.site === 'waitlist' ? waitlistHead(true) : {}),
   component: WorkspacePicker,
 })
 function WorkspacePicker() {
-  const data = Route.useLoaderData()
+  const loaded = Route.useLoaderData()
+  if (loaded.site === 'waitlist') return <Waitlist />
+  const data = loaded.viewer
   return (
     <AuthLayout title="Choose your workspace" subtitle="Where would you like to work today?">
       <div className="workspace-picker">
@@ -45,7 +52,7 @@ function WorkspacePicker() {
             <ArrowRight size={18} />
           </a>
         ))}
-        <a className="button secondary" href="/onboarding/company">
+        <a className="button secondary" href="/onboarding/company?newWorkspace=true">
           <Plus size={16} />
           Create a workspace
         </a>

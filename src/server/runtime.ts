@@ -20,7 +20,7 @@ export async function withRuntime(
     db: ReturnType<typeof connectDatabase>['db']
     auth: ReturnType<typeof createAuth>
     config: ReturnType<typeof readConfig>
-    media: R2Bucket
+    media: R2Bucket | undefined
   }) => Promise<Response>,
 ) {
   let connection: ReturnType<typeof connectDatabase> | undefined

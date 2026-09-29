@@ -181,6 +181,6 @@ test('Figma desktop dimensions, field states, onboarding cards, and avatar selec
   await expect(page.getByText('Step 2/2')).toBeVisible()
   await expect(page.getByLabel('Phone number')).toHaveCount(0)
   await page.getByRole('button', { name: 'Go to workspace', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'Welcome, Alex' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Welcome to Rekann, Alex' })).toBeVisible()
   await owner.dispose()
 })

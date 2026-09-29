@@ -2,7 +2,15 @@ import { and, eq, gt, sql } from 'drizzle-orm'
 import type { Database, Transaction } from './db'
 import type { Auth } from './auth'
 import type { AppConfig } from './config'
-import { auditEvent, invitation, rateLimit, user, workspace, workspaceMember } from './schema'
+import {
+  auditEvent,
+  invitation,
+  rateLimit,
+  user,
+  workspace,
+  workspaceMember,
+  employeeRecord,
+} from './schema'
 import type { ManagerPermission, Role } from './schema'
 import { invitationEmail, sendEmail } from './email'
 import * as inputs from '../shared/contracts'
@@ -257,6 +265,25 @@ export async function createInvitation(
         ),
       )
     if (existing) throw new AppError(409, 'This person already has access to your workspace.')
+    const [record] = await tx
+      .select()
+      .from(employeeRecord)
+      .where(
+        and(eq(employeeRecord.workspaceId, data.workspaceId), eq(employeeRecord.email, data.email)),
+      )
+    if (record) {
+      if (record.inactiveAt)
+        throw new AppError(409, 'Reactivate this employee before sending an invitation.')
+      if (employee.role !== 'admin' && record.createdBy !== viewer.id)
+        throw new AppError(403, 'You cannot invite this employee.')
+      if (record.status !== 'ready')
+        throw new AppError(400, 'Complete the draft before sending an invitation.')
+      const [linkedMember] = record.memberId
+        ? await tx.select().from(workspaceMember).where(eq(workspaceMember.id, record.memberId))
+        : []
+      if ((linkedMember?.role ?? record.fields.role) !== data.role)
+        throw new AppError(400, 'The invitation role must match the employee record.')
+    }
     // Resend rotates the token and invalidates the previous invitation immediately.
     await tx
       .update(invitation)
@@ -276,6 +303,11 @@ export async function createInvitation(
       invitedBy: viewer.id,
       expiresAt: new Date(Date.now() + 7 * 86_400_000),
     })
+    if (record)
+      await tx
+        .update(employeeRecord)
+        .set({ invitationId: id })
+        .where(eq(employeeRecord.id, record.id))
     await audit(tx, data.workspaceId, viewer.id, 'invitation.created', id)
     return { id, name: company.name }
   })
@@ -285,7 +317,7 @@ export async function createInvitation(
       invitationEmail(data.email, result.name, `${config.BETTER_AUTH_URL}/invite/${token}`),
     )
     await db.update(invitation).set({ delivery: 'sent' }).where(eq(invitation.id, result.id))
-    return { ok: true }
+    return { ok: true, inviteUrl: `${config.BETTER_AUTH_URL}/invite/${token}` }
   } catch {
     await db.update(invitation).set({ delivery: 'failed' }).where(eq(invitation.id, result.id))
     throw new AppError(
@@ -359,18 +391,51 @@ export async function acceptInvitation(db: Database, viewer: Identity, raw: unkn
           eq(workspaceMember.userId, viewer.id),
         ),
       )
+    const [employeeDraft] = await tx
+      .select()
+      .from(employeeRecord)
+      .where(
+        and(
+          eq(employeeRecord.workspaceId, current.workspaceId),
+          eq(employeeRecord.invitationId, current.id),
+        ),
+      )
+    const fields = employeeDraft?.fields
+    const names = fields?.fullName.split(/\s+/) ?? []
+    const employment = fields
+      ? {
+          firstName: names[0] ?? '',
+          lastName: names.slice(1).join(' '),
+          jobTitle: fields.jobTitle,
+          employeeNumber: fields.employeeNumber,
+          department: fields.department || null,
+          employmentType: fields.employmentType || null,
+          startDate: fields.startDate || null,
+          phone: fields.phone,
+          birthPlace: fields.birthPlace,
+          birthDate: fields.birthDate || null,
+          avatarKey: employeeDraft.avatarKey,
+        }
+      : {}
+    const memberId = existing?.id ?? employeeDraft?.id ?? crypto.randomUUID()
     if (!existing)
       await tx.insert(workspaceMember).values({
-        id: crypto.randomUUID(),
-        workspaceId: record.workspaceId,
+        id: memberId,
+        workspaceId: current.workspaceId,
         userId: viewer.id,
         role,
+        ...employment,
       })
     else if (existing.status === 'removed')
       await tx
         .update(workspaceMember)
-        .set({ status: 'active', role, updatedAt: new Date() })
+        .set({ status: 'active', role, updatedAt: new Date(), ...employment })
         .where(eq(workspaceMember.id, existing.id))
+    if (employeeDraft)
+      await tx
+        .update(employeeRecord)
+        .set({ memberId })
+        .where(eq(employeeRecord.id, employeeDraft.id))
     await tx.update(invitation).set({ status: 'accepted' }).where(eq(invitation.id, record.id))
     await audit(tx, record.workspaceId, viewer.id, 'invitation.accepted', record.id)
     return {

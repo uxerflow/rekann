@@ -3,6 +3,7 @@ import {
   bigint,
   boolean,
   check,
+  date,
   index,
   integer,
   jsonb,
@@ -120,6 +121,12 @@ export const workspaceMember = pgTable(
     firstName: text('first_name').notNull().default(''),
     lastName: text('last_name').notNull().default(''),
     jobTitle: text('job_title').notNull().default(''),
+    employeeNumber: text('employee_number'),
+    department: text('department'),
+    employmentType: text('employment_type').$type<
+      'Full-time' | 'Part-time' | 'Contract' | 'Internship' | 'Freelance'
+    >(),
+    startDate: date('start_date', { mode: 'string' }),
     phone: text('phone').notNull().default(''),
     birthDate: text('birth_date'),
     birthPlace: text('birth_place').notNull().default(''),
@@ -131,6 +138,11 @@ export const workspaceMember = pgTable(
   (t) => [
     uniqueIndex('workspace_user_unique').on(t.workspaceId, t.userId),
     index('membership_user_idx').on(t.userId),
+    uniqueIndex('employee_number_workspace_unique').on(t.workspaceId, t.employeeNumber),
+    check(
+      'employment_type_check',
+      sql`${t.employmentType} in ('Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance')`,
+    ),
     check('membership_role_check', sql`${t.role} in ('admin', 'manager', 'employee')`),
     check('membership_status_check', sql`${t.status} in ('active', 'removed')`),
   ],
@@ -176,4 +188,181 @@ export const auditEvent = pgTable(
     createdAt: createdAt(),
   },
   (t) => [index('audit_workspace_idx').on(t.workspaceId, t.createdAt)],
+)
+
+// Public marketing consent is separate from application users and workspace membership.
+export const waitlistSubscriber = pgTable(
+  'waitlist_subscriber',
+  {
+    id: text('id').primaryKey(),
+    email: text('email').notNull().unique(),
+    status: text('status')
+      .$type<'subscribed' | 'unsubscribed' | 'suppressed'>()
+      .notNull()
+      .default('subscribed'),
+    consentVersion: text('consent_version').notNull().default('waitlist-2026-09'),
+    createdAt: createdAt(),
+    unsubscribedAt: timestamp('unsubscribed_at', { withTimezone: true }),
+    syncPending: boolean('sync_pending').notNull().default(true),
+    syncAttempts: integer('sync_attempts').notNull().default(0),
+    nextSyncAt: timestamp('next_sync_at', { withTimezone: true }).notNull().defaultNow(),
+    syncedAt: timestamp('synced_at', { withTimezone: true }),
+    welcomeSentAt: timestamp('welcome_sent_at', { withTimezone: true }),
+  },
+  (t) => [
+    index('waitlist_pending_idx')
+      .on(t.nextSyncAt)
+      .where(sql`${t.syncPending} = true`),
+    check(
+      'waitlist_status_check',
+      sql`${t.status} in ('subscribed', 'unsubscribed', 'suppressed')`,
+    ),
+    check('waitlist_email_normalized', sql`${t.email} = lower(trim(${t.email}))`),
+  ],
+)
+
+// Pre-account employment records are private to authorized people administrators.
+// Membership remains the authentication boundary; a draft never grants access.
+export const employeeRecord = pgTable(
+  'employee_record',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => workspace.id, { onDelete: 'cascade' }),
+    createdBy: text('created_by')
+      .notNull()
+      .references(() => user.id),
+    memberId: text('member_id').references(() => workspaceMember.id, { onDelete: 'set null' }),
+    invitationId: text('invitation_id').references(() => invitation.id, { onDelete: 'set null' }),
+    email: text('email').notNull(),
+    employeeNumber: text('employee_number').notNull(),
+    status: text('status').$type<'draft' | 'ready'>().notNull(),
+    fields: jsonb('fields').$type<import('../shared/employee-input').EmployeeFields>().notNull(),
+    avatarKey: text('avatar_key'),
+    inactiveAt: timestamp('inactive_at', { withTimezone: true }),
+    additionalContact: jsonb('additional_contact').$type<{
+      name: string
+      phone: string
+      relationship: string
+    }>(),
+    version: integer('version').notNull().default(1),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    uniqueIndex('employee_record_workspace_email_unique').on(t.workspaceId, t.email),
+    uniqueIndex('employee_record_workspace_number_unique').on(t.workspaceId, t.employeeNumber),
+    uniqueIndex('employee_record_member_unique').on(t.memberId),
+    check('employee_record_status_check', sql`${t.status} in ('draft', 'ready')`),
+  ],
+)
+
+export const employeeAttendance = pgTable(
+  'employee_attendance',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => workspace.id, { onDelete: 'cascade' }),
+    memberId: text('member_id')
+      .notNull()
+      .references(() => workspaceMember.id),
+    clockIn: timestamp('clock_in', { withTimezone: true }).notNull(),
+    clockOut: timestamp('clock_out', { withTimezone: true }),
+    late: boolean('late').notNull().default(false),
+  },
+  (t) => [
+    index('attendance_member_idx').on(t.workspaceId, t.memberId, t.clockIn),
+    uniqueIndex('attendance_open_unique')
+      .on(t.memberId)
+      .where(sql`${t.clockOut} is null`),
+    check('attendance_duration_check', sql`${t.clockOut} is null or ${t.clockOut} >= ${t.clockIn}`),
+  ],
+)
+export const employeeAllowance = pgTable(
+  'employee_allowance',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => workspace.id, { onDelete: 'cascade' }),
+    memberId: text('member_id')
+      .notNull()
+      .references(() => workspaceMember.id),
+    year: integer('year').notNull(),
+    type: text('type').notNull(),
+    halfDays: integer('half_days').notNull(),
+  },
+  (t) => [
+    uniqueIndex('allowance_member_year_type').on(t.workspaceId, t.memberId, t.year, t.type),
+    check('allowance_positive', sql`${t.halfDays} >= 0`),
+  ],
+)
+export const employeeLeave = pgTable(
+  'employee_leave',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => workspace.id, { onDelete: 'cascade' }),
+    memberId: text('member_id')
+      .notNull()
+      .references(() => workspaceMember.id),
+    type: text('type').notNull(),
+    startDate: date('start_date').notNull(),
+    endDate: date('end_date').notNull(),
+    halfDays: integer('half_days').notNull(),
+    duration: text('duration').notNull(),
+    reason: text('reason').notNull().default(''),
+    status: text('status').$type<'pending' | 'approved' | 'rejected' | 'cancelled'>().notNull(),
+    rejectionReason: text('rejection_reason'),
+    reviewedBy: text('reviewed_by').references(() => user.id),
+    reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
+    createdBy: text('created_by')
+      .notNull()
+      .references(() => user.id),
+    createdAt: createdAt(),
+    attachmentId: text('attachment_id'),
+  },
+  (t) => [
+    index('leave_member_idx').on(t.workspaceId, t.memberId),
+    check('leave_dates_check', sql`${t.endDate} >= ${t.startDate}`),
+    check('leave_days_check', sql`${t.halfDays}>0`),
+    check('leave_status_check', sql`${t.status} in ('pending','approved','rejected','cancelled')`),
+  ],
+)
+export const employeeDocument = pgTable(
+  'employee_document',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => workspace.id, { onDelete: 'cascade' }),
+    memberId: text('member_id')
+      .notNull()
+      .references(() => workspaceMember.id),
+    title: text('title').notNull(),
+    category: text('category').notNull(),
+    key: text('key'),
+    url: text('url'),
+    fileName: text('file_name'),
+    mime: text('mime'),
+    size: integer('size'),
+    visibleToEmployee: boolean('visible_to_employee').notNull().default(false),
+    version: integer('version').notNull().default(1),
+    createdBy: text('created_by')
+      .notNull()
+      .references(() => user.id),
+    createdAt: createdAt(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+    deletedBy: text('deleted_by').references(() => user.id),
+  },
+  (t) => [
+    index('document_member_idx').on(t.workspaceId, t.memberId),
+    check(
+      'document_source_check',
+      sql`(${t.key} is not null and ${t.url} is null) or (${t.key} is null and ${t.url} is not null)`,
+    ),
+  ],
 )

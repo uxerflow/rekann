@@ -14,7 +14,9 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as WaitlistRouteImport } from './routes/waitlist'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as OnboardingCompanyRouteImport } from './routes/onboarding.company'
 import { Route as OnboardingProfileRouteImport } from './routes/onboarding.profile'
@@ -22,6 +24,7 @@ import { Route as WSlugRouteImport } from './routes/w.$slug'
 import { Route as WorkspaceWorkspaceIdRouteImport } from './routes/workspace.$workspaceId'
 import { Route as ApiAppSplatRouteImport } from './routes/api.app.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
+import { Route as ApiWaitlistSplatRouteImport } from './routes/api.waitlist.$'
 import { Route as WSlugSplatRouteImport } from './routes/w.$slug.$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -49,9 +52,19 @@ const SignUpRoute = SignUpRouteImport.update({
   path: '/sign-up',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
   path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WaitlistRoute = WaitlistRouteImport.update({
+  id: '/waitlist',
+  path: '/waitlist',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
@@ -89,6 +102,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWaitlistSplatRoute = ApiWaitlistSplatRouteImport.update({
+  id: '/api/waitlist/$',
+  path: '/api/waitlist/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WSlugSplatRoute = WSlugSplatRouteImport.update({
   id: '/$',
   path: '/$',
@@ -101,7 +119,9 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/waitlist': typeof WaitlistRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
@@ -109,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRoute
   '/api/app/$': typeof ApiAppSplatRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/waitlist/$': typeof ApiWaitlistSplatRoute
   '/w/$slug/$': typeof WSlugSplatRoute
 }
 export interface FileRoutesByTo {
@@ -117,7 +138,9 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/waitlist': typeof WaitlistRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
@@ -125,6 +148,7 @@ export interface FileRoutesByTo {
   '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRoute
   '/api/app/$': typeof ApiAppSplatRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/waitlist/$': typeof ApiWaitlistSplatRoute
   '/w/$slug/$': typeof WSlugSplatRoute
 }
 export interface FileRoutesById {
@@ -134,7 +158,9 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/waitlist': typeof WaitlistRoute
   '/invite/$token': typeof InviteTokenRoute
   '/onboarding/company': typeof OnboardingCompanyRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
@@ -142,6 +168,7 @@ export interface FileRoutesById {
   '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRoute
   '/api/app/$': typeof ApiAppSplatRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/waitlist/$': typeof ApiWaitlistSplatRoute
   '/w/$slug/$': typeof WSlugSplatRoute
 }
 export interface FileRouteTypes {
@@ -152,7 +179,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
+    | '/unsubscribe'
     | '/verify-email'
+    | '/waitlist'
     | '/invite/$token'
     | '/onboarding/company'
     | '/onboarding/profile'
@@ -160,6 +189,7 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceId'
     | '/api/app/$'
     | '/api/auth/$'
+    | '/api/waitlist/$'
     | '/w/$slug/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -168,7 +198,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
+    | '/unsubscribe'
     | '/verify-email'
+    | '/waitlist'
     | '/invite/$token'
     | '/onboarding/company'
     | '/onboarding/profile'
@@ -176,6 +208,7 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceId'
     | '/api/app/$'
     | '/api/auth/$'
+    | '/api/waitlist/$'
     | '/w/$slug/$'
   id:
     | '__root__'
@@ -184,7 +217,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
+    | '/unsubscribe'
     | '/verify-email'
+    | '/waitlist'
     | '/invite/$token'
     | '/onboarding/company'
     | '/onboarding/profile'
@@ -192,6 +227,7 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceId'
     | '/api/app/$'
     | '/api/auth/$'
+    | '/api/waitlist/$'
     | '/w/$slug/$'
   fileRoutesById: FileRoutesById
 }
@@ -201,7 +237,9 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
+  WaitlistRoute: typeof WaitlistRoute
   InviteTokenRoute: typeof InviteTokenRoute
   OnboardingCompanyRoute: typeof OnboardingCompanyRoute
   OnboardingProfileRoute: typeof OnboardingProfileRoute
@@ -209,6 +247,7 @@ export interface RootRouteChildren {
   WorkspaceWorkspaceIdRoute: typeof WorkspaceWorkspaceIdRoute
   ApiAppSplatRoute: typeof ApiAppSplatRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiWaitlistSplatRoute: typeof ApiWaitlistSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -248,11 +287,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignUpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/verify-email': {
       id: '/verify-email'
       path: '/verify-email'
       fullPath: '/verify-email'
       preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/waitlist': {
+      id: '/waitlist'
+      path: '/waitlist'
+      fullPath: '/waitlist'
+      preLoaderRoute: typeof WaitlistRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invite/$token': {
@@ -304,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/waitlist/$': {
+      id: '/api/waitlist/$'
+      path: '/api/waitlist/$'
+      fullPath: '/api/waitlist/$'
+      preLoaderRoute: typeof ApiWaitlistSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/w/$slug/$': {
       id: '/w/$slug/$'
       path: '/$'
@@ -330,7 +390,9 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   VerifyEmailRoute: VerifyEmailRoute,
+  WaitlistRoute: WaitlistRoute,
   InviteTokenRoute: InviteTokenRoute,
   OnboardingCompanyRoute: OnboardingCompanyRoute,
   OnboardingProfileRoute: OnboardingProfileRoute,
@@ -338,6 +400,7 @@ const rootRouteChildren: RootRouteChildren = {
   WorkspaceWorkspaceIdRoute: WorkspaceWorkspaceIdRoute,
   ApiAppSplatRoute: ApiAppSplatRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiWaitlistSplatRoute: ApiWaitlistSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

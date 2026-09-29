@@ -8,8 +8,8 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   reporter: [['list']],
   projects: [
-    { name: 'unit', testMatch: '**/unit.spec.ts' },
-    { name: 'e2e', testIgnore: '**/unit.spec.ts' },
+    { name: 'unit', testMatch: ['**/unit.spec.ts', '**/*.unit.spec.ts'] },
+    { name: 'e2e', testIgnore: ['**/unit.spec.ts', '**/*.unit.spec.ts'] },
   ],
   use: {
     baseURL: 'http://127.0.0.1:4310',

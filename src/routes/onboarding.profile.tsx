@@ -11,7 +11,7 @@ export const Route = createFileRoute('/onboarding/profile')({
     const data = await loadWorkspace({ data: { id: deps.workspaceId } })
     if (!data) throw redirect({ to: '/' })
     throw redirect({
-      href: `/w/${data.workspace.slug}/${data.employee.profileCompleted ? 'profile' : 'onboarding/profile'}`,
+      href: `/w/${data.workspace.slug}${data.employee.profileCompleted ? '' : '/onboarding/profile'}`,
     })
   },
   head: () => ({ meta: [{ title: 'Your profile · Rekann' }] }),
