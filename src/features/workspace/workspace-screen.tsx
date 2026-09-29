@@ -1,3 +1,4 @@
+import { LeavesScreen } from '../leaves/leaves-screen'
 import { AiWorkspace } from '../ai/ai-workspace'
 import { TeamDirectory } from '../team/team-directory'
 import { Dashboard, type DashboardState } from './dashboard'
@@ -90,6 +91,9 @@ export function WorkspaceScreen({
           state={preview || (permissions.admin ? 'welcome' : 'empty')}
           onUnavailable={(name) => setAnnouncement(`${name} is not available yet.`)}
         />
+      )}
+      {view === 'leaves' && (
+        <LeavesScreen key={workspace.id} workspaceId={workspace.id} admin={permissions.admin} />
       )}
       {view === 'ai' && (
         <AiWorkspace

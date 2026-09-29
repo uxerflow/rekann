@@ -34,6 +34,8 @@ export function SelectField({
   menuDescription,
   menuAction,
   onOpen,
+  multipleValues,
+  onMultipleChange,
 }: {
   label: string
   placeholder: string
@@ -58,6 +60,8 @@ export function SelectField({
     onSelect: () => void
   }
   onOpen?: () => void
+  multipleValues?: readonly string[]
+  onMultipleChange?: (values: string[]) => void
 }) {
   const id = useId()
   const ready = useHydrated()
@@ -86,6 +90,14 @@ export function SelectField({
   }
   function choose(option: string) {
     if (disabledOptions.includes(option)) return
+    if (multipleValues && onMultipleChange) {
+      onMultipleChange(
+        multipleValues.includes(option)
+          ? multipleValues.filter((v) => v !== option)
+          : [...multipleValues, option],
+      )
+      return
+    }
     onChange(option)
     close(true)
   }
@@ -332,6 +344,7 @@ export function SelectField({
                     ref={list}
                     id={`${id}-list`}
                     role="listbox"
+                    aria-multiselectable={multipleValues ? true : undefined}
                     aria-label={label}
                     className="select-options"
                     onMouseLeave={() => setHovering(false)}
@@ -375,14 +388,18 @@ export function SelectField({
                         key={option}
                         id={`${id}-option-${index}`}
                         role="option"
-                        aria-selected={value === option}
+                        aria-selected={
+                          multipleValues ? multipleValues.includes(option) : value === option
+                        }
                         aria-disabled={disabledOptions.includes(option) || undefined}
                         className={`select-option ${active === index ? 'active' : ''}`}
                         onMouseDown={(event) => event.preventDefault()}
                         onClick={() => choose(option)}
                       >
                         <span>{option}</span>
-                        {value === option && <Check size={16} aria-hidden="true" />}
+                        {(multipleValues ? multipleValues.includes(option) : value === option) && (
+                          <Check size={16} strokeWidth={1.5} aria-hidden="true" />
+                        )}
                       </div>
                     ))}
                   </div>

@@ -35,6 +35,7 @@ async function setup() {
     '0006_cuddly_stature',
     '0007_red_ser_duncan',
     '0009_open_junta',
+    '0014_curved_zodiak',
   ])
     await pg.exec(readFileSync(`drizzle/${file}.sql`, 'utf8'))
   const db = drizzle(pg, { schema }) as unknown as Database
