@@ -66,11 +66,13 @@ The preview hostname uses a random suffix for less obvious discovery. This is no
 
 ## September 29 Admin Leaves release
 
-- Application commit: `f02794b` on `feat/admin-leaves`; draft PR [#13](https://github.com/uxerflow/rekann/pull/13) targets `feat/auth-workspace`. No merge to `main`.
-- Active `rekann-staging` version: `8247e7ce-1e3d-4ef8-8d39-9f05b5551b23`, built with `CLOUDFLARE_ENV=staging`. Generated Worker name, account, preview custom domain and staging R2 bucket were checked before deployment.
+- Application baseline: `f02794b`, followed by the mobile-filter spacing fix, on `feat/admin-leaves`; draft PR [#13](https://github.com/uxerflow/rekann/pull/13) targets `feat/auth-workspace`. No merge to `main`.
+- Active `rekann-staging` version: `8f9d87ab-d217-4048-9971-575cb949911e`, built with `CLOUDFLARE_ENV=staging`. Generated Worker name, account, preview custom domain and staging R2 bucket were checked before deployment.
 - Neon owner and runtime connection hosts were matched to staging endpoint `ep-twilight-star-b3e6tf0x` on branch `br-nameless-salad-b3p61oq1`. Migrations 0014–0015 were applied and runtime CRUD grants on `leave_policy` verified. Existing account/workspace counts were unchanged.
 - Frozen install, changed-source formatting, TypeScript, staging build and all 51 unit tests passed. The final 11 Leaves unit cases were rerun after boundary validation changes. Local browser scenarios passed for Admin Leaves, Employee Detail and shared dropdowns. They cover persistence, closures, failure/retry, keyboard and hover interaction, mobile overflow and form discard.
 - Live staging smoke passed verified-account sign-in, anonymous-access denial, employee denial of admin data, repeat approval without duplicate deduction, closure refund, employee selection and time-off recording through the browser, persistence after refresh, and mobile overflow. There were no browser exceptions. Screenshots were inspected at desktop and mobile sizes.
 - The temporary test workspace and two verified identities were removed in cleanup. Final counts matched the existing baseline: 11 users, one workspace. The smoke did not send external emails or change owner data.
 - Public waitlist active version remains `ebca3c9c-bf9e-4325-90a5-6dff4d4b9c01`. No Worker upload, migration or route change targeted production.
 - This release stores policy payment/attendance terms but does not run payroll, issue unused-leave payouts, or generate attendance records. External holiday feeds and a separate employee Leaves screen are not included. See `LEAVES.md` for the complete behavior and owner acceptance boundaries. Live attachment delivery was not repeated in this staging smoke; the reused document upload flow passed Employee Detail browser regression locally.
+
+The final mobile screenshot exposed shrinking filter wrappers despite passing overall page-overflow checks. The filter row now preserves each control width and scrolls horizontally with an 8 px gap. The Leaves browser flow and live staging smoke were repeated with explicit non-overlap assertions. Exported SVG trailing blank lines were normalized without changing their paths or styles.

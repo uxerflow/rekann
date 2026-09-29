@@ -4,7 +4,7 @@ Updated: September 29, 2026.
 
 ## Admin Leaves preview release, September 29
 
-The approved Admin Leaves flow is implemented and deployed at `https://preview-f3d09c858192da81b6d6.rekann.app`. Application commit `f02794b` is on `feat/admin-leaves`; draft PR #13 targets `feat/auth-workspace` (#9) so the review shows the Leaves delta. Nothing was merged to `main`. Active staging Worker version: `8247e7ce-1e3d-4ef8-8d39-9f05b5551b23`.
+The approved Admin Leaves flow is implemented and deployed at `https://preview-f3d09c858192da81b6d6.rekann.app`. Application baseline `f02794b` plus the mobile-filter spacing fix is on `feat/admin-leaves`; draft PR #13 targets `feat/auth-workspace` (#9) so the review shows the Leaves delta. Nothing was merged to `main`. Active staging Worker version: `8f9d87ab-d217-4048-9971-575cb949911e`.
 
 The release includes Week, Month and Year calendars, admin employee selection and time-off recording, approval/rejection/cancellation, annual/custom policies, company closures, balance rules, and loading/empty/error/retry states. Existing employee self-service remains in Employee Detail. See `docs/LEAVES.md` for permissions, period behavior, closure coverage and the boundary between saved payment terms and payroll execution.
 
@@ -68,7 +68,7 @@ The dashboard shell, welcome card, setup checklist, widget layouts, responsive p
 - Resend domain `updates.rekann.app` is verified. Sender: `Rekann <noreply@updates.rekann.app>`.
 - Database, auth, and email credentials are Worker secrets, with ignored local configuration. Never print or commit credentials.
 - Staging is internet-accessible, with authenticated application data. Use test data. Build with `CLOUDFLARE_ENV=staging`; see `docs/STAGING.md` for deployment instructions.
-- Latest verified deployment: `8247e7ce-1e3d-4ef8-8d39-9f05b5551b23` on September 29, 2026. Admin Leaves is included alongside AI, Team Directory and Employee Detail; migrations through 0015 are applied. Live authenticated staging checks passed and temporary test data was cleaned up.
+- Latest verified deployment: `8f9d87ab-d217-4048-9971-575cb949911e` on September 29, 2026. Admin Leaves is included alongside AI, Team Directory and Employee Detail; migrations through 0015 are applied. Live authenticated staging checks passed and temporary test data was cleaned up.
 
 ## Verification and limits
 

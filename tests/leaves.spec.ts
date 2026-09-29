@@ -288,6 +288,16 @@ test('admin leaves persist requests, policies, approvals and closures with acces
   expect(balances.find((x: { name: string }) => x.name === 'Annual leave').remaining).toBe(9)
   await page.setViewportSize({ width: 390, height: 844 })
   await page.getByRole('button', { name: 'Request', exact: true }).click()
+  const filterBoxes = await page
+    .locator('.leave-list-filters .select-trigger')
+    .evaluateAll((nodes) =>
+      nodes.map((n) => {
+        const r = n.getBoundingClientRect()
+        return { left: r.left, right: r.right }
+      }),
+    )
+  for (let i = 1; i < filterBoxes.length; i++)
+    expect(filterBoxes[i].left - filterBoxes[i - 1].right).toBeGreaterThanOrEqual(8)
   await shot('mobile-requests')
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await page.getByRole('button', { name: 'Record time off', exact: true }).click()
@@ -323,27 +333,23 @@ test('admin leaves persist requests, policies, approvals and closures with acces
   // Exercise two active employees with the same name and job title.
   const duplicateId = crypto.randomUUID()
   users.push(duplicateId)
-  await db
-    .insert(schema.user)
-    .values({
-      id: duplicateId,
-      name: 'Emily Louris',
-      email: uniqueEmail('same-name'),
-      emailVerified: true,
-    })
-  await db
-    .insert(schema.workspaceMember)
-    .values({
-      id: crypto.randomUUID(),
-      workspaceId,
-      userId: duplicateId,
-      firstName: 'Emily',
-      lastName: 'Louris',
-      jobTitle: 'UI/UX Designer',
-      employmentType: 'Full-time',
-      startDate: '2020-01-01',
-      profileCompleted: true,
-    })
+  await db.insert(schema.user).values({
+    id: duplicateId,
+    name: 'Emily Louris',
+    email: uniqueEmail('same-name'),
+    emailVerified: true,
+  })
+  await db.insert(schema.workspaceMember).values({
+    id: crypto.randomUUID(),
+    workspaceId,
+    userId: duplicateId,
+    firstName: 'Emily',
+    lastName: 'Louris',
+    jobTitle: 'UI/UX Designer',
+    employmentType: 'Full-time',
+    startDate: '2020-01-01',
+    profileCompleted: true,
+  })
   await page.reload()
   await expect(page.locator('.leave-calendar-layout')).toBeVisible()
   await page.getByRole('button', { name: 'Record time off', exact: true }).click()
