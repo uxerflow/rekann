@@ -722,6 +722,8 @@
 .leave-chip-icon {
   flex: none;
   width: 16px;
+  min-width: 16px;
+  max-width: none;
   height: 16px;
 }
 .leave-timeline .leave-chip {
