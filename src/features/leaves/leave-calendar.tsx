@@ -61,7 +61,11 @@ export function LeaveCalendar({
     [day, setDay] = useState<string | null>(null),
     [event, setEvent] = useState<CalendarEvent | null>(null)
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
-  const [summary, setSummary] = useState<{ kind: string; events: CalendarEvent[] } | null>(null)
+  const [summary, setSummary] = useState<{
+    kind: string
+    events: CalendarEvent[]
+    date?: string
+  } | null>(null)
   const closeEvent = useCallback(() => {
     setEvent(null)
     setSummary(null)
@@ -176,9 +180,11 @@ export function LeaveCalendar({
               className={[0, 6].includes(new Date(d).getUTCDay()) ? 'weekend' : ''}
               disabled={!d.startsWith(month.slice(0, 7))}
               aria-label={`${prettyDate(d)}, ${at(d).length} events`}
-              onClick={() => {
-                setDate(d)
-                setMode('Month')
+              title={`${prettyDate(d)} · ${at(d).length ? 'View leave and closure details' : 'No leave or closures'}`}
+              onClick={(click) => {
+                setEvent(null)
+                setAnchor(click.currentTarget)
+                setSummary({ kind: 'day', events: at(d), date: d })
               }}
             >
               {d.startsWith(month.slice(0, 7)) && (
@@ -427,6 +433,20 @@ export function LeaveCalendar({
             monthGrid(date)
           ) : (
             <div className="leave-year">
+              <div className="leave-year-legend" aria-label="Calendar dot meanings">
+                <span>
+                  <i className="approved" />
+                  Approved leave
+                </span>
+                <span>
+                  <i className="pending" />
+                  Pending approval
+                </span>
+                <span>
+                  <i className="closure" />
+                  Company closure
+                </span>
+              </div>
               {Array.from({ length: 12 }, (_, i) => {
                 const m = `${date.slice(0, 4)}-${String(i + 1).padStart(2, '0')}-01`
                 const monthEvents = events.filter(
@@ -639,14 +659,31 @@ export function LeaveCalendar({
         <DetailMenu
           anchor={anchor}
           onClose={closeEvent}
-          width={360}
-          label={summary.kind === 'closure' ? 'Company closures' : 'Leave permissions'}
+          width={320}
+          label={
+            summary.date
+              ? prettyDate(summary.date)
+              : summary.kind === 'closure'
+                ? 'Company closures'
+                : summary.kind === 'pending'
+                  ? 'Pending approval'
+                  : 'Approved leave'
+          }
           className="leave-summary-popover"
         >
           <span className="leave-popover-heading">
-            {summary.kind === 'closure' ? 'Company closures' : 'Leave permissions'}
+            {summary.date
+              ? prettyDate(summary.date)
+              : summary.kind === 'closure'
+                ? 'Company closures'
+                : summary.kind === 'pending'
+                  ? 'Pending approval'
+                  : 'Approved leave'}
           </span>
           <ScrollArea className="leave-summary-scroll" type="auto">
+            {!summary.events.length && (
+              <p className="leave-summary-empty">No leave or closures on this day.</p>
+            )}
             {summary.events.map((item) => {
               const short = (date: string) =>
                 new Intl.DateTimeFormat('en', {
@@ -661,8 +698,9 @@ export function LeaveCalendar({
               return (
                 <button
                   type="button"
-                  className={`leave-summary-row ${summary.kind}`}
+                  className={`leave-summary-row ${item.pending ? 'pending' : item.request ? 'approved' : 'closure'}`}
                   key={item.id}
+                  aria-label={`${item.memberId ? state.people.find((person) => person.id === item.memberId)?.name + ' · ' : ''}${item.name} · ${item.pending ? 'Pending approval' : item.request ? 'Approved leave' : 'Company closure'}`}
                   onClick={() => {
                     closeEvent()
                     if (item.request) onRequest(item.request)

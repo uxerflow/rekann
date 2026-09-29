@@ -31,3 +31,10 @@ Automated verification for this change is limited to dependency integrity, TypeS
 - [ ] Calendar toolbar: date selector, Week/Month/Year dropdown, arrows, and Today have equal height. On mobile, controls wrap without clipping.
 - [ ] Navigate to an earlier date, click Today, and check that the current period returns while Week/Month/Year mode stays unchanged. Repeat in all three modes.
 - [ ] Compare Week against the updated Figma review: stronger employee separators on the left, faint central grid, compact pending cards, and readable single-day chips. All chips retain their icons, including single-day Sick leave. Labels use Inter Medium 13/20. Hover reveals the full name and dates.
+
+## Year date popovers
+
+- [ ] In Year, click a date with dots. Its dated popover opens and the calendar stays in Year.
+- [ ] Check the legend: red is approved leave, yellow is pending approval, blue is company closure. A mixed date uses the matching dot for each row.
+- [ ] Click a date without events; it shows a short empty message without switching views.
+- [ ] Month badges open compact 320 px lists. Check long names, dates crossing months, Escape, outside click, and scrolling a long list.
