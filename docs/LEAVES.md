@@ -35,3 +35,13 @@ Employment choices use the existing Team Directory values (`Full-time`, `Contrac
 Behavior tests are in `tests/leaves.unit.spec.ts` and `tests/leaves.spec.ts`. They cover workspace/admin boundaries, stale policy edits, eligibility, request rules, approval retries, owner review, period boundaries, carry forward, closure refunds, retained requests, insufficient balance rollback and unlimited allowances. Browser coverage uses isolated development fixtures with cleanup and exercises calendar navigation, employee selection, approval/rejection, persistence after reload, policy/closure creation, failure/retry without lost input, empty search, responsive overflow, keyboard selection and dirty-form discard.
 
 Release-specific build, test and deployment evidence is recorded in `PROJECT_STATE.md` and `docs/STAGING.md`. Owner visual acceptance remains the final review; automated checks do not establish pixel-perfect identity on every viewport.
+
+## Visual follow-up, September 29
+
+The People column now has a full-height divider and 16 px horizontal padding. Pending empty artwork is centered. Request and policy empty views use the 48 px calendar illustration exported from Figma `1199:94237`, with the shared 20/28 medium heading and bounded 14/22 description.
+
+Year view follows `1199:61664`: three compact columns, 4 px gutters, 6 px card padding, 32 px date rows, muted weekends, circular today marker, colored status dots and summary badges. Month titles remain black by owner request. Real date positions and six-week months take precedence over illustrative dates in the source. Company closures are labeled accurately; there is no national-holiday feed.
+
+The [custom date picker](https://www.figma.com/design/jWSy3bCKjtKfyrToW5zyZ5/Rekann---HR-Platform?node-id=1207-123679) is a Figma-first review artifact beside the Admin Leaves wrap. It includes Week, Month, Year, Day keyboard focus, Range empty/start/selected/error/mobile, five shared input states, and a connected nine-state date-cell component set. Existing Input-field and Button instances, typography styles and color variables are reused. The original master is unchanged. Calendar date inputs in the application remain native until this design is reviewed; the new picker has not been implemented.
+
+Avatar layout excludes the avatar itself from the person-copy selectors, so shared initial avatars remain centered in calendar rows, request rows and review dialogs. Demo employees use existing Rekann gradient avatars, converted to PNG and stored in the private staging media bucket.

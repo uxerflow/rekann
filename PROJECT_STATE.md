@@ -4,13 +4,21 @@ Updated: September 29, 2026.
 
 ## Admin Leaves preview release, September 29
 
-The approved Admin Leaves flow is implemented and deployed at `https://preview-f3d09c858192da81b6d6.rekann.app`. Application baseline `f02794b` plus the mobile-filter spacing fix is on `feat/admin-leaves`; draft PR #13 targets `feat/auth-workspace` (#9) so the review shows the Leaves delta. Nothing was merged to `main`. Active staging Worker version: `8f9d87ab-d217-4048-9971-575cb949911e`.
+The approved Admin Leaves flow is implemented and deployed at `https://preview-f3d09c858192da81b6d6.rekann.app`. Application baseline `f02794b` plus the mobile-filter spacing fix is on `feat/admin-leaves`; draft PR #13 targets `feat/auth-workspace` (#9) so the review shows the Leaves delta. Nothing was merged to `main`. Active staging Worker version: `b2295e66-bcc0-497f-9e1a-bb8ed7c77484`.
 
 The release includes Week, Month and Year calendars, admin employee selection and time-off recording, approval/rejection/cancellation, annual/custom policies, company closures, balance rules, and loading/empty/error/retry states. Existing employee self-service remains in Employee Detail. See `docs/LEAVES.md` for permissions, period behavior, closure coverage and the boundary between saved payment terms and payroll execution.
 
 Frozen install, formatting of changed source, TypeScript, staging build and all 51 unit tests passed. The 11 Leaves unit tests were repeated after the final validation changes. Browser flows passed for Leaves, Employee Detail and shared dropdowns; Leaves covers network retry, preserved inputs, desktop/mobile overflow, keyboard behavior, dirty-form discard and duplicate employee names. The dropdown regression test was updated for the existing generic no-options copy and run with the local mailbox; original local email configuration was restored. Graphify was updated.
 
-Migrations 0014–0015 were applied to the explicitly verified development and staging branches. Live staging checks passed sign-in, anonymous denial, employee/admin separation, approval retry, closure refunds, browser recording and persistence after refresh, with no browser exceptions or mobile overflow. Temporary staging identities/workspace were removed; the baseline remains 11 users and one workspace. Production waitlist remains `ebca3c9c-bf9e-4325-90a5-6dff4d4b9c01`. Owner visual acceptance is next; automated checks are not a claim of pixel-perfect identity on every viewport.
+Migrations 0014–0015 were applied to the explicitly verified development and staging branches. Live staging checks passed sign-in, anonymous denial, employee/admin separation, approval retry, closure refunds, browser recording and persistence after refresh, with no browser exceptions or mobile overflow. Temporary staging identities/workspace were removed after the initial release. The owner subsequently requested persistent demo data; see the visual follow-up below. Production waitlist remains `ebca3c9c-bf9e-4325-90a5-6dff4d4b9c01`. Owner visual acceptance is next; automated checks are not a claim of pixel-perfect identity on every viewport.
+
+## Leaves visual follow-up, September 29
+
+The owner-requested People divider/padding, centered empty artwork, consistent 48 px empty-state icons and compact Year cards are deployed to preview staging. Black month titles are intentional. Frozen install, TypeScript, staging build, 51 unit tests, the full Leaves browser flow and the focused empty/wide-screen browser test passed. The latter was repeated after the final sticky-divider adjustment and avatar-selector correction; it also asserts initial-avatar vertical centering. Graphify is current.
+
+A separate Figma review wrap `1207:123679` contains the custom date picker modes and states. It reuses shared inputs, buttons, variables and typography without changing the existing master. Date-picker implementation remains pending design review.
+
+After the owner logged into Pavel Hub, six clearly named fictional employees (`DEMO-001` through `DEMO-006`), four demo policies and ten requests were added to that staging workspace. Request statuses: five approved, three pending, one rejected and one cancelled. Policy eligibility is restricted to the demo departments and Full-time employment; the company closure covers only the six demo members. No existing employee was edited, no invitation/email was sent, and the synthetic users have no login credentials. The six demo members use built-in Rekann gradient avatars stored in private staging R2. This is persistent review data, not the disposable QA fixture.
 
 ## Preview staging AI release, September 29
 
@@ -68,7 +76,7 @@ The dashboard shell, welcome card, setup checklist, widget layouts, responsive p
 - Resend domain `updates.rekann.app` is verified. Sender: `Rekann <noreply@updates.rekann.app>`.
 - Database, auth, and email credentials are Worker secrets, with ignored local configuration. Never print or commit credentials.
 - Staging is internet-accessible, with authenticated application data. Use test data. Build with `CLOUDFLARE_ENV=staging`; see `docs/STAGING.md` for deployment instructions.
-- Latest verified deployment: `8f9d87ab-d217-4048-9971-575cb949911e` on September 29, 2026. Admin Leaves is included alongside AI, Team Directory and Employee Detail; migrations through 0015 are applied. Live authenticated staging checks passed and temporary test data was cleaned up.
+- Latest verified deployment: `b2295e66-bcc0-497f-9e1a-bb8ed7c77484` on September 29, 2026. Admin Leaves is included alongside AI, Team Directory and Employee Detail; migrations through 0015 are applied. Live authenticated staging checks passed and temporary test data was cleaned up.
 
 ## Verification and limits
 

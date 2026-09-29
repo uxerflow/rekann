@@ -179,7 +179,7 @@
   height: 36px;
   flex-shrink: 0;
 }
-.leave-person > div,
+.leave-person > div:not(.avatar),
 .leave-person > span {
   min-width: 0;
   display: flex;
@@ -194,7 +194,7 @@
   white-space: nowrap;
 }
 .leave-person span span,
-.leave-person > div > span,
+.leave-person > div:not(.avatar) > span,
 .leave-person small {
   color: #707070;
   font-size: 13px;
@@ -328,8 +328,8 @@
   min-height: 400px;
 }
 .leave-empty > img {
-  height: 112px;
-  width: 160px;
+  height: 48px;
+  width: 48px;
   object-fit: contain;
   margin-bottom: 24px;
 }
@@ -337,10 +337,13 @@
 .leave-empty h1 {
   font-size: 20px;
   line-height: 28px;
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: -0.2px;
   margin: 0 0 8px;
 }
 .leave-empty p {
+  max-width: 360px;
+  line-height: 22px;
   margin: 0 0 24px;
   color: #707070;
 }
@@ -532,7 +535,8 @@
   width: 100px;
   height: 80px;
   object-fit: contain;
-  margin-bottom: 16px;
+  display: block;
+  margin: 0 auto 16px;
 }
 .leave-pending-empty h3 {
   color: #292929;
@@ -553,7 +557,7 @@
   height: 64px;
 }
 .leave-timeline-header > span {
-  padding: 24px 8px;
+  padding: 24px 16px;
   border-right: 1px solid #e5e5e5;
   font-size: 12px;
 }
@@ -588,7 +592,7 @@
   min-height: 60px;
 }
 .leave-timeline-row > .leave-person {
-  padding: 8px;
+  padding: 8px 16px;
   border-right: 1px solid #e5e5e5;
   border-bottom: 1px solid #e5e5e5;
 }
@@ -749,58 +753,137 @@
   padding: 0 6px;
   font-size: 12px;
 }
+/* Year cards follow Figma 1199:61664; date rows never grow with screen width. */
 .leave-year {
-  padding: 20px;
+  padding: 4px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(180px, 1fr));
-  gap: 24px 32px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  background: #fafafa;
+}
+.leave-mini-month {
+  min-width: 0;
+  min-height: 288px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: white;
+  border-radius: 4px;
+  box-shadow:
+    0 1px 2px -1px #0000001a,
+    0 1px 3px #0000001a;
 }
 .leave-mini-month > .text-button {
+  align-self: flex-start;
   color: #292929;
   font-size: 14px;
+  line-height: 20px;
   font-weight: 500;
-  margin-bottom: 16px;
+  padding: 0 2px;
 }
 .leave-mini-days {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: 32px;
+  gap: 2px;
   text-align: center;
   font-size: 12px;
+  min-height: 202px;
 }
 .leave-mini-days > span {
   color: #9e9e9e;
-  height: 24px;
+  display: grid;
+  place-items: center;
 }
 .leave-mini-days button {
   border: 0;
-  border-radius: 50%;
+  border-radius: 4px;
   background: none;
   color: #292929;
   font-size: 12px;
-  aspect-ratio: 1;
+  line-height: 16px;
   position: relative;
   min-width: 0;
   padding: 0;
 }
+.leave-mini-days button.weekend {
+  color: #9e9e9e;
+}
 .leave-mini-days button:hover:not(:disabled) {
   background: #f2f2f2;
 }
-.leave-mini-days .has-leave:after {
-  content: '';
+.leave-mini-days time {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+.leave-mini-dots {
+  position: absolute;
+  bottom: 1px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+}
+.leave-mini-dots i,
+.leave-year-badge::before {
   width: 4px;
   height: 4px;
-  position: absolute;
-  bottom: 0;
-  left: calc(50% - 2px);
   border-radius: 50%;
-  background: #6a52ee;
+  background: currentColor;
 }
-.leave-mini-month > small {
-  display: block;
-  color: #707070;
+.leave-mini-dots .approved {
+  color: #ff5454;
+}
+.leave-mini-dots .closure {
+  color: #0095ff;
+}
+.leave-mini-dots .pending {
+  color: #ffb224;
+}
+.leave-year-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 2px;
+  margin-top: auto;
+  min-height: 38px;
   font-size: 12px;
-  margin-top: 12px;
+  line-height: 16px;
+  color: #707070;
+}
+.leave-year-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border: 1px solid #ffc6c6;
+  border-radius: 4px;
+  background: #fff0f0;
+  color: #e53535;
+  font-size: 12px;
+  line-height: 16px;
+}
+.leave-year-badge::before {
+  content: '';
+}
+.leave-year-badge.closure {
+  color: #0085eb;
+  background: #edf8ff;
+  border-color: #bee6ff;
+}
+.leave-year-badge.pending {
+  color: #b87900;
+  background: #fff9e8;
+  border-color: #ffdd83;
+}
+.leave-year-badge:hover {
+  filter: brightness(0.97);
 }
 .leave-day-list {
   display: flex;
@@ -1223,7 +1306,7 @@
     grid-template-columns: minmax(0, 1fr) 280px;
   }
   .leave-year {
-    grid-template-columns: repeat(2, minmax(180px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .leave-calendar-toolbar {
     padding-inline: 12px;
@@ -1360,8 +1443,8 @@
   }
   .leave-year {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px;
-    padding: 16px;
+    gap: 4px;
+    padding: 4px;
   }
   .leave-mini-days {
     gap: 2px;
@@ -1371,7 +1454,7 @@
     padding: 32px 20px;
   }
   .leave-empty > img {
-    height: 80px;
+    height: 48px;
     margin-bottom: 16px;
   }
   .leave-two-fields {
@@ -1765,6 +1848,22 @@
 }
 .leave-timeline {
   min-height: calc(100dvh - 152px);
+}
+.leave-people-background {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.leave-people-background::before {
+  content: '';
+  display: block;
+  position: sticky;
+  left: 0;
+  width: 240px;
+  height: 100%;
+  border-right: 1px solid #e5e5e5;
+  background: white;
 }
 .leave-timeline-background {
   pointer-events: none;

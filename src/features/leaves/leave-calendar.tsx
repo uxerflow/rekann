@@ -128,7 +128,7 @@ export function LeaveCalendar({
           {days.map((d) => (
             <button
               key={d}
-              className={`${d === state.today ? 'is-today' : ''} ${at(d).length ? 'has-leave' : ''}`}
+              className={[0, 6].includes(new Date(d).getUTCDay()) ? 'weekend' : ''}
               disabled={!d.startsWith(month.slice(0, 7))}
               aria-label={`${prettyDate(d)}, ${at(d).length} events`}
               onClick={() => {
@@ -136,7 +136,16 @@ export function LeaveCalendar({
                 setMode('Month')
               }}
             >
-              {d.startsWith(month.slice(0, 7)) ? Number(d.slice(8)) : ' '}
+              {d.startsWith(month.slice(0, 7)) && (
+                <>
+                  <time className={d === state.today ? 'is-today' : ''}>{Number(d.slice(8))}</time>
+                  <span className="leave-mini-dots" aria-hidden="true">
+                    {at(d).some((e) => e.request && !e.pending) && <i className="approved" />}
+                    {at(d).some((e) => !e.request) && <i className="closure" />}
+                    {at(d).some((e) => e.pending) && <i className="pending" />}
+                  </span>
+                </>
+              )}
             </button>
           ))}
         </div>
@@ -287,6 +296,7 @@ export function LeaveCalendar({
           {mode === 'Week' ? (
             <div className="leave-timeline-scroll">
               <div className="leave-timeline">
+                <div className="leave-people-background" aria-hidden="true" />
                 <div className="leave-timeline-background" aria-hidden="true">
                   {weekDays.map((d) => (
                     <div
@@ -380,9 +390,29 @@ export function LeaveCalendar({
             <div className="leave-year">
               {Array.from({ length: 12 }, (_, i) => {
                 const m = `${date.slice(0, 4)}-${String(i + 1).padStart(2, '0')}-01`
-                const count = events.filter(
+                const monthEvents = events.filter(
                   (e) => e.start <= `${m.slice(0, 7)}-31` && e.end >= m,
-                ).length
+                )
+                const groups = [
+                  {
+                    kind: 'approved',
+                    count: monthEvents.filter((e) => e.request && !e.pending).length,
+                    label: 'leave',
+                    plural: 'leaves',
+                  },
+                  {
+                    kind: 'closure',
+                    count: monthEvents.filter((e) => !e.request).length,
+                    label: 'company closure',
+                    plural: 'company closures',
+                  },
+                  {
+                    kind: 'pending',
+                    count: monthEvents.filter((e) => e.pending).length,
+                    label: 'needs approval',
+                    plural: 'need approval',
+                  },
+                ]
                 return (
                   <section className="leave-mini-month" key={m}>
                     <button
@@ -395,9 +425,24 @@ export function LeaveCalendar({
                       {monthName(m).split(' ')[0]}
                     </button>
                     {monthGrid(m, true)}
-                    <small>
-                      {count ? `${count} ${count === 1 ? 'event' : 'events'}` : 'No events'}
-                    </small>
+                    <div className="leave-year-summary">
+                      {monthEvents.length
+                        ? groups
+                            .filter((g) => g.count)
+                            .map((g) => (
+                              <button
+                                key={g.kind}
+                                className={`leave-year-badge ${g.kind}`}
+                                onClick={() => {
+                                  setDate(m)
+                                  setMode('Month')
+                                }}
+                              >
+                                {g.count} {g.count === 1 ? g.label : g.plural}
+                              </button>
+                            ))
+                        : 'No events'}
+                    </div>
                   </section>
                 )
               })}

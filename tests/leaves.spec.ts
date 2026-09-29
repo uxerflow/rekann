@@ -366,3 +366,72 @@ test('admin leaves persist requests, policies, approvals and closures with acces
   await ctx.dispose()
   await employee.dispose()
 })
+
+test('empty leave views keep compact centered artwork and fixed year rows on wide screens', async ({
+  page,
+}) => {
+  const ctx = await client()
+  await identity(ctx, 'leaves-empty')
+  const workspaceId = await company(ctx, 'Leaves Empty Review')
+  workspaces.push(workspaceId)
+  await profile(ctx, workspaceId)
+  const data = await details(ctx, workspaceId)
+  await page.context().addCookies((await ctx.storageState()).cookies)
+  await page.setViewportSize({ width: 1440, height: 1024 })
+  await page.goto(`/w/${data.workspace.slug}/leaves`)
+  await expect(page.locator('.leave-pending-empty')).toBeVisible()
+  await page.evaluate(() => document.fonts.ready)
+  const timeline = (await page.locator('.leave-timeline').boundingBox())!
+  const divider = (await page.locator('.leave-people-background').boundingBox())!
+  expect(divider.y + divider.height).toBe(timeline.y + timeline.height)
+  await expect(page.locator('.leave-timeline-row > .leave-person')).toHaveCSS(
+    'padding-left',
+    '16px',
+  )
+  const avatar = page.locator('.leave-person .avatar').first()
+  await expect(avatar).toHaveCSS('display', 'grid')
+  const avatarBox = (await avatar.boundingBox())!
+  const initials = (await avatar.locator('span').boundingBox())!
+  expect(
+    Math.abs(initials.y + initials.height / 2 - avatarBox.y - avatarBox.height / 2),
+  ).toBeLessThan(1)
+  const empty = (await page.locator('.leave-pending-empty').boundingBox())!
+  const illustration = (await page.locator('.leave-pending-empty img').boundingBox())!
+  expect(
+    Math.abs(illustration.x + illustration.width / 2 - empty.x - empty.width / 2),
+  ).toBeLessThan(1)
+  mkdirSync('test-results/leaves', { recursive: true })
+  await page.screenshot({ path: 'test-results/leaves/empty-week.png' })
+  for (const name of ['Request', 'Leave policy']) {
+    await page
+      .getByRole('navigation', { name: 'Leaves sections' })
+      .getByRole('button', { name, exact: true })
+      .click()
+    await expect(page.locator('.leave-empty img')).toHaveCSS('width', '48px')
+    await expect(page.locator('.leave-empty img')).toHaveCSS('height', '48px')
+    await expect(page.locator('.leave-empty h2')).toHaveCSS('font-weight', '500')
+    await page.screenshot({
+      path: `test-results/leaves/empty-${name === 'Request' ? 'requests' : 'policies'}.png`,
+    })
+  }
+  await page
+    .getByRole('navigation', { name: 'Leaves sections' })
+    .getByRole('button', { name: 'Leaves', exact: true })
+    .click()
+  await page.getByRole('combobox', { name: /Calendar view/ }).click()
+  await page.getByRole('option', { name: 'Year', exact: true }).click()
+  await page.getByLabel('Calendar date').fill('2026-01')
+  for (const width of [1440, 2560]) {
+    await page.setViewportSize({ width, height: 1024 })
+    const cards = await page.locator('.leave-mini-month').all()
+    expect(cards).toHaveLength(12)
+    for (const card of cards) {
+      expect((await card.boundingBox())!.height).toBeLessThanOrEqual(322)
+      await expect(card.locator('button').first()).toHaveCSS('color', 'rgb(41, 41, 41)')
+    }
+    const date = page.locator('.leave-mini-days button:not(:disabled)').first()
+    expect((await date.boundingBox())!.height).toBe(32)
+    await page.screenshot({ path: `test-results/leaves/empty-year-${width}.png` })
+  }
+  await ctx.dispose()
+})

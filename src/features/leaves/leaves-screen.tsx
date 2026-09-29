@@ -291,7 +291,7 @@ export function LeavesScreen({ workspaceId, admin }: { workspaceId: string; admi
             )}
           {!total ? (
             <div className="leave-empty">
-              <img src="/team/empty.svg" alt="" />
+              <img src={filtered ? '/team/empty.svg' : '/leaves/empty.svg'} alt="" />
               <h2>
                 {filtered
                   ? 'No results found'
@@ -303,7 +303,7 @@ export function LeavesScreen({ workspaceId, admin }: { workspaceId: string; admi
                 {filtered
                   ? 'Try another search or clear your filters.'
                   : tab === 'Request'
-                    ? 'Leave requests will appear here when your team submits them.'
+                    ? 'Review employee requests here, or record time off for your team.'
                     : 'Create a leave policy to get started.'}
               </p>
               {filtered ? (
