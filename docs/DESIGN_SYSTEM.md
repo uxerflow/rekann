@@ -1,0 +1,105 @@
+# Auth design foundations
+
+Onboarding Back follows Figma node `288:15500`: white secondary button, 80 × 36 px on desktop, 10 px radius, 1 px `#e5e5e5` border, Inter Medium 14/20 px, and no arrow icon. Reuse the shared secondary hover and focus states; retain the 44 px mobile touch target.
+
+Source: Rekann Figma Auth section, inspected through the local figma-cli bridge on September 15, 2026. The follow-up fidelity pass reads individual component variants, not the extractor's suggested defaults. Shared primitives live in `src/components/ui.tsx`; semantic tokens and layout live in `src/styles.css`.
+
+| Foundation                     | Measured value                                                                            |
+| ------------------------------ | ----------------------------------------------------------------------------------------- |
+| UI font                        | Inter, locally hosted through `@fontsource/inter`                                         |
+| Brand type                     | Figma logo 504:13272, outlined SVG; 108.48 × 24 auth, 90.57 × 20 onboarding               |
+| Heading                        | 24/30 px, weight 500, tracking −0.2 px                                                    |
+| Body                           | 14/22 px, weight 400, tracking −0.1 px                                                    |
+| Form label                     | 14/20 px, weight 500                                                                      |
+| Upload caption                 | 13/20 px, weight 400                                                                      |
+| Brand / action                 | `#1da578`                                                                                 |
+| Action hover                   | `#127857`                                                                                 |
+| Primary text / secondary text  | `#292929` / `#707070`                                                                     |
+| Placeholder                    | `#9e9e9e`                                                                                 |
+| Border                         | `#e5e5e5`, 1 px                                                                           |
+| Field and button radius        | 10 px                                                                                     |
+| Desktop field / primary button | 36 px high                                                                                |
+| Secondary small button         | 32 px high                                                                                |
+| Focus                          | Existing gray border, white 1 px outer layer, green 2 px outer ring                       |
+| Field error                    | Same ring geometry in `#ff5454`                                                           |
+| Disabled field                 | `#fafafa` fill and `#9e9e9e` content                                                      |
+| Auth frame                     | 1440 × 936 reference; 88 px header, content starts at y=288, 368 px form                  |
+| Onboarding frame               | 48 px header; one-third preview, two-thirds form; form x=720/y=128 at reference size      |
+| Onboarding form                | 480 px wide; 32 px heading gap; 16 px field gap                                           |
+| Upload control                 | 480 × 88 px, 64 px preview, 12 px padding/gap                                             |
+| Company card                   | 336 × 338 px at x=72/y=268                                                                |
+| Profile card                   | 336 × 414 px at x=72/y=254; 258 px photo                                                  |
+| Card shell                     | 16 px outer and 12 px inner radius; 6 px inset                                            |
+| OTP                            | Six 40 px cells, 10 px radius, evenly distributed spacing (8 px minimum), 24 px separator |
+
+References: login `196:5126`, company filled `209:5295`, profile empty `209:7394`, profile filled `209:7570`, field variants `199:67115`, primary button `264:9373`, focus `264:9375`, hover `264:9457`.
+
+The brand, lanyard, background, and auth/form glyphs are exported from Figma. They are local assets, not approximate CSS drawings. CSS retains the structural card containers because their content must update with the user's input. Lucide remains available for new screens with no supplied icon reference.
+
+The product decisions still apply: Google sign-in is disabled; English copy is edited for clarity; recovery/help links remain available. Email-only auth therefore omits the Google button and separator rather than leaving a nonfunctional control. Auth labels are visually hidden but remain programmatically associated with their fields. Password guidance and validation stay visible where needed. Workspace creators complete exactly two steps: company details, then their profile with “Go to workspace.” Invited employees complete profile and optional employee details in a separate two-step flow, regardless of their assigned role. Workspace time zone initializes from the browser, with UTC during SSR. Required company description, last name, and job title match the supplied field labels and are validated on both client and server.
+
+`tests/visual.spec.ts` compares browser bounds at 1440 × 936 against the values above with a 1 px tolerance, checks exact focus/color/radius properties, captures empty/focused/filled states, and exercises avatar choice and step-back state retention. Mobile is a responsive adaptation: decorative previews are hidden and controls retain 44 px touch height. Raster text rendering may differ by browser/OS; the measured dimensions and color tokens are the review contract.
+
+Forms and interactive Button components wait for hydration before accepting input. The six-cell code control uses one native input so paste, autofill, and screen-reader labeling continue to work. Avatar choice generates initials locally; uploaded photos remain user-provided and follow the existing private R2 pipeline.
+
+## Interaction standard
+
+Text links and text buttons never add an underline on hover. Use a subtle darker foreground on hover and press instead, with a shared 160 ms ease-out transition for color, background, border, and shadow. Brand actions use `#1da578` → `#127857` → `#0e6348`; muted and destructive controls retain their semantic color family. Buttons, icons, navigation, and clickable cards use the same smooth transition where relevant, without movement or scaling. Disabled controls do not react. Keep keyboard focus visible and respect reduced-motion preferences. Apply this standard to future relevant components.
+
+Use semantic cursors for every interactive state. Links, enabled buttons, selects, file controls, checkboxes, radios, summaries, and elements with `role="button"` use the pointer cursor. Editable text fields and text areas use the text cursor. Disabled controls use the not-allowed cursor, and busy controls use the progress cursor. Plain labels and static content retain the default cursor.
+
+Password requirements are progressive help: show the hint while the password field or its visibility toggle is focused. After leaving, keep it visible only when a visited, nonempty password is below the minimum length. Empty untouched forms stay compact. Valid or cleared passwords hide the hint on blur. Apply the same behavior to account creation and password recovery, retaining the input's accessible description while help is visible.
+
+## Avatar picker
+
+During profile onboarding, a selected solid color stays linked to the current name. Initials update from the empty “Y” fallback as first/last name change, in both previews, with a subtle 160 ms fade respecting reduced motion. Keep color selection across the optional-details step; generate the final PNG from the latest initials at submission. Gradient and uploaded images never regenerate from name edits. Existing saved PNGs remain images; reselect a solid color to link it to live initials.
+
+The picker offers 40 solid colors from Avvvatars (20 light backgrounds and 20 solid accent colors), rendered with initials and contrast-aware black/white text. No Avvvatars shape artwork or runtime package is included. Blank names show a “Y” fallback instead of an empty swatch. Oreo options are restricted to Silk, Flare, Nova, and Jade across all 40 palettes (160 static SVGs). Show 12 options at a time; Shuffle draws a new batch excluding the visible choices and does not change the user's selected avatar. Only the current batch is loaded. Skeletons reflect actual image decoding, with no artificial delay; failed images are disabled and offer retry. The generator is a development dependency; regenerate assets and their manifest with `node scripts/generate-avatars.mjs`. Selection is converted locally to PNG and follows the existing private image upload flow. Attribution is in `THIRD_PARTY_NOTICES.md`.
+
+## Dropdowns
+
+Interaction follow-up: [Fluid scrollbars](https://www.fluidfunctionalism.com/docs/scrollbars), [motion](https://www.fluidfunctionalism.com/docs/motion), and [fluid hover](https://www.fluidfunctionalism.com/docs/fluid-hover) inform the implementation. Rekann adapts these patterns with Radix ScrollArea and Framer Motion, rather than importing the entire Fluid component registry. Desktop scroll thumbs rest at 3 px and expand to 6 px within a 10 px hit area; the track stays transparent. Overflow edges fade only when content remains in that direction. Touch scrolling keeps native physics and hides the custom track.
+
+`src/lib/motion.ts` defines fast (80 ms), moderate (160 ms), and slow (240 ms) spring tiers, with faster exits. Dropdowns use moderate entrances and 120 ms opacity exits. A single background follows the nearest option with the fast spring, including the gaps between rows. Selection and keyboard focus remain separate; pointer movement never scrolls the list automatically. Reduced motion removes popup scaling and highlight travel. Reuse these primitives for future relevant lists; keep existing button color transitions. Surfaces and dark mode are deferred.
+
+Approved September 15, 2026: [Dropdown / Location](https://www.figma.com/design/jWSy3bCKjtKfyrToW5zyZ5/Rekann---HR-Platform?node-id=295-10750) and [Dropdown / Industry](https://www.figma.com/design/jWSy3bCKjtKfyrToW5zyZ5/Rekann---HR-Platform?node-id=295-10671), on Components 1.0. Location variants cover open, selected, filtered, empty, disabled, error, and mobile. These replace the temporary native menus for company onboarding.
+
+Closed controls retain the existing 36 px height and 10 px radius. Menus use the same white surface, gray border, Inter 14/20 text, 8 px padding, 4 px row gaps, 6 px row radii, and a subtle 0 8 24 shadow at 8% black. Active rows use the light gray surface; selected rows use the existing `brand/muted` color (`#ecfbf3`) and `brand/hover` foreground (`#127857`) with a check icon. Rows and triggers are 44 px high on mobile. Menus scroll within a 300 px maximum height and open above the control when necessary. Select menus use overflow-only scrollbars; never show a rail for a list that fits. On overflow, reserve 16 px beside the viewport for the 10 px scrollbar hit area plus a 6 px content gap. Selection backgrounds and checkmarks end before this gutter. Optional menu descriptions and section actions remain outside the option scroller.
+
+Location includes 249 ISO 3166-1 countries and territories with English display names. Indonesia is first; all others follow English alphabetical order. No country is silently selected, and no IP service is used. Search is case- and accent-insensitive, with a clear control and “No countries found” state. Industry uses the same menu without search. Arrow keys navigate, Enter selects, Escape cancels, and Tab exits. Selecting a value restores trigger focus and updates the company preview. Values continue through existing workspace validation and persistence.
+
+Fluid interaction conventions are required for future relevant components. Use the shared `ScrollArea` for bounded vertical lists and dialog content (including the avatar picker); do not introduce native thick scrollbars in those containers. Dropdown hover uses one moving neutral highlight (`#f2f2f2`), distinct from green selection. Standalone buttons retain smooth color darkening, without underlines or travel. Native dialogs retain focus trapping and Escape handling, with a 240 ms entrance and 160 ms exit using shared CSS timing tokens; reduced motion disables these transitions. The document itself keeps native scrolling. Verify overflow, thumb dragging, keyboard selection, and reduced motion when adding new scrolling or animated controls.
+
+## Dashboard
+
+Dashboard phase one follows Figma section `869:54842` (desktop `221:6486`, mobile `891:31709`). At 1440 px: 240 px sidebar, 48 px top bar, 64 px horizontal content padding, 20 px grid gaps, 344 × 124 px metrics, 708 × 316 px attention card, 344 × 316 px notes, and 344 × 362 px detail cards. Metric radii are 18 px; content cards are 20 px. Below 1000 px navigation becomes a modal menu; below 700 px cards stack with 16 px spacing and padding. The Assistant is full-screen on small screens. Names wrap or truncate within the available width, while metric text uses whole numbers without grouping separators.
+
+Dashboard icons and metric illustrations are exported into `public/dashboard` from the source Figma nodes. Reuse the shared scroll area and interaction tokens. The browser tests cover desktop geometry, narrow-screen overflow, native dialog keyboard behavior, and long note text.
+
+Workspace data currently supplies identity, company, employees, and permissions. Attendance, departments, leave, reports, and real Assistant execution are not integrated. Dashboard destinations without a backend show an unavailable message; local Assistant previews use fixed sample responses. Do not treat zero/empty states as a completed reporting backend. Setup completion is currently a local preview, not a server-derived onboarding status. Development checklist actions simulate completion and persist it on this device, scoped by workspace, employee, and preview state. Production does not restore simulated completion: company and policy setup remain unavailable and employee setup links to Team. Quick notes are stored only on the current device, keyed by workspace and employee, with visible storage errors; they are not synchronized to the server.
+
+For local visual review only, append `?dashboardPreview=filled`, `empty`, `setup`, `welcome`, `setup-progress`, `setup-complete`, `loading`, or `error` to an authenticated workspace URL. This override is ignored in production. Fixture counts are separate from real workspace data. Loading and recoverable error presentations also connect to workspace route loading/errors. This phase does not deploy, migrate, or implement future navigation destinations.
+
+Sidebar measurements come from instance `264:12350`: 12 px horizontal inset, a 216 × 32 px workspace control, 32 px navigation rows separated by 4 px, 16 px between groups, and 10 px control radii. Navigation and compact buttons use Inter Medium 14/20; group headings use Inter Medium 12/18. Keep desktop-only and mobile-only controls explicitly scoped so shared icon-button styles cannot reveal the mobile menu on desktop.
+
+Assistant frame `565:18184` uses a non-modal 408 px dock below the 48 px top bar. Its 8 px surround contains a 392 px panel with a 16 px radius, 49 px header, 312 px prompt stack, 20/28 semibold title, 14/22 description, 36 px prompt buttons, and a 102 px composer. Opening it reduces the dashboard width and hides metric illustrations; the lower cards use two columns. At 1000 px and below, use a full-screen modal with a 61 px header and a 44 px close target. Keep Escape, focus restoration, responsive mode changes, and the shared scroll area working. These presentation changes do not enable Assistant execution.
+
+The Assistant trigger toggles the drawer and exposes `aria-expanded`/`aria-controls`. Use a 240 ms entrance and a short 120 ms fade on exit; keep the closing native dialog painted via discrete display/overlay transitions and disable interactions during exit. Reflow the dashboard once at its final width: interpolating width while restoring three columns and metric illustrations temporarily squeezes cards and causes visible height jumps. Do not clip-wipe the Assistant text. Preserve the expanded width until the drawer has closed, and honor reduced motion. Verify rapid open/close reversals as well as final geometry.
+
+Dashboard legend markers use 4× PNG exports from Figma in `public/dashboard/legend-*.png`: 10 × 10 px, 4 px corner radius, 0.5 px dark outline, and a white inner highlight. Reuse these assets instead of flat CSS squares. The raster exports preserve the white highlight that differs in the SVG filter rendering. The widget chevrons and quick-note add icon also use direct Figma exports.
+
+### Welcome, setup, and Assistant previews
+
+The welcome modal follows `869:49981`: 800 × 408 px, 20 px radius, 320 px copy column and 448 × 400 px illustration exported from Figma. The modal is centered, keyboard accessible, and stacks on narrow screens. Its 28 px mark uses the current Rekann logo from `504:13272`, replacing the legacy mark in the welcome reference. Welcome dismissal is stored on this device. Setup screens follow `869:43179`, `869:49572`, and `891:29804`; the desktop checklist is 1072 × 278 px with three cards. Dismissal and the “Show setup checklist” action preserve preview progress.
+
+Assistant states follow `869:50870` (provider menu), `869:51436` (context menu), `869:54270` (thinking), `869:52002` (attendance response), `869:52841` (draft), and `869:53588` (completed). For local review, add `&assistantPreview=provider`, `context`, `thinking`, `chat`, `review`, or `completed` after a dashboard preview parameter. All preview parameters are ignored in production.
+
+Local prompts produce fixed sample responses after a short simulated thinking state. Drafts support Edit, Cancel, a review form, and explicit confirmation; confirmation only changes local component state. Each draft retains its own reviewed values. Draft Edit and Cancel reuse the secondary `dashboard-small-button` style (1 px border, 10 px radius, 14/20 medium type), including shared hover, focus, and responsive states. The review form and new-conversation control are functional extensions using existing components; the standalone full Assistant feature is not implemented. Menus support keyboard navigation and shared moving hover highlights. Escape closes a nested form/menu before the drawer. Attachments show local filenames only, with type/size/count validation; files are never uploaded or analyzed. Provider connection is a placeholder for Settings.
+
+Production integration still needs workspace-scoped reporting, setup completion from saved records, authorized Assistant tools, provider configuration, audit logging, and real policy persistence. Do not mistake a sample policy confirmation for a saved workspace policy. Keep these boundaries explicit in future work.
+
+## Team Directory
+
+Phase-one directory follows Figma section 938:49767. Reuse DashboardShell, Avatar and SelectField (compact variants). At 1440px, list controls use 32px height, 10px radius and a 360px search field; the list has a 44px header and 60px rows. The grid has four 275×232px cards with 18px radius, 20px gaps and circular 56px avatars. Tables keep a contained horizontal scroller on narrow screens; controls increase to 44px. Shared dropdowns retain keyboard navigation, fluid hover and ScrollArea. Directory icons and empty/error artwork are local SVG exports in public/team. Personal pins and preferred view are browser-local, scoped by workspace and membership.
+
+Directory filter and pagination menus use the shared compact SelectField: explicit Inter 14/20 text in the portal, balanced 8px menu/row padding, 36px desktop rows, 4px row gaps, and a selected check with brand-muted fill. Selected rows do not get an extra inset border. Employment-type menus are 160px wide; mobile rows remain 44px.

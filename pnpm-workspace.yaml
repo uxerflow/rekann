@@ -7,3 +7,5 @@ allowBuilds:
 # https://github.com/advisories/GHSA-rgj7-g3m4-5g8c
 overrides:
   'miniflare>sharp': 0.35.4
+  # drizzle-kit's legacy TS loader otherwise resolves a vulnerable dev server.
+  '@esbuild-kit/core-utils>esbuild': 0.25.12

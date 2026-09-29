@@ -1,0 +1,3 @@
+# Generated declarations and route manifests add noise without architectural value.
+worker-configuration.d.ts
+src/routeTree.gen.ts
