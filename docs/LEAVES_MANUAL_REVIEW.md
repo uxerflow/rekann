@@ -16,3 +16,11 @@ Use the existing Demo employees. These checks are intentionally left for owner m
 - [ ] Repeat the dropdown, date range, and Assistant checks on a narrow screen. Scroll long content and verify the close and action buttons remain reachable.
 
 Automated verification for this change is limited to dependency integrity, TypeScript, and the staging build, at the owner's request. Browser and end-to-end acceptance remain manual.
+
+## Scrollbar and toolbar follow-up
+
+- [ ] Record time off: scroll from employee selection to balance details. The scrollbar must stay outside inputs, dropdowns, textarea, and balance cards. Header and footer remain reachable without overlap.
+- [ ] Check one other long dialog (policy setup, employee edit, or AI settings). Scrollbar separation follows the same shared rule. Resizing should not put the rail over content.
+- [ ] Calendar toolbar: date selector, Week/Month/Year dropdown, arrows, and Today have equal height. On mobile, controls wrap without clipping.
+- [ ] Navigate to an earlier date, click Today, and check that the current period returns while Week/Month/Year mode stays unchanged. Repeat in all three modes.
+- [ ] Review the proposed popovers and light Week grid in Figma separately; these visual proposals are not live yet.

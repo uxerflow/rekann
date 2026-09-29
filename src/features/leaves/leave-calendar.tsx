@@ -241,6 +241,13 @@ export function LeaveCalendar({
         <div className="leave-calendar-toolbar">
           <strong>{mode === 'Year' ? date.slice(0, 4) : monthName(date)}</strong>
           <div>
+            <Button
+              className="secondary leave-today-button"
+              onClick={() => setDate(state.today)}
+              title="Go to today"
+            >
+              Today
+            </Button>
             <button
               className="icon-button"
               aria-label={`Previous ${mode.toLowerCase()}`}

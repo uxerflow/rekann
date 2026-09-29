@@ -141,6 +141,7 @@
   margin: 0 0 24px;
 }
 .detail-dialog-scroll {
+  margin-right: -16px;
   max-height: calc(100dvh - 240px);
   min-height: 0;
 }
@@ -545,6 +546,7 @@
     grid-template-columns: 1fr;
   }
   .detail-dialog-scroll {
+    margin-right: -8px;
     max-height: calc(100dvh - 240px);
   }
   .detail-inline {

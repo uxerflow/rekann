@@ -91,7 +91,9 @@ export function DetailDialog({
       ) : (
         <>
           {description && <p className="detail-dialog-description">{description}</p>}
-          <ScrollArea className="detail-dialog-scroll">{children}</ScrollArea>
+          <ScrollArea className="detail-dialog-scroll" gutter="stable">
+            {children}
+          </ScrollArea>
           {footer && <div className="detail-dialog-footer">{footer}</div>}
         </>
       )}

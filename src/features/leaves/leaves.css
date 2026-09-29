@@ -2073,3 +2073,50 @@
   font-size: 12px;
   line-height: 20px;
 }
+
+/* Every calendar toolbar control uses the same height and corner radius. */
+.leave-calendar-toolbar .icon-button,
+.leave-calendar-toolbar .date-trigger,
+.leave-calendar-toolbar .select-trigger,
+.leave-calendar-toolbar .leave-today-button {
+  height: 36px;
+  min-height: 36px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  line-height: 20px;
+}
+.leave-calendar-toolbar .icon-button {
+  width: 36px;
+}
+.leave-today-button {
+  flex-shrink: 0;
+  padding: 0 12px;
+}
+.leave-calendar-toolbar .date-field-compact {
+  min-width: 0;
+}
+@media (max-width: 1200px) and (min-width: 761px) {
+  .leave-calendar-toolbar {
+    height: auto;
+    min-height: 48px;
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 760px) {
+  .leave-calendar-toolbar > div {
+    flex-wrap: wrap;
+  }
+  .leave-calendar-toolbar .icon-button,
+  .leave-calendar-toolbar .date-trigger,
+  .leave-calendar-toolbar .select-trigger,
+  .leave-calendar-toolbar .leave-today-button {
+    height: 44px;
+    min-height: 44px;
+  }
+  .leave-calendar-toolbar .icon-button {
+    width: 44px;
+  }
+  .leave-calendar-toolbar .date-field-compact {
+    flex: 1 1 200px;
+  }
+}

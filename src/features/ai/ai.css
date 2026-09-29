@@ -540,12 +540,9 @@
   flex-shrink: 0;
 }
 
-/* The scroll rail sits in the dialog gutter, outside the content column. */
-.ai-dialog .detail-dialog-scroll {
-  margin: 0 -16px;
-}
+/* Shared DetailDialog owns the scrollbar lane. */
 .ai-dialog .detail-dialog-scroll > .scroll-viewport > div {
-  padding: 4px 16px;
+  padding: 4px 0;
   box-sizing: border-box;
 }
 .ai-dialog .ai-settings-fields {
@@ -668,12 +665,6 @@
   .ai-availability .button {
     grid-column: 2;
     justify-self: start;
-  }
-  .ai-dialog .detail-dialog-scroll {
-    margin: 0 -12px;
-  }
-  .ai-dialog .detail-dialog-scroll > .scroll-viewport > div {
-    padding: 4px 12px;
   }
 }
 

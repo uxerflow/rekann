@@ -2155,7 +2155,8 @@ select:user-invalid {
 }
 
 /* Keep a real gutter between scrollable content and the full scrollbar hit area. */
-.scroll-area[data-gutter='true'][data-overflow='true'] > .scroll-viewport {
+.scroll-area[data-gutter='true'][data-overflow='true'] > .scroll-viewport,
+.scroll-area[data-gutter='stable'] > .scroll-viewport {
   width: calc(100% - 16px);
 }
 .select-popup .select-option {
