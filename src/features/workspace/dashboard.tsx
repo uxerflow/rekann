@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Check, X, ListChecks } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Check } from 'lucide-react'
 import { ScrollArea } from '../../components/scroll-area'
 import type { WorkspaceDetails } from '../../server/workspaces'
 import './dashboard.css'
@@ -403,122 +403,199 @@ export function DashboardSkeleton() {
   )
 }
 function QuickNotes({ storageKey }: { storageKey: string }) {
-  const [notes, setNotes] = useState('')
-  const [items, setItems] = useState<{ text: string; done: boolean }[]>([])
-  const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState('')
+  type NoteBlock = { id: string; type: 'text' | 'checklist'; text: string; done: boolean }
+  const newBlock = (type: NoteBlock['type'] = 'text', text = ''): NoteBlock => ({
+    id: crypto.randomUUID(),
+    type,
+    text,
+    done: false,
+  })
+  const [blocks, setBlocks] = useState<NoteBlock[]>([])
   const [ready, setReady] = useState(false)
   const [storageError, setStorageError] = useState(false)
+  const editors = useRef(new Map<string, HTMLTextAreaElement>())
+  const focusNext = useRef<string | null>(null)
+  const activeBlock = useRef<string | null>(null)
   useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey) || 'null')
-      if (saved) {
-        if (typeof saved.notes === 'string') setNotes(saved.notes.slice(0, 1000))
-        if (Array.isArray(saved.items))
-          setItems(
-            saved.items
-              .filter(
-                (v: unknown): v is { text: string; done: boolean } =>
-                  !!v &&
-                  typeof v === 'object' &&
-                  'text' in v &&
-                  typeof v.text === 'string' &&
-                  'done' in v &&
-                  typeof v.done === 'boolean',
-              )
-              .slice(0, 20)
-              .map((v: { text: string; done: boolean }) => ({ ...v, text: v.text.slice(0, 160) })),
-          )
+      const isBlock = (value: unknown): value is NoteBlock =>
+        !!value &&
+        typeof value === 'object' &&
+        'id' in value &&
+        typeof value.id === 'string' &&
+        'type' in value &&
+        (value.type === 'text' || value.type === 'checklist') &&
+        'text' in value &&
+        typeof value.text === 'string' &&
+        'done' in value &&
+        typeof value.done === 'boolean'
+      if (Array.isArray(saved?.blocks)) {
+        const restored = saved.blocks.filter(isBlock).slice(0, 100)
+        setBlocks(
+          restored.length
+            ? restored.map((block: NoteBlock) => ({ ...block, text: block.text.slice(0, 1000) }))
+            : [newBlock()],
+        )
+      } else {
+        const note = typeof saved?.notes === 'string' ? saved.notes.slice(0, 1000) : ''
+        const legacyItems = Array.isArray(saved?.items)
+          ? saved.items.filter(
+              (item: unknown): item is { text: string; done: boolean } =>
+                !!item &&
+                typeof item === 'object' &&
+                'text' in item &&
+                typeof item.text === 'string' &&
+                'done' in item &&
+                typeof item.done === 'boolean',
+            )
+          : []
+        setBlocks([
+          newBlock('text', note),
+          ...legacyItems.slice(0, 20).map((item: { text: string; done: boolean }) => ({
+            ...newBlock('checklist', item.text.slice(0, 160)),
+            done: item.done,
+          })),
+        ])
       }
     } catch {
       setStorageError(true)
+      setBlocks([newBlock()])
     }
     setReady(true)
   }, [storageKey])
   useEffect(() => {
     if (!ready) return
     try {
-      localStorage.setItem(storageKey, JSON.stringify({ notes, items }))
+      localStorage.setItem(storageKey, JSON.stringify({ blocks }))
     } catch {
       setStorageError(true)
     }
-  }, [notes, items, ready, storageKey])
+  }, [blocks, ready, storageKey])
+  useEffect(() => {
+    for (const editor of editors.current.values()) {
+      editor.style.height = '0px'
+      editor.style.height = `${editor.scrollHeight}px`
+    }
+    const id = focusNext.current
+    if (id) {
+      editors.current.get(id)?.focus()
+      focusNext.current = null
+    }
+  }, [blocks])
+  const insertChecklist = () => {
+    const block = newBlock('checklist')
+    const index = blocks.findIndex((item) => item.id === activeBlock.current)
+    focusNext.current = block.id
+    setBlocks((current) => {
+      const next = [...current]
+      next.splice(index < 0 ? next.length : index + 1, 0, block)
+      return next
+    })
+  }
   return (
     <section className="quick-notes" aria-label="Quick notes">
       <ScrollArea className="notes-scroll">
-        <textarea
-          aria-label="Personal notes"
-          placeholder="Write your personal notes..."
-          value={notes}
-          maxLength={1000}
-          disabled={!ready}
-          onChange={(e) => setNotes(e.target.value)}
-        />
-        {items.map((item, i) => (
-          <label className="note-task" key={i}>
-            <input
-              type="checkbox"
-              checked={item.done}
-              onChange={(e) =>
-                setItems(items.map((v, j) => (j === i ? { ...v, done: e.target.checked } : v)))
-              }
-            />
-            <span className={item.done ? 'is-done' : ''}>{item.text}</span>
-          </label>
-        ))}
-        {editing && (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              if (draft.trim()) {
-                setItems([...items, { text: draft.trim(), done: false }])
-                setDraft('')
-                setEditing(false)
-              }
-            }}
-          >
-            <input
-              autoFocus
-              aria-label="New checklist item"
-              placeholder="Add a task"
-              value={draft}
-              maxLength={160}
-              onChange={(e) => setDraft(e.target.value)}
-            />
-            <button className="sr-only" type="submit">
-              Save task
-            </button>
-          </form>
-        )}
+        <div className="notes-editor">
+          {blocks.map((block, index) => (
+            <div
+              className={`note-line ${block.type === 'checklist' ? 'note-line-checklist' : ''}`}
+              key={block.id}
+            >
+              {block.type === 'checklist' && (
+                <input
+                  type="checkbox"
+                  aria-label={block.text || `Checklist item ${index + 1}`}
+                  checked={block.done}
+                  onChange={(event) =>
+                    setBlocks((current) =>
+                      current.map((item) =>
+                        item.id === block.id ? { ...item, done: event.target.checked } : item,
+                      ),
+                    )
+                  }
+                />
+              )}
+              <textarea
+                ref={(element) => {
+                  if (element) editors.current.set(block.id, element)
+                  else editors.current.delete(block.id)
+                }}
+                aria-label={
+                  block.type === 'checklist'
+                    ? `Checklist item ${index + 1}`
+                    : index === 0
+                      ? 'Personal notes'
+                      : `Personal notes line ${index + 1}`
+                }
+                placeholder={
+                  index === 0 && block.type === 'text' ? 'Write your personal notes...' : ''
+                }
+                value={block.text}
+                rows={1}
+                maxLength={1000}
+                disabled={!ready}
+                className={block.done ? 'is-done' : undefined}
+                onFocus={() => {
+                  activeBlock.current = block.id
+                }}
+                onChange={(event) =>
+                  setBlocks((current) =>
+                    current.map((item) =>
+                      item.id === block.id ? { ...item, text: event.target.value } : item,
+                    ),
+                  )
+                }
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
+                    event.preventDefault()
+                    if (block.type === 'checklist' && !block.text.trim()) {
+                      setBlocks((current) =>
+                        current.map((item) =>
+                          item.id === block.id ? { ...item, type: 'text', done: false } : item,
+                        ),
+                      )
+                      focusNext.current = block.id
+                      return
+                    }
+                    const position = event.currentTarget.selectionStart
+                    const next = newBlock(block.type, block.text.slice(position))
+                    focusNext.current = next.id
+                    setBlocks((current) => {
+                      const at = current.findIndex((item) => item.id === block.id)
+                      const updated = [...current]
+                      updated.splice(at, 1, { ...block, text: block.text.slice(0, position) }, next)
+                      return updated
+                    })
+                  } else if (event.key === 'Backspace' && !block.text && index > 0) {
+                    event.preventDefault()
+                    if (block.type === 'checklist') {
+                      focusNext.current = block.id
+                      setBlocks((current) =>
+                        current.map((item) =>
+                          item.id === block.id ? { ...item, type: 'text', done: false } : item,
+                        ),
+                      )
+                    } else {
+                      const previous = blocks[index - 1]
+                      focusNext.current = previous.id
+                      setBlocks((current) => current.filter((item) => item.id !== block.id))
+                    }
+                  }
+                }}
+              />
+            </div>
+          ))}
+        </div>
       </ScrollArea>
       <div className="notes-toolbar">
         {storageError && <small role="status">Notes could not be saved on this device.</small>}
-        {editing && (
-          <button
-            aria-label="Save checklist item"
-            disabled={!draft.trim()}
-            onClick={() => {
-              setItems([...items, { text: draft.trim(), done: false }])
-              setDraft('')
-              setEditing(false)
-            }}
-          >
-            <ListChecks size={16} />
-          </button>
-        )}
         <button
-          aria-label={editing ? 'Cancel checklist item' : 'Add checklist item'}
-          disabled={!ready || (!editing && items.length >= 20)}
-          onClick={() => {
-            setEditing(!editing)
-            setDraft('')
-          }}
+          aria-label="Add checklist item"
+          disabled={!ready || blocks.length >= 100}
+          onClick={insertChecklist}
         >
-          {editing ? (
-            <X size={16} />
-          ) : (
-            <img src="/dashboard/notes-add.svg" width="16" height="16" alt="" />
-          )}
+          <img src="/dashboard/notes-add.svg" width="16" height="16" alt="" />
         </button>
       </div>
     </section>
