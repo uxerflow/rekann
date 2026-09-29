@@ -1,3 +1,4 @@
+import { DatePicker } from '../../components/date-picker'
 import { useEffect, useState, type ReactNode } from 'react'
 import { ArrowLeft, ChevronDown, Plus, Trash2 } from 'lucide-react'
 import { Button, Field, Notice } from '../../components/ui'
@@ -412,24 +413,18 @@ export function PolicyForm({
           )}
           {closure && (
             <Section title="Dates" description="Select the date range for this closure.">
-              <div className="leave-two-fields">
-                <Field
-                  label="Start date"
-                  required
-                  type="date"
-                  min={state.today}
-                  value={r.startDate}
-                  onChange={(e) => set('startDate', e.target.value)}
-                />
-                <Field
-                  label="End date"
-                  required
-                  type="date"
-                  min={r.startDate || state.today}
-                  value={r.endDate}
-                  onChange={(e) => set('endDate', e.target.value)}
-                />
-              </div>
+              <DatePicker
+                label="Closure dates"
+                required
+                mode="range"
+                today={state.today}
+                min={state.today}
+                value={r.startDate}
+                endValue={r.endDate}
+                onChange={(start, end) =>
+                  setDraft((d) => ({ ...d, rules: { ...d.rules, startDate: start, endDate: end } }))
+                }
+              />
               <Radio
                 label="Count days as"
                 value={r.countAs}

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Button, Field, Notice, Avatar, mediaUrl } from '../../components/ui'
+import { Paperclip, X } from 'lucide-react'
+import { DatePicker } from '../../components/date-picker'
 import { SelectField } from '../../components/select-field'
 import { DetailDialog } from '../team/detail-dialog'
 import type { AdminLeaves, LeaveOption, LeaveRequest } from '../../server/leaves'
@@ -224,28 +226,19 @@ export function RecordLeave({
           }}
           disabled={!person || loading || busy}
         />
-        <div className="leave-two-fields">
-          <Field
-            label="Start date"
-            type="date"
-            required
-            disabled={!person || busy}
-            value={startDate}
-            onChange={(e) => {
-              setStart(e.target.value)
-              if (endDate < e.target.value) setEnd(e.target.value)
-            }}
-          />
-          <Field
-            label="End date"
-            type="date"
-            required
-            min={startDate}
-            disabled={!person || busy}
-            value={endDate}
-            onChange={(e) => setEnd(e.target.value)}
-          />
-        </div>
+        <DatePicker
+          label="Leave dates"
+          required
+          mode="range"
+          value={startDate}
+          endValue={endDate}
+          today={state.today}
+          disabled={!person || busy}
+          onChange={(start, end) => {
+            setStart(start)
+            setEnd(end)
+          }}
+        />
         <SelectField
           label="Leave duration"
           placeholder="Full day"
@@ -269,7 +262,14 @@ export function RecordLeave({
         </label>
         <div className="field">
           <label htmlFor="leave-attachment">
-            Attachment {selected?.rules?.document === 'Required' ? 'required' : 'optional'}
+            Attachment{' '}
+            <span
+              className={
+                selected?.rules?.document === 'Required' ? 'date-required' : 'leave-optional'
+              }
+            >
+              {selected?.rules?.document === 'Required' ? '*' : '(optional)'}
+            </span>
           </label>
           <input
             ref={input}
@@ -279,35 +279,80 @@ export function RecordLeave({
             accept="application/pdf,image/png,image/jpeg"
             disabled={!person || busy}
             onChange={(e) => {
-              setFile(e.target.files?.[0] ?? null)
+              const next = e.target.files?.[0]
+              e.target.value = ''
+              if (!next) return
+              if (
+                !['application/pdf', 'image/png', 'image/jpeg'].includes(next.type) ||
+                next.size > 20 * 1024 * 1024 ||
+                next.size < 16
+              ) {
+                setError('Choose a PDF, PNG or JPG file up to 20 MB.')
+                return
+              }
+              setError('')
+              setFile(next)
               setAttachmentId(undefined)
             }}
           />
-          <Button
-            className="secondary leave-file-button"
-            disabled={!person || busy}
-            onClick={() => input.current?.click()}
-          >
-            {file ? file.name : 'Attach file'}
-          </Button>
-        </div>
-        <div className="leave-balance">
-          <div>
-            <strong>{amount ? daysText(amount) : '—'}</strong>
-            <span>Requested</span>
+          <div className="leave-attachment-row">
+            <Button
+              className="secondary leave-file-button"
+              disabled={!person || busy}
+              onClick={() => input.current?.click()}
+            >
+              <Paperclip size={16} strokeWidth={1.5} />
+              <span>{file ? file.name : 'Upload file'}</span>
+            </Button>
+            {file && (
+              <button
+                type="button"
+                className="icon-button"
+                aria-label="Remove attachment"
+                disabled={busy}
+                onClick={() => {
+                  setFile(null)
+                  setAttachmentId(undefined)
+                }}
+              >
+                <X size={16} strokeWidth={1.5} />
+              </button>
+            )}
           </div>
-          <div>
-            <strong>{selected ? daysText(remaining) : '—'}</strong>
-            <span>After recording</span>
-          </div>
+          <p className="hint">PDF, PNG or JPG · Up to 20 MB</p>
         </div>
-        <p className="hint">
-          {person
-            ? selected
-              ? `Current balance: ${daysText(selected.remaining)}`
-              : 'Select a leave type to see the available balance.'
-            : 'Select an employee to see their leave types and balance.'}
-        </p>
+        {person && selected ? (
+          <section className="leave-owned-balance" aria-label={`${person.name}'s leave balance`}>
+            <header>
+              <strong>{person.name}’s balance</strong>
+              <span>{selected.name}</span>
+            </header>
+            <div className="leave-balance">
+              <div>
+                <strong>{daysText(selected.remaining)}</strong>
+                <span>Available</span>
+              </div>
+              <div>
+                <strong>{amount ? daysText(charge) : '—'}</strong>
+                <span>This time off</span>
+              </div>
+              <div>
+                <strong>{daysText(remaining)}</strong>
+                <span>After recording</span>
+              </div>
+            </div>
+            <p className="hint">
+              {prettyDate(selected.start)} – {prettyDate(selected.end)}. Includes approved time off
+              and applicable company closures. Pending requests are not deducted.
+            </p>
+          </section>
+        ) : (
+          <p className="hint">
+            {person
+              ? 'Select a leave type to see this employee’s balance.'
+              : 'Select an employee to see their leave types and balance.'}
+          </p>
+        )}
       </div>
     </DetailDialog>
   )

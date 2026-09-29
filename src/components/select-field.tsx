@@ -124,17 +124,12 @@ export function SelectField({
       const below = bottom - rect.bottom - 8
       const height = Math.min(300, Math.max(above, below) - 8)
       const up = below < Math.min(300, height) && above > below
-      const dialog = trigger.current!.closest('dialog')
-      const origin = dialog?.getBoundingClientRect()
-      const offsetX = origin ? origin.left + (dialog?.clientLeft ?? 0) : 0
-      const offsetY = origin ? origin.top + (dialog?.clientTop ?? 0) : 0
+      const width = Math.min(menuWidth ?? rect.width, window.innerWidth - 16)
       setPosition({
-        left:
-          Math.max(8, Math.min(rect.left, window.innerWidth - (menuWidth ?? rect.width) - 8)) -
-          offsetX,
-        top: (up ? rect.top - 8 : rect.bottom + 8) - offsetY,
-        width: menuWidth ?? rect.width,
-        maxHeight: Math.max(100, height),
+        left: Math.max(8, Math.min(rect.left, window.innerWidth - width - 8)),
+        top: up ? rect.top - 8 : rect.bottom + 8,
+        width,
+        maxHeight: Math.max(80, height),
       })
       popup.current?.setAttribute('data-side', up ? 'top' : 'bottom')
     }
@@ -148,6 +143,7 @@ export function SelectField({
     function scrolled(event: Event) {
       if (!popup.current?.contains(event.target as Node)) place()
     }
+    popup.current?.showPopover()
     place()
     if (searchable) search.current?.focus({ preventScroll: true })
     document.addEventListener('pointerdown', outside)
@@ -192,6 +188,7 @@ export function SelectField({
     setHovering(true)
     if (event.key === 'Escape' && open) {
       event.preventDefault()
+      event.stopPropagation()
       close(true)
     } else if (event.key === 'Tab') {
       if (open && !event.shiftKey && menuAction && !menuAction.disabled) {
@@ -282,6 +279,7 @@ export function SelectField({
             {open && (
               <motion.div
                 ref={popup}
+                popover="manual"
                 id={`${id}-popup`}
                 className={compact ? 'select-popup select-popup-compact' : 'select-popup'}
                 style={position}

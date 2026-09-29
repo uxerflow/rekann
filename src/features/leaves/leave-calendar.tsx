@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { ChevronLeft, ChevronRight, PanelRightClose, PanelRightOpen } from 'lucide-react'
 import { Avatar, Button, mediaUrl } from '../../components/ui'
+import { DatePicker } from '../../components/date-picker'
 import { SelectField } from '../../components/select-field'
 import { ScrollArea } from '../../components/scroll-area'
 import { DetailMenu } from '../team/detail-menu'
@@ -51,7 +52,11 @@ export function LeaveCalendar({
     [day, setDay] = useState<string | null>(null),
     [event, setEvent] = useState<CalendarEvent | null>(null)
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
-  const closeEvent = useCallback(() => setEvent(null), [])
+  const [summary, setSummary] = useState<{ kind: string; events: CalendarEvent[] } | null>(null)
+  const closeEvent = useCallback(() => {
+    setEvent(null)
+    setSummary(null)
+  }, [])
   const events: CalendarEvent[] = [
     ...state.requests
       .filter((r) => ['approved', 'pending'].includes(r.status))
@@ -101,6 +106,7 @@ export function LeaveCalendar({
         className={`leave-chip tone-${tone(e.name)} ${e.pending ? 'leave-pending' : ''}`}
         aria-label={`${p?.name || 'Company'} · ${e.name}${e.pending ? ' · Pending' : ''}`}
         onClick={(click) => {
+          setSummary(null)
           setAnchor(click.currentTarget)
           setEvent(e)
         }}
@@ -249,29 +255,14 @@ export function LeaveCalendar({
             >
               <ChevronRight size={16} />
             </button>
-            <label className="leave-date-control" data-mode={mode}>
-              <span>
-                {mode === 'Week'
-                  ? `${new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', timeZone: 'UTC' }).format(new Date(weekStart))} – ${new Intl.DateTimeFormat('en', { month: weekStart.slice(0, 7) === weekDays[13].slice(0, 7) ? undefined : 'short', day: 'numeric', timeZone: 'UTC' }).format(new Date(weekDays[13]))}, ${weekStart.slice(0, 4)}`
-                  : mode === 'Year'
-                    ? date.slice(0, 4)
-                    : new Intl.DateTimeFormat('en', {
-                        month: 'short',
-                        year: 'numeric',
-                        timeZone: 'UTC',
-                      }).format(new Date(date))}
-              </span>
-              <img src="/leaves/date.svg" width={16} height={16} alt="" />
-              <input
-                aria-label="Calendar date"
-                type={mode === 'Week' ? 'date' : 'month'}
-                value={mode === 'Week' ? date : date.slice(0, 7)}
-                onChange={(e) => {
-                  if (e.target.value)
-                    setDate(mode === 'Week' ? e.target.value : `${e.target.value}-01`)
-                }}
-              />
-            </label>
+            <DatePicker
+              label="Calendar date"
+              compact
+              value={date}
+              today={state.today}
+              mode={mode.toLowerCase() as 'week' | 'month' | 'year'}
+              onChange={setDate}
+            />
             <SelectField
               compact
               required={false}
@@ -433,9 +424,19 @@ export function LeaveCalendar({
                               <button
                                 key={g.kind}
                                 className={`leave-year-badge ${g.kind}`}
-                                onClick={() => {
-                                  setDate(m)
-                                  setMode('Month')
+                                onClick={(e) => {
+                                  setEvent(null)
+                                  setAnchor(e.currentTarget)
+                                  setSummary({
+                                    kind: g.kind,
+                                    events: monthEvents.filter((item) =>
+                                      g.kind === 'pending'
+                                        ? item.pending
+                                        : g.kind === 'closure'
+                                          ? !item.request
+                                          : !!item.request && !item.pending,
+                                    ),
+                                  })
                                 }}
                               >
                                 {g.count} {g.count === 1 ? g.label : g.plural}
@@ -527,25 +528,22 @@ export function LeaveCalendar({
           anchor={anchor}
           onClose={closeEvent}
           label={event.name}
-          width={270}
+          width={288}
           className="leave-event-popover"
         >
-          <strong>{event.name}</strong>
+          <span className="leave-popover-heading">
+            {event.request ? 'Leave details' : 'Company closure'}
+          </span>
+          <strong className={`leave-popover-type ${tone(event.name)}`}>{event.name}</strong>
           <p>
             {event.memberId
               ? state.people.find((p) => p.id === event.memberId)?.name
-              : 'Company closure'}
+              : `${event.coveredIds?.length ?? 0} employees covered`}
           </p>
           <p>
-            {prettyDate(event.start)} → {prettyDate(event.end)}
+            {prettyDate(event.start)} – {prettyDate(event.end)}
           </p>
-          <small>
-            {event.pending
-              ? 'Pending approval'
-              : event.request
-                ? 'Approved'
-                : `${event.coveredIds?.length ?? 0} members covered`}
-          </small>
+          {event.request && <LeavePopoverStatus pending={event.pending} />}
           {event.request && (
             <button
               onClick={() => {
@@ -559,6 +557,67 @@ export function LeaveCalendar({
           )}
         </DetailMenu>
       )}
+      {summary && anchor && (
+        <DetailMenu
+          anchor={anchor}
+          onClose={closeEvent}
+          width={360}
+          label={summary.kind === 'closure' ? 'Company closures' : 'Leave permissions'}
+          className="leave-summary-popover"
+        >
+          <span className="leave-popover-heading">
+            {summary.kind === 'closure' ? 'Company closures' : 'Leave permissions'}
+          </span>
+          <ScrollArea className="leave-summary-scroll" type="auto">
+            {summary.events.map((item) => {
+              const short = (date: string) =>
+                new Intl.DateTimeFormat('en', {
+                  month: 'short',
+                  day: 'numeric',
+                  timeZone: 'UTC',
+                }).format(new Date(date))
+              const dates =
+                item.start === item.end
+                  ? short(item.start)
+                  : `${short(item.start)} – ${item.start.slice(0, 7) === item.end.slice(0, 7) ? Number(item.end.slice(8)) : short(item.end)}`
+              return (
+                <button
+                  type="button"
+                  className={`leave-summary-row ${summary.kind}`}
+                  key={item.id}
+                  onClick={() => {
+                    closeEvent()
+                    if (item.request) onRequest(item.request)
+                    else setEvent(item)
+                  }}
+                >
+                  <span className="leave-summary-date">
+                    <i />
+                    {dates}
+                  </span>
+                  <span>
+                    {item.memberId && (
+                      <>
+                        {state.people.find((p) => p.id === item.memberId)?.name}
+                        <span className="leave-summary-dot"> · </span>
+                      </>
+                    )}
+                    <span className={`leave-popover-type ${tone(item.name)}`}>{item.name}</span>
+                  </span>
+                </button>
+              )
+            })}
+          </ScrollArea>
+        </DetailMenu>
+      )}
     </div>
+  )
+}
+
+function LeavePopoverStatus({ pending }: { pending: boolean }) {
+  return (
+    <span className={`leave-popover-status ${pending ? 'pending' : 'approved'}`}>
+      {pending ? 'Pending approval' : 'Approved'}
+    </span>
   )
 }
