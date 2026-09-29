@@ -30,4 +30,4 @@ Automated verification for this change is limited to dependency integrity, TypeS
 - [ ] Check one other long dialog (policy setup, employee edit, or AI settings). Scrollbar separation follows the same shared rule. Resizing should not put the rail over content.
 - [ ] Calendar toolbar: date selector, Week/Month/Year dropdown, arrows, and Today have equal height. On mobile, controls wrap without clipping.
 - [ ] Navigate to an earlier date, click Today, and check that the current period returns while Week/Month/Year mode stays unchanged. Repeat in all three modes.
-- [ ] Compare Week against the updated Figma review: stronger employee separators on the left, faint central grid, compact pending cards, and readable single-day chips. Narrow chips prioritize text; wider chips keep their icons. Hover reveals the full name and dates.
+- [ ] Compare Week against the updated Figma review: stronger employee separators on the left, faint central grid, compact pending cards, and readable single-day chips. All chips retain their icons, including single-day Sick leave. Labels use Inter Medium 13/20. Hover reveals the full name and dates.

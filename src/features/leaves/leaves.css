@@ -651,8 +651,11 @@
   text-align: left;
   color: #4332cc;
   background: #f7f5ff;
+  font-family: Inter, sans-serif;
   font-size: 13px;
+  font-weight: 500;
   line-height: 20px;
+  letter-spacing: -0.1px;
 }
 .leave-chip span {
   overflow: hidden;
@@ -738,7 +741,6 @@
 .leave-timeline .leave-chip {
   gap: 8px;
   border-radius: 8px;
-  font-size: 12px;
   background: #f5f5ff;
   border-color: #b9bbff;
 }
@@ -2244,13 +2246,10 @@
   }
 }
 
-/* Keep short events readable before spending their width on decorative icons. */
+/* Preserve the leave-type icon while tightening narrow events. */
 @container (max-width: 112px) {
   .leave-timeline .leave-chip {
-    gap: 0;
+    gap: 4px;
     padding-inline: 6px;
-  }
-  .leave-timeline .leave-chip-icon {
-    display: none;
   }
 }
