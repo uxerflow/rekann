@@ -2,6 +2,12 @@
 
 Updated: September 27, 2026.
 
+## Preview staging AI release, September 29
+
+Owner-authorized push and staging deployment are complete. The feature branch is pushed to GitHub without merging `main`. Preview `https://preview-f3d09c858192da81b6d6.rekann.app` now serves Worker version `4adc9c7a-a230-40a0-b213-4cd2fc7eb96a`, built from application/configuration commit `f59c2d6`. Migrations through 0013, an isolated encryption secret, the Cloudflare AI binding and the explicit staging budget allocation are in place.
+
+Live sign-in, included AI in English and Indonesian, anonymous-access denial, memory save/clear, model menu, mobile layout and Assistant drawer passed. Temporary test data was removed; 11 existing users and one workspace remain. Production waitlist deployment history is unchanged. See `docs/STAGING.md` for evidence and remaining acceptance limits. The local-checkpoint and September 27 notes below are historical.
+
 ## Local Git checkpoint, September 29
 
 The owner authorized local commit cleanup before Leave and Attendance work. The existing dashboard, Team Directory, employee management, waitlist and staging setup are recorded first; AI integration and migrations 0010–0013 follow in a separate commit. Shared dropdown and scroll-area foundations are included in the baseline so both commits are self-contained. Existing application behavior is preserved; exported SVG changes only trim trailing blank lines.
@@ -18,7 +24,7 @@ Development migrations 0010–0013 are applied. Included Rekann AI now defaults 
 
 ## Current status
 
-Auth & Workspace and the dashboard UI are deployed to https://preview-f3d09c858192da81b6d6.rekann.app. The current local branch is `feat/auth-workspace`. Existing application work and AI are recorded in separate local commits as of September 29; these commits have not been pushed or merged, and no new deployment was performed. The waitlist is live at https://rekann.app with production database persistence. Resend Contacts, the dedicated waitlist segment, welcome delivery and signed unsubscribe synchronization are configured and tested live.
+Auth & Workspace and the dashboard UI are deployed to https://preview-f3d09c858192da81b6d6.rekann.app. The current local branch is `feat/auth-workspace`. Existing application work and AI are recorded in separate commits and pushed as of September 29. AI is deployed to preview staging; the feature branch has not been merged into main. The waitlist is live at https://rekann.app with production database persistence. Resend Contacts, the dedicated waitlist segment, welcome delivery and signed unsubscribe synchronization are configured and tested live.
 
 Notion remains the canonical product source. Follow the owner's approved Figma designs and implement in small phases. Team Directory phase one is implemented locally following the September 26 design review. Add Employee was authorized on September 27 and is implemented in development with three steps, saved drafts and invitation handling. Employee Detail is now implemented and deployed to staging: profile/work/personal edits, account access and reactivation, persisted attendance, leave requests/allowances/reviews and private documents with Undo. See docs/TEAM_DIRECTORY.md for permissions, policy boundaries and verification; this work was deployed to staging on September 27; production remains the waitlist.
 
@@ -89,7 +95,7 @@ The original failure was not reproduced and its cause remains unconfirmed. No pe
 1. Complete staging acceptance: password reset, invitation through acceptance, private logo/avatar upload, sign-out/sign-in, and role/access checks. The owner plans to perform real-email testing.
 2. Owner review of local Team Directory and Add Employee, followed by the separately scoped active-member detail modules.
 3. Connect dashboard widgets and setup progress to real module data as those modules are implemented; decide server persistence for Quick notes.
-4. Complete AI release preparation and acceptance within the approved Team Directory scope. Staging still needs migrations 0010–0013, an AI binding, an environment encryption key and an allocated included-AI budget before activation; see `docs/AI_ASSISTANT.md`.
+4. Owner acceptance of AI on preview staging within the approved Team Directory scope. Included inference smoke passed; workspace-owned OpenRouter live inference and broader interpretation acceptance remain pending. See `docs/AI_ASSISTANT.md`.
 5. Owner acceptance of the live waitlist in a real inbox; Resend test-recipient delivery and both unsubscribe directions already passed. Operational details and queue checks are in `docs/WAITLIST.md`.
 6. Reconcile documentation and review local changes before a GitHub PR/merge. The existing CI deploys `main` to the default production Worker; staging deployment does not establish production readiness. Verify production resources, recovery, and deployment targeting before release or real employee data.
 

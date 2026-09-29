@@ -1,13 +1,13 @@
 # Staging
 
-Staging is deployed at https://preview-f3d09c858192da81b6d6.rekann.app. It uses the current local application, including the dashboard preview implementation. Team Directory, Add Employee and Employee Detail were deployed on September 27, 2026.
+Staging is deployed at https://preview-f3d09c858192da81b6d6.rekann.app. It uses the current local application, including the dashboard preview implementation. Team Directory, Add Employee and Employee Detail were deployed on September 27, 2026. Rekann AI was deployed to this preview on September 29.
 
 ## Isolated resources
 
 - Cloudflare account: Rekann, `f0f101bf2b8415c34b2a1589e4017295`, Wrangler profile `rekann`.
 - Worker: `rekann-staging`; custom domain: `preview-f3d09c858192da81b6d6.rekann.app`.
 - Private R2 bucket: `rekann-staging-media`.
-- Neon project: `bold-flower-53962598`; branch: `staging` (`br-nameless-salad-b3p61oq1`). Migrations through 0009 were applied to this branch; existing staging accounts were preserved.
+- Neon project: `bold-flower-53962598`; branch: `staging` (`br-nameless-salad-b3p61oq1`). Migrations through 0013 are applied to this branch; existing staging accounts were preserved.
 - Restricted database role: `rekann_runtime`. Production and local development data are separate.
 - Resend sender: `Rekann <noreply@updates.rekann.app>`.
 - `APP_ENV=production` enables HTTPS and secure cookies on staging; resource isolation comes from the Wrangler environment and separate database branch.
@@ -25,7 +25,7 @@ corepack pnpm exec wrangler deploy --config dist/server/wrangler.json
 
 The Vite plugin selects the environment at build time. Inspect the generated configuration before deployment; its Worker name must be `rekann-staging`. Building without `CLOUDFLARE_ENV=staging` targets the default environment instead.
 
-Database URL, auth secret and Resend API key are Worker secrets. Initial provisioning used ignored, mode-0600 `.env.staging-secrets.json`; owner migration credentials are in ignored `.env.staging-migrations`. Never commit or display either file. Subsequent deployments retain Worker secrets.
+Database URL, auth secret, Resend API key and the environment-specific AI encryption key are Worker secrets. Initial provisioning used ignored, mode-0600 `.env.staging-secrets.json`; owner migration credentials are in ignored `.env.staging-migrations`. Never commit or display either file. Subsequent deployments retain Worker secrets.
 
 ## Manual acceptance
 
@@ -51,3 +51,16 @@ The preview hostname uses a random suffix for less obvious discovery. This is no
 - Live staging smoke checks used a temporary verified test identity and workspace: sign-in (1.2 seconds), directory/detail rendering, attendance reads, leave allowance/request/cancellation and private document links all passed. No browser exceptions occurred. Test identity/workspace were deleted afterward; no external email was sent.
 - Production waitlist remained on version `ebca3c9c-bf9e-4325-90a5-6dff4d4b9c01`; its page title, signup CTA and asset references were unchanged. Only `rekann-staging` was deployed.
 - Live file upload/download and real invitation-email delivery were not repeated during this release smoke check; their feature behavior was covered by development and mocked-transport tests. Owner staging acceptance remains the final UX check.
+
+## September 29 AI release
+
+- Application/configuration commit: `f59c2d6` on `feat/auth-workspace`; pushed to GitHub without merging `main`.
+- Active Worker version: `4adc9c7a-a230-40a0-b213-4cd2fc7eb96a`, serving 100% of `rekann-staging` traffic at the preview hostname.
+- The generated build target was checked for the staging account, Worker name, custom domain and R2 bucket. Staging now has the `AI` binding, `REKANN_AI_ENABLED=true`, and its own server-only encryption secret. No workspace OpenRouter key is required for included AI.
+- Migration and runtime connection hosts were matched to Neon staging branch `br-nameless-salad-b3p61oq1`, endpoint `ep-twilight-star-b3e6tf0x`. Applied 0010–0013 and verified runtime CRUD grants on all four AI tables. Existing users/workspaces were preserved; no production migrations were run.
+- Development and staging each retain an explicitly allocated 65,536-token daily pool and 1,000,000-token monthly pool in separate database ledgers. See `docs/AI_ASSISTANT.md` for combined allocation and limits.
+- Validation: regenerated Worker types, TypeScript and staging build passed. The immediately preceding code checkpoint passed 40 unit tests and focused browser flows; Employee Detail required one separate successful rerun after an unexplained navigation failure.
+- Live staging smoke passed sign-in, included connection without a workspace key, anonymous-access denial, private memory save/clear, AI page, model menu, mobile overflow check and Assistant drawer. Real Cloudflare directory counts returned the expected temporary workspace count in English (2.565 s, 373 tokens) and Indonesian (1.937 s, 377 tokens). These are individual smoke samples, not latency guarantees or broad model-quality acceptance.
+- Temporary verified test identity/workspace were removed. Final counts matched the pre-release baseline: 11 users and one workspace. No external email was sent; aggregate AI usage accounting remains retained by design.
+- Public waitlist deployment history was identical before and after; active version remains `ebca3c9c-bf9e-4325-90a5-6dff4d4b9c01`. No deployment targeted `rekann.app`, `www.rekann.app` or the default production Worker.
+- Workspace-owned OpenRouter live inference and real-email/upload acceptance were not repeated in this release.
