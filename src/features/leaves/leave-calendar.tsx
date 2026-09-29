@@ -1,5 +1,11 @@
 import { useState, useCallback } from 'react'
-import { ChevronLeft, ChevronRight, PanelRightClose, PanelRightOpen } from 'lucide-react'
+import {
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  PanelRightClose,
+  PanelRightOpen,
+} from 'lucide-react'
 import { Avatar, Button, mediaUrl } from '../../components/ui'
 import { DatePicker } from '../../components/date-picker'
 import { SelectField } from '../../components/select-field'
@@ -21,7 +27,7 @@ const tone = (name: string) =>
     ? 'red'
     : /sick|medical/i.test(name)
       ? 'gray'
-      : /patern/i.test(name)
+      : /patern|parental/i.test(name)
         ? 'blue'
         : /matern|closure|holiday/i.test(name)
           ? 'orange'
@@ -104,6 +110,17 @@ export function LeaveCalendar({
   }
   function chip(e: CalendarEvent, compact = false) {
     const p = state.people.find((p) => p.id === e.memberId)
+    const icon = /unpaid/i.test(e.name)
+      ? 'unpaid'
+      : /sick|medical/i.test(e.name)
+        ? 'sick'
+        : /patern|parental/i.test(e.name)
+          ? 'paternal'
+          : /matern/i.test(e.name)
+            ? 'maternity'
+            : /annual/i.test(e.name)
+              ? 'annual'
+              : null
     return (
       <button
         type="button"
@@ -115,7 +132,24 @@ export function LeaveCalendar({
           setEvent(e)
         }}
       >
-        {compact && p && <Avatar name={p.name} image={mediaUrl(p.avatarKey)} />}
+        {compact && p ? (
+          <Avatar name={p.name} image={mediaUrl(p.avatarKey)} />
+        ) : icon ? (
+          <img
+            className="leave-chip-icon"
+            src={`/leaves/${icon}.svg`}
+            width={16}
+            height={16}
+            alt=""
+          />
+        ) : (
+          <CalendarDays
+            className="leave-chip-icon"
+            size={16}
+            strokeWidth={1.5}
+            aria-hidden="true"
+          />
+        )}
         <span>{e.name}</span>
       </button>
     )
@@ -239,6 +273,15 @@ export function LeaveCalendar({
   }
   const weekStart = monday(date),
     weekDays = Array.from({ length: 14 }, (_, i) => addDays(weekStart, i))
+  const activePeople = state.people.filter((person) => person.active)
+  const visibleWeekEvents = events.filter(
+    (event) =>
+      event.start <= weekDays[13] &&
+      event.end >= weekStart &&
+      activePeople.some(
+        (person) => person.id === event.memberId || event.coveredIds?.includes(person.id),
+      ),
+  )
   return (
     <div className={`leave-calendar-layout ${sidebar ? '' : 'pending-hidden'}`}>
       <section className="leave-calendar-main">
@@ -314,7 +357,7 @@ export function LeaveCalendar({
                     <div className="leave-timeline-dates">
                       {weekDays.map((d) => (
                         <button
-                          className={d === state.today ? 'is-today' : ''}
+                          className={`${d === state.today ? 'is-today' : ''} ${[0, 6].includes(new Date(d).getUTCDay()) ? 'weekend' : ''}`}
                           key={d}
                           aria-label={prettyDate(d)}
                           onClick={() => setDay(d)}
@@ -326,63 +369,56 @@ export function LeaveCalendar({
                   </div>
                 </div>
                 <div className="leave-timeline-body">
-                  {state.people
-                    .filter((p) => p.active)
-                    .map((p) => (
-                      <div className="leave-timeline-row" key={p.id}>
-                        <div className="leave-person">
-                          <Avatar name={p.name} image={mediaUrl(p.avatarKey)} />
-                          <div>
-                            <strong>{p.name}</strong>
-                            <span>{p.jobTitle || 'Employee'}</span>
-                          </div>
-                        </div>
-                        <div className="leave-timeline-track">
-                          {weekDays.map((d) => (
-                            <div
-                              className={`leave-track-day ${[0, 6].includes(new Date(d).getUTCDay()) ? 'weekend' : ''} ${d === state.today ? 'today-column' : ''}`}
-                              key={d}
-                            />
-                          ))}
-                          {events
-                            .filter(
-                              (e) =>
-                                (e.memberId === p.id || e.coveredIds?.includes(p.id)) &&
-                                e.start <= weekDays[13] &&
-                                e.end >= weekStart,
-                            )
-                            .map((e) => {
-                              const start = Math.max(
-                                  0,
-                                  Math.round(
-                                    (Date.parse(e.start) - Date.parse(weekStart)) / 86400000,
-                                  ),
-                                ),
-                                end = Math.min(
-                                  13,
-                                  Math.round(
-                                    (Date.parse(e.end) - Date.parse(weekStart)) / 86400000,
-                                  ),
-                                )
-                              return (
-                                <div
-                                  className="leave-timeline-event"
-                                  key={e.id}
-                                  style={{
-                                    left: `calc(${(start / 14) * 100}% + 4px)`,
-                                    width: `calc(${((end - start + 1) / 14) * 100}% - 8px)`,
-                                  }}
-                                >
-                                  {chip(e)}
-                                </div>
-                              )
-                            })}
+                  {activePeople.map((p) => (
+                    <div className="leave-timeline-row" key={p.id}>
+                      <div className="leave-person">
+                        <Avatar name={p.name} image={mediaUrl(p.avatarKey)} />
+                        <div>
+                          <strong>{p.name}</strong>
+                          <span>{p.jobTitle || 'Employee'}</span>
                         </div>
                       </div>
-                    ))}
+                      <div className="leave-timeline-track">
+                        {visibleWeekEvents
+                          .filter((e) => e.memberId === p.id || e.coveredIds?.includes(p.id))
+                          .map((e) => {
+                            const start = Math.max(
+                                0,
+                                Math.round(
+                                  (Date.parse(e.start) - Date.parse(weekStart)) / 86400000,
+                                ),
+                              ),
+                              end = Math.min(
+                                13,
+                                Math.round((Date.parse(e.end) - Date.parse(weekStart)) / 86400000),
+                              )
+                            return (
+                              <div
+                                className="leave-timeline-event"
+                                key={e.id}
+                                style={{
+                                  left: `calc(${(start / 14) * 100}% + 4px)`,
+                                  width: `calc(${((end - start + 1) / 14) * 100}% - 8px)`,
+                                }}
+                              >
+                                {chip(e)}
+                              </div>
+                            )
+                          })}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                {!events.some((e) => e.start <= weekDays[13] && e.end >= weekStart) && (
-                  <p className="leave-calendar-empty">No leave this week. Everyone is available.</p>
+                {!visibleWeekEvents.length && (
+                  <div className="leave-calendar-empty-area">
+                    <div className="leave-calendar-empty">
+                      <img src="/leaves/week-empty.svg" width={48} height={48} alt="" />
+                      <div>
+                        <h3>No leave this week</h3>
+                        <p>Everyone is available for the selected dates.</p>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -475,12 +511,11 @@ export function LeaveCalendar({
             </button>
           </header>
           <ScrollArea className="leave-pending-scroll" type="auto">
-            <div className="leave-pending-list">
+            <div className={`leave-pending-list ${!pending.length ? 'is-empty' : ''}`}>
               {!pending.length ? (
                 <div className="leave-pending-empty">
-                  <img src="/dashboard/reports-empty.svg" alt="" />
                   <h3>All caught up</h3>
-                  <p>New leave requests will appear here.</p>
+                  <p>There are no requests waiting for review.</p>
                 </div>
               ) : (
                 <>

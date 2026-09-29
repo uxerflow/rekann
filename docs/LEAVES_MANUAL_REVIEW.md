@@ -8,7 +8,10 @@ Use the existing Demo employees. These checks are intentionally left for owner m
 - [ ] Open a pending leave. The status reads Pending; the primary Review request button opens the correct request.
 - [ ] Open a company closure. Check the policy name, dates, and Applies to. View policy opens that closure policy; close it without saving when only reviewing.
 - [ ] Check a long employee name, half-day request, and a date range across months. Text wraps without overlapping status or leaving the popover. Escape and clicking outside close it; the popover stays within the viewport.
-- [ ] Week grid styling stays unchanged in staging while the revised Figma grid is under review.
+- [ ] Week: grid lines are faint, continuous, and aligned with employee rows. Scroll down and sideways; the People column stays opaque and its right border continues to the bottom.
+- [ ] Week chips: annual, sick, unpaid, maternity, and paternal leave show their Figma icons. Pending leave retains a dashed border. Open a chip and confirm the existing detail popover still works.
+- [ ] Navigate to a period without leave. The 48 px calendar icon, No leave this week, and supporting copy are centered over the calendar; people and dates remain visible. When no requests are pending, the sidebar shows the text-only All caught up state.
+- [ ] Today returns to the workspace date. Switching Week, Month, and Year preserves the existing navigation behavior.
 - [ ] Year: click each available leave, pending approval, and company closure badge. A compact list opens without changing the calendar view. Open a request from its row.
 - [ ] Dropdowns: check calendar mode, employee search, leave type, policy fields, and AI model. Selected items have a fill and thin check, with no green border. Open near the bottom of a dialog and scroll the menu: nothing clips. Click elsewhere and reopen.
 - [ ] Keyboard: Tab to a dropdown, open it, move with arrows, select with Enter, then close with Escape. Keyboard focus remains visible. Escape from a popup must not discard its parent form.
