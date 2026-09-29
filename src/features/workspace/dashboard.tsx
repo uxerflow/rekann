@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Check } from 'lucide-react'
 import { ScrollArea } from '../../components/scroll-area'
 import type { WorkspaceDetails } from '../../server/workspaces'
@@ -472,10 +472,12 @@ function QuickNotes({ storageKey }: { storageKey: string }) {
       setStorageError(true)
     }
   }, [blocks, ready, storageKey])
-  useEffect(() => {
-    for (const editor of editors.current.values()) {
-      editor.style.height = '0px'
-      editor.style.height = `${editor.scrollHeight}px`
+  useLayoutEffect(() => {
+    if (!CSS.supports('field-sizing', 'content')) {
+      for (const editor of editors.current.values()) {
+        editor.style.height = 'auto'
+        editor.style.height = `${editor.scrollHeight}px`
+      }
     }
     const id = focusNext.current
     if (id) {
