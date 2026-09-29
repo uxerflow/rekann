@@ -1,3 +1,5 @@
+import * as memory from '../server/ai/memory'
+import * as ai from '../server/ai/service'
 import { createFileRoute } from '@tanstack/react-router'
 import { json, withRuntime } from '../server/runtime'
 import * as service from '../server/workspaces'
@@ -10,7 +12,7 @@ import { readMedia, saveMedia } from '../server/media'
 import { readJson } from '../server/http'
 
 async function handle({ request }: { request: Request }) {
-  return withRuntime(async ({ db, auth, config, media }) => {
+  return withRuntime(async ({ db, auth, config, media, aiPlatform }) => {
     const url = new URL(request.url)
     const operation = url.pathname.replace('/api/app/', '')
     if (request.method === 'GET' && operation === 'invitation')
@@ -25,6 +27,11 @@ async function handle({ request }: { request: Request }) {
       url.searchParams.get('id') ?? '',
     ] as const
     if (request.method === 'GET') {
+      if (operation === 'ai/memory') return json(await memory.readMemory(db, viewer.id, scope[2]))
+      if (operation === 'ai/settings')
+        return json(await ai.settingsView(db, viewer.id, scope[2], aiPlatform))
+      if (operation === 'ai/history')
+        return json(await ai.history(db, viewer.id, scope[2], aiPlatform))
       if (operation === 'employee/detail-options') return json(await detail.detailOptions(...scope))
       if (operation === 'employee/detail') return json(await detail.getEmployeeDetail(...scope))
       if (operation === 'employee/time')
@@ -130,6 +137,37 @@ async function handle({ request }: { request: Request }) {
     )
     await service.limitAction(db, viewer.id, operation, operation === 'invitation/create' ? 10 : 30)
     switch (operation) {
+      case 'ai/memory':
+        return json(await memory.saveMemory(db, viewer.id, body))
+      case 'ai/forget':
+        return json(await memory.forgetMemory(db, viewer.id, body))
+      case 'ai/settings':
+        return json(
+          await ai.saveSettings(
+            db,
+            viewer.id,
+            body,
+            config.AI_ENCRYPTION_KEY,
+            undefined,
+            aiPlatform,
+          ),
+        )
+      case 'ai/disconnect':
+        return json(await ai.disconnect(db, viewer.id, body, aiPlatform))
+      case 'ai/message':
+        return json(
+          await ai.message(
+            db,
+            viewer.id,
+            body,
+            config.AI_ENCRYPTION_KEY,
+            undefined,
+            request.signal,
+            aiPlatform,
+          ),
+        )
+      case 'ai/action':
+        return json(await ai.action(db, viewer.id, body, aiPlatform))
       case 'employee/detail-save':
         return json(await detail.patchEmployeeDetail(db, viewer.id, body, media))
       case 'employee/active':

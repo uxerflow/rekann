@@ -2,9 +2,23 @@
 
 Updated: September 27, 2026.
 
+## Local Git checkpoint, September 29
+
+The owner authorized local commit cleanup before Leave and Attendance work. The existing dashboard, Team Directory, employee management, waitlist and staging setup are recorded first; AI integration and migrations 0010–0013 follow in a separate commit. Shared dropdown and scroll-area foundations are included in the baseline so both commits are self-contained. Existing application behavior is preserved; exported SVG changes only trim trailing blank lines.
+
+The baseline was materialized separately and passed TypeScript and a staging-targeted build without AI integration. The complete working tree passed frozen dependency installation, TypeScript, a staging-targeted build and all 40 unit tests. Focused browser verification passed employee creation, AI settings and confirmed actions, and the directory. The first Employee Detail run failed after an unexpected navigation during document Undo; a separate rerun passed the complete flow without a code change. The initial navigation cause remains unconfirmed. Live account-backed model inference is an opt-in check and was skipped for this Git cleanup.
+
+No push, merge, remote migration or deployment is part of this checkpoint. Staging remains on the September 27 version, and the public waitlist at `rekann.app` is unchanged. The outstanding AI staging requirements remain listed in `docs/AI_ASSISTANT.md`.
+
+## Rekann AI development, September 27
+
+The owner authorized a first end-to-end AI slice for Team Directory read/write, followed by private memory and explicit storage/token limits. Implemented locally at `/w/:slug/ai` and the Assistant panel, with workspace-admin OpenRouter settings, permission-aware search/count, employee drafts, limited work edits, explicit confirmation, idempotent commits, audit, quotas and encrypted provider keys. Private notes and recent-message context are scoped to both workspace and authenticated user; other admins cannot read them. See `docs/AI_ASSISTANT.md` for boundaries, retention and release setup.
+
+Development migrations 0010–0013 are applied. Included Rekann AI now defaults on for workspaces without saved settings when the central provider is configured, with read-only access for active roles. Its backend allowance decreases at 100, 200 and 1,000 verified active members, while a 1,000,000-token shared monthly ceiling stays fixed. Population tiers and shared pool totals remain hidden. The model menu now shows the current personal daily allowance and UTC reset, plus the Figma OWN AI PROVIDER section linking admins to connection settings. Shared dropdowns show a scrollbar only on overflow and reserve a separate gutter so it cannot cover content or checkmarks. See docs/AI_ASSISTANT.md. Settings use collapsed advanced controls, grouped numbers and dialog scroll gutters. Workspace OpenRouter keys remain a separate explicit option with no automatic fallback. Aggregate usage survives forgetting and workspace deletion; private memory remains isolated. Typecheck/build, focused AI tests and the authenticated browser flow passed. Live included Cloudflare inference is verified without a workspace key; workspace OpenRouter live inference remains pending. Included AI uses a Cloudflare Workers AI binding, enabled in dev with no OpenRouter key, plus a 65,536-token shared daily cap. Staging requires its own binding and allocated budget before activation. Staging and the production waitlist are unchanged. Standard automated integration checks mock inference; an opt-in real Cloudflare smoke test validates the included connection. Broader live interpretation acceptance is still required before release.
+
 ## Current status
 
-Auth & Workspace and the dashboard UI are deployed to https://preview-f3d09c858192da81b6d6.rekann.app. The current local branch is `feat/auth-workspace`; deployment does not mean the local changes have been committed, reviewed, or merged. The waitlist is live at https://rekann.app with production database persistence. Resend Contacts, the dedicated waitlist segment, welcome delivery and signed unsubscribe synchronization are configured and tested live.
+Auth & Workspace and the dashboard UI are deployed to https://preview-f3d09c858192da81b6d6.rekann.app. The current local branch is `feat/auth-workspace`. Existing application work and AI are recorded in separate local commits as of September 29; these commits have not been pushed or merged, and no new deployment was performed. The waitlist is live at https://rekann.app with production database persistence. Resend Contacts, the dedicated waitlist segment, welcome delivery and signed unsubscribe synchronization are configured and tested live.
 
 Notion remains the canonical product source. Follow the owner's approved Figma designs and implement in small phases. Team Directory phase one is implemented locally following the September 26 design review. Add Employee was authorized on September 27 and is implemented in development with three steps, saved drafts and invitation handling. Employee Detail is now implemented and deployed to staging: profile/work/personal edits, account access and reactivation, persisted attendance, leave requests/allowances/reviews and private documents with Undo. See docs/TEAM_DIRECTORY.md for permissions, policy boundaries and verification; this work was deployed to staging on September 27; production remains the waitlist.
 
@@ -26,8 +40,8 @@ The dashboard shell, welcome card, setup checklist, widget layouts, responsive p
 - Dashboard metrics and preview states use sample values rather than attendance, time-off, and approval data.
 - Setup completion is not fully connected to saved company settings and leave policies.
 - Quick notes/checklists use browser local storage rather than server persistence.
-- The Assistant is a development-only visual preview with simulated responses; provider execution is not included in this baseline.
-- The local Team Directory now has live workspace-scoped list/grid browsing, search, combined department/type filters, sort, pagination, personal browser-local pins, and loading/empty/error recovery states. Nullable employment fields were added with migration 0006 in development only. Existing invitation/access management is preserved in Settings → Team access. Add Employee and its saved-record/invitation screens now follow as the next local phase, with migrations 0007–0008 applied in development. Employee Detail follows with migration 0009, also development only.
+- The Assistant now uses the Team Directory AI service in local development. The previous simulation is retained only behind the explicit development `assistantPreview` query. Live provider acceptance is pending; attachments and other HR modules remain unavailable.
+- The local Team Directory now has live workspace-scoped list/grid browsing, search, combined department/type filters, sort, pagination, personal browser-local pins, and loading/empty/error recovery states. Nullable employment fields use migration 0006. Existing invitation/access management is preserved in Settings → Team access. Add Employee and its saved-record/invitation screens use migrations 0007–0008; Employee Detail uses migration 0009. These migrations are applied to both development and staging.
 
 ## Staging resources
 
@@ -75,7 +89,7 @@ The original failure was not reproduced and its cause remains unconfirmed. No pe
 1. Complete staging acceptance: password reset, invitation through acceptance, private logo/avatar upload, sign-out/sign-in, and role/access checks. The owner plans to perform real-email testing.
 2. Owner review of local Team Directory and Add Employee, followed by the separately scoped active-member detail modules.
 3. Connect dashboard widgets and setup progress to real module data as those modules are implemented; decide server persistence for Quick notes.
-4. Scope Assistant integration separately with the owner and current Notion requirements before implementing provider access or data-changing actions.
+4. Complete AI release preparation and acceptance within the approved Team Directory scope. Staging still needs migrations 0010–0013, an AI binding, an environment encryption key and an allocated included-AI budget before activation; see `docs/AI_ASSISTANT.md`.
 5. Owner acceptance of the live waitlist in a real inbox; Resend test-recipient delivery and both unsubscribe directions already passed. Operational details and queue checks are in `docs/WAITLIST.md`.
 6. Reconcile documentation and review local changes before a GitHub PR/merge. The existing CI deploys `main` to the default production Worker; staging deployment does not establish production readiness. Verify production resources, recovery, and deployment targeting before release or real employee data.
 
@@ -115,3 +129,5 @@ Solid-color avatars selected during onboarding now follow live name initials in 
 - Generated migrations 0007–0008 are applied to development only. No sample employees remain in the owner's workspace; browser-test identities are cleaned up.
 - Frozen dependencies, TypeScript, build, 15 unit tests and focused directory/Add Employee browser checks passed. Invitation transport was mocked for service tests; no external invitation email was sent during this validation.
 - Full active-member editing, attendance/leave/documents and statistics remain deferred. See docs/TEAM_DIRECTORY.md for precise scope and checks. No deploy, commit or push performed.
+
+- AI composer refinement (September 27): restored disabled attachment button; Team directory context menu with unavailable contexts disabled; separate model dropdown; clear textarea surface with no resize handle; provider disclosure in Your memory. Included AI uses Cloudflare Workers AI; OpenRouter keys are optional workspace connections managed in the app. No deployment.

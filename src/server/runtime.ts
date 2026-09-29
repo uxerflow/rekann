@@ -3,6 +3,7 @@ import { ZodError } from 'zod'
 import { readConfig } from './config'
 import { connectDatabase } from './db'
 import { createAuth } from './auth'
+import type { AiPlatform } from './ai/budget'
 import { AppError } from './workspaces'
 
 export function json(data: unknown, status = 200) {
@@ -21,6 +22,7 @@ export async function withRuntime(
     auth: ReturnType<typeof createAuth>
     config: ReturnType<typeof readConfig>
     media: R2Bucket | undefined
+    aiPlatform: AiPlatform
   }) => Promise<Response>,
 ) {
   let connection: ReturnType<typeof connectDatabase> | undefined
@@ -32,6 +34,7 @@ export async function withRuntime(
       auth: createAuth(connection.db, config),
       config,
       media: env.MEDIA,
+      aiPlatform: { REKANN_AI_ENABLED: config.REKANN_AI_ENABLED, AI: env.AI },
     })
   } catch (error) {
     if (error instanceof AppError) return json({ error: error.message }, error.status)

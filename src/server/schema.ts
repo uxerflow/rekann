@@ -366,3 +366,79 @@ export const employeeDocument = pgTable(
     ),
   ],
 )
+
+// Keys never leave the server. Conversation access is scoped to the originating actor.
+export const aiSettings = pgTable('ai_settings', {
+  workspaceId: text('workspace_id')
+    .primaryKey()
+    .references(() => workspace.id, { onDelete: 'cascade' }),
+  encryptedKey: text('encrypted_key'),
+  funding: text('funding').$type<'workspace' | 'rekann'>().notNull().default('workspace'),
+  enabled: boolean('enabled').notNull().default(false),
+  allowedRoles: jsonb('allowed_roles').$type<Role[]>().notNull().default(['admin']),
+  allowWrites: boolean('allow_writes').notNull().default(false),
+  monthlyTokens: integer('monthly_tokens').notNull().default(100000),
+  dailyRequests: integer('daily_requests').notNull().default(30),
+  version: integer('version').notNull().default(1),
+})
+export const aiTurn = pgTable(
+  'ai_turn',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => workspace.id, { onDelete: 'cascade' }),
+    actorId: text('actor_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    prompt: text('prompt').notNull(),
+    status: text('status').notNull().default('pending'),
+    result: jsonb('result').$type<import('../shared/ai').AiResult>(),
+    proposal: jsonb('proposal').$type<{
+      kind: 'create' | 'update'
+      targetId: string
+      targetVersion: number
+      snapshot: string
+      fields: Partial<Record<import('../shared/ai').AiField, string>>
+    }>(),
+    settingsVersion: integer('settings_version').notNull(),
+    funding: text('funding').$type<'workspace' | 'rekann'>().notNull().default('workspace'),
+    version: integer('version').notNull().default(0),
+    tokens: integer('tokens').notNull().default(16384),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index('ai_turn_usage_idx').on(t.workspaceId, t.createdAt),
+    index('ai_turn_retention_idx').on(t.createdAt),
+    index('ai_turn_actor_idx').on(t.workspaceId, t.actorId, t.createdAt),
+  ],
+)
+
+export const aiMemory = pgTable(
+  'ai_memory',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => workspace.id, { onDelete: 'cascade' }),
+    actorId: text('actor_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    enabled: boolean('enabled').notNull().default(true),
+    notes: text('notes').notNull().default(''),
+    version: integer('version').notNull().default(1),
+  },
+  (t) => [uniqueIndex('ai_memory_owner_idx').on(t.workspaceId, t.actorId)],
+)
+
+// Aggregate funded usage survives conversation/workspace deletion. No prompt or employee data.
+export const aiBudget = pgTable(
+  'ai_budget',
+  {
+    id: text('id').primaryKey(),
+    period: text('period').notNull(),
+    tokens: integer('tokens').notNull().default(0),
+    requests: integer('requests').notNull().default(0),
+  },
+  (t) => [index('ai_budget_retention_idx').on(t.period)],
+)

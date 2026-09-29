@@ -1,3 +1,4 @@
+import { AiWorkspace } from '../ai/ai-workspace'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { ArrowLeft, LogOut } from 'lucide-react'
 import type { Bootstrap, WorkspaceDetails } from '../../server/workspaces'
@@ -120,7 +121,7 @@ export function DashboardShell({
                 label: '',
                 items: [
                   ['Dashboard', 'grid-view', base, 'overview'],
-                  ['Rekann AI', 'rekann-assistant', '', ''],
+                  ['Rekann AI', 'rekann-assistant', `${base}/ai`, 'ai'],
                   ['Team directory', 'user-group-02', `${base}/team`, 'team'],
                   ['Company', 'building-06', '', 'profile'],
                   ['Daily report', 'analytics-01', '', ''],
@@ -259,7 +260,9 @@ export function DashboardShell({
             </>
             <span>
               {title ??
-                (view === 'overview'
+                (view === 'ai'
+                  ? 'Rekann AI'
+                  : view === 'overview'
                     ? 'Dashboard'
                     : view === 'team'
                       ? 'Team directory'
@@ -291,7 +294,7 @@ export function DashboardShell({
             >
               <img src="/dashboard/notifications.svg" alt="" />
             </button>
-            {!hideAssistant && (
+            {!hideAssistant && view !== 'ai' && (
               <button
                 className="dash-assistant-trigger"
                 aria-label="Open Assistant"
@@ -310,7 +313,9 @@ export function DashboardShell({
           className={
             view === 'overview'
               ? 'dash-main'
-              : view === 'team'
+              : view === 'ai'
+                ? 'ai-main'
+                : view === 'team'
                   ? 'directory-main'
                   : 'workspace-main'
           }
@@ -328,15 +333,25 @@ export function DashboardShell({
           closeAssistant()
         }}
       >
-        {assistantOpen && (
-          <DashboardAssistant
-            key={data.workspace.id}
-            open={assistantOpen}
-            expanded={assistantExpanded}
-            onExpand={() => setAssistantExpanded(!assistantExpanded)}
-            onClose={closeAssistant}
-          />
-        )}
+        {assistantOpen &&
+          (import.meta.env.DEV && new URLSearchParams(location.search).has('assistantPreview') ? (
+            <DashboardAssistant
+              key={data.workspace.id}
+              open={assistantOpen}
+              expanded={assistantExpanded}
+              onExpand={() => setAssistantExpanded(!assistantExpanded)}
+              onClose={closeAssistant}
+            />
+          ) : (
+            <AiWorkspace
+              key={data.workspace.id}
+              workspaceId={data.workspace.id}
+              slug={data.workspace.slug}
+              name={data.employee.firstName}
+              compact
+              onClose={closeAssistant}
+            />
+          ))}
       </dialog>
     </div>
   )

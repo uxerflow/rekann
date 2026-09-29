@@ -71,6 +71,34 @@
       "when": 1790475412033,
       "tag": "0009_open_junta",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790520109851,
+      "tag": "0010_perpetual_shadow_king",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1790520889571,
+      "tag": "0011_fuzzy_luke_cage",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1790521275695,
+      "tag": "0012_wild_lockheed",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1790522306932,
+      "tag": "0013_clean_jubilee",
+      "breakpoints": true
     }
   ]
 }

@@ -1,3 +1,4 @@
+import { AiWorkspace } from '../ai/ai-workspace'
 import { TeamDirectory } from '../team/team-directory'
 import { Dashboard, type DashboardState } from './dashboard'
 import { DashboardShell } from './dashboard-shell'
@@ -88,6 +89,14 @@ export function WorkspaceScreen({
           key={`${workspace.id}-${preview || 'default'}`}
           state={preview || (permissions.admin ? 'welcome' : 'empty')}
           onUnavailable={(name) => setAnnouncement(`${name} is not available yet.`)}
+        />
+      )}
+      {view === 'ai' && (
+        <AiWorkspace
+          key={workspace.id}
+          workspaceId={workspace.id}
+          slug={workspace.slug}
+          name={data.employee.firstName}
         />
       )}
       {view === 'team' && (

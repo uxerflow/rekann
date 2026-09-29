@@ -1,6 +1,8 @@
 import { z } from 'zod'
 
 export const configSchema = z.object({
+  AI_ENCRYPTION_KEY: z.string().optional(),
+  REKANN_AI_ENABLED: z.enum(['true', 'false']).default('false'),
   DATABASE_URL: z.string().startsWith('postgres'),
   BETTER_AUTH_SECRET: z.string().min(32),
   BETTER_AUTH_URL: z.url(),

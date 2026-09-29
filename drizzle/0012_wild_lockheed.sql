@@ -1,0 +1,1 @@
+CREATE INDEX "ai_turn_retention_idx" ON "ai_turn" USING btree ("created_at");

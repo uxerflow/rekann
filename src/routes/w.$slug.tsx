@@ -18,6 +18,7 @@ export const Route = createFileRoute('/w/$slug')({
       !/^\/team\/(?:add|records\/[a-f0-9-]{36}(?:\/edit)?)$/.test(section) &&
       ![
         '',
+        '/ai',
         '/team',
         '/access',
         '/profile',
@@ -62,7 +63,9 @@ function WorkspaceRoute() {
       viewer={viewer}
       data={data}
       view={
-        pathname.endsWith('/team')
+        pathname.endsWith('/ai')
+          ? 'ai'
+          : pathname.endsWith('/team')
             ? 'team'
             : pathname.endsWith('/access')
               ? 'access'

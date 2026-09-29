@@ -2,12 +2,21 @@ import server from '@tanstack/react-start/server-entry'
 import { readConfig } from './server/config'
 import { connectDatabase } from './server/db'
 import { processWaitlist } from './server/waitlist'
+import { compactMemory } from './server/ai/memory'
 
 async function deliver(env: Env) {
   const config = readConfig(env)
   const connection = connectDatabase(config.DATABASE_URL)
   try {
     await processWaitlist(connection.db, config)
+  } finally {
+    await connection.close()
+  }
+}
+async function maintainAI(env: Env) {
+  const connection = connectDatabase(readConfig(env).DATABASE_URL)
+  try {
+    await compactMemory(connection.db)
   } finally {
     await connection.close()
   }
@@ -47,6 +56,8 @@ export default {
     return response
   },
   async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext) {
-    ctx.waitUntil(deliver(env))
+    ctx.waitUntil(
+      env.SITE_MODE !== 'waitlist' && _event.cron === '17 * * * *' ? maintainAI(env) : deliver(env),
+    )
   },
 } satisfies ExportedHandler<Env>
