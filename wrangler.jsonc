@@ -38,12 +38,14 @@
     },
     "staging": {
       "name": "rekann-staging",
+      "ai": { "binding": "AI", "remote": true },
       "triggers": { "crons": ["* * * * *", "17 * * * *"] },
       "workers_dev": false,
       "preview_urls": false,
       "routes": [{ "pattern": "preview-f3d09c858192da81b6d6.rekann.app", "custom_domain": true }],
       "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "rekann-staging-media" }],
       "vars": {
+        "REKANN_AI_ENABLED": "true",
         "APP_ENV": "production",
         "EMAIL_DELIVERY": "resend",
         "BETTER_AUTH_URL": "https://preview-f3d09c858192da81b6d6.rekann.app",

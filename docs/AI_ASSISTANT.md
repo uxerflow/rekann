@@ -58,6 +58,12 @@ Live OpenRouter inference has not been tested with an owner-supplied key. Automa
 
 Future scope requires a separate decision: shared company memory with explicit publish permissions, automatic extraction with user review, other HR modules, attachments, broad semantic retrieval, configurable models or localized replies.
 
+## Development and staging budget allocation — September 29
+
+The owner authorized the preview staging release. Development and staging each receive an independent pool of 65,536 tokens per UTC day and 1,000,000 per UTC month, enforced by their separate database ledgers. The combined daily allocation is 131,072 tokens; this is an explicit allocation for these two environments, not a shared counter. No third environment is enabled by this release. The default production kill switch stays off and the public waitlist has no AI binding.
+
+The pinned model pricing was rechecked against [Cloudflare Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/) on September 29: 4,119 neurons per million input tokens and 34,868 per million output tokens. Counting all allocated tokens at the higher output rate bounds these two pools to approximately 4,571 neurons/day combined. Other Cloudflare workloads are outside this application ledger; another deployment requires an explicit allocation review. Existing request reservations, adaptive person/workspace limits and no-fallback behavior are unchanged.
+
 ## Verification recorded
 
 - Frozen dependency installation, TypeScript check and production build passed.
