@@ -1,6 +1,16 @@
 # Project State
 
-Updated: September 27, 2026.
+Updated: September 29, 2026.
+
+## Admin Leaves preview release, September 29
+
+The approved Admin Leaves flow is implemented and deployed at `https://preview-f3d09c858192da81b6d6.rekann.app`. Application commit `f02794b` is on `feat/admin-leaves`; draft PR #13 targets `feat/auth-workspace` (#9) so the review shows the Leaves delta. Nothing was merged to `main`. Active staging Worker version: `8247e7ce-1e3d-4ef8-8d39-9f05b5551b23`.
+
+The release includes Week, Month and Year calendars, admin employee selection and time-off recording, approval/rejection/cancellation, annual/custom policies, company closures, balance rules, and loading/empty/error/retry states. Existing employee self-service remains in Employee Detail. See `docs/LEAVES.md` for permissions, period behavior, closure coverage and the boundary between saved payment terms and payroll execution.
+
+Frozen install, formatting of changed source, TypeScript, staging build and all 51 unit tests passed. The 11 Leaves unit tests were repeated after the final validation changes. Browser flows passed for Leaves, Employee Detail and shared dropdowns; Leaves covers network retry, preserved inputs, desktop/mobile overflow, keyboard behavior, dirty-form discard and duplicate employee names. The dropdown regression test was updated for the existing generic no-options copy and run with the local mailbox; original local email configuration was restored. Graphify was updated.
+
+Migrations 0014–0015 were applied to the explicitly verified development and staging branches. Live staging checks passed sign-in, anonymous denial, employee/admin separation, approval retry, closure refunds, browser recording and persistence after refresh, with no browser exceptions or mobile overflow. Temporary staging identities/workspace were removed; the baseline remains 11 users and one workspace. Production waitlist remains `ebca3c9c-bf9e-4325-90a5-6dff4d4b9c01`. Owner visual acceptance is next; automated checks are not a claim of pixel-perfect identity on every viewport.
 
 ## Preview staging AI release, September 29
 
@@ -24,7 +34,7 @@ Development migrations 0010–0013 are applied. Included Rekann AI now defaults 
 
 ## Current status
 
-Auth & Workspace and the dashboard UI are deployed to https://preview-f3d09c858192da81b6d6.rekann.app. The current local branch is `feat/auth-workspace`. Existing application work and AI are recorded in separate commits and pushed as of September 29. AI is deployed to preview staging; the feature branch has not been merged into main. The waitlist is live at https://rekann.app with production database persistence. Resend Contacts, the dedicated waitlist segment, welcome delivery and signed unsubscribe synchronization are configured and tested live.
+Auth & Workspace and the dashboard UI are deployed to https://preview-f3d09c858192da81b6d6.rekann.app. The current local branch is `feat/admin-leaves`, based on `feat/auth-workspace`. Admin Leaves is now also on preview staging. Existing application work and AI are recorded in separate commits and pushed as of September 29. AI is deployed to preview staging; the feature branch has not been merged into main. The waitlist is live at https://rekann.app with production database persistence. Resend Contacts, the dedicated waitlist segment, welcome delivery and signed unsubscribe synchronization are configured and tested live.
 
 Notion remains the canonical product source. Follow the owner's approved Figma designs and implement in small phases. Team Directory phase one is implemented locally following the September 26 design review. Add Employee was authorized on September 27 and is implemented in development with three steps, saved drafts and invitation handling. Employee Detail is now implemented and deployed to staging: profile/work/personal edits, account access and reactivation, persisted attendance, leave requests/allowances/reviews and private documents with Undo. See docs/TEAM_DIRECTORY.md for permissions, policy boundaries and verification; this work was deployed to staging on September 27; production remains the waitlist.
 
@@ -58,7 +68,7 @@ The dashboard shell, welcome card, setup checklist, widget layouts, responsive p
 - Resend domain `updates.rekann.app` is verified. Sender: `Rekann <noreply@updates.rekann.app>`.
 - Database, auth, and email credentials are Worker secrets, with ignored local configuration. Never print or commit credentials.
 - Staging is internet-accessible, with authenticated application data. Use test data. Build with `CLOUDFLARE_ENV=staging`; see `docs/STAGING.md` for deployment instructions.
-- Latest verified deployment: `97c4e427-0701-4f95-a231-dcc647351de3` on September 27, 2026. Team Directory, Add Employee and Employee Detail are included; migrations through 0009 are applied. Live authenticated staging smoke checks passed and temporary test data was cleaned up.
+- Latest verified deployment: `8247e7ce-1e3d-4ef8-8d39-9f05b5551b23` on September 29, 2026. Admin Leaves is included alongside AI, Team Directory and Employee Detail; migrations through 0015 are applied. Live authenticated staging checks passed and temporary test data was cleaned up.
 
 ## Verification and limits
 
@@ -93,7 +103,7 @@ The original failure was not reproduced and its cause remains unconfirmed. No pe
 ## Next work
 
 1. Complete staging acceptance: password reset, invitation through acceptance, private logo/avatar upload, sign-out/sign-in, and role/access checks. The owner plans to perform real-email testing.
-2. Owner review of local Team Directory and Add Employee, followed by the separately scoped active-member detail modules.
+2. Owner review of Admin Leaves on preview staging, including calendar, policies, closure impact and responsive behavior. Attendance remains a separate implementation slice.
 3. Connect dashboard widgets and setup progress to real module data as those modules are implemented; decide server persistence for Quick notes.
 4. Owner acceptance of AI on preview staging within the approved Team Directory scope. Included inference smoke passed; workspace-owned OpenRouter live inference and broader interpretation acceptance remain pending. See `docs/AI_ASSISTANT.md`.
 5. Owner acceptance of the live waitlist in a real inbox; Resend test-recipient delivery and both unsubscribe directions already passed. Operational details and queue checks are in `docs/WAITLIST.md`.
