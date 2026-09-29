@@ -99,7 +99,7 @@ export function LeaveCalendar({
     )
   function navigate(delta: number) {
     if (mode === 'Week') {
-      setDate(addDays(date, delta * 14))
+      setDate(addDays(date, delta * 7))
       return
     }
     const d = new Date(date)
@@ -126,6 +126,7 @@ export function LeaveCalendar({
         type="button"
         className={`leave-chip tone-${tone(e.name)} ${e.pending ? 'leave-pending' : ''}`}
         aria-label={`${p?.name || 'Company'} · ${e.name}${e.pending ? ' · Pending' : ''}`}
+        title={`${e.name} · ${p?.name || 'Company'} · ${prettyDate(e.start)}${e.end !== e.start ? ` – ${prettyDate(e.end)}` : ''}`}
         onClick={(click) => {
           setSummary(null)
           setAnchor(click.currentTarget)
@@ -272,11 +273,11 @@ export function LeaveCalendar({
     )
   }
   const weekStart = monday(date),
-    weekDays = Array.from({ length: 14 }, (_, i) => addDays(weekStart, i))
+    weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
   const activePeople = state.people.filter((person) => person.active)
   const visibleWeekEvents = events.filter(
     (event) =>
-      event.start <= weekDays[13] &&
+      event.start <= weekDays[6] &&
       event.end >= weekStart &&
       activePeople.some(
         (person) => person.id === event.memberId || event.coveredIds?.includes(person.id),
@@ -389,7 +390,7 @@ export function LeaveCalendar({
                                 ),
                               ),
                               end = Math.min(
-                                13,
+                                6,
                                 Math.round((Date.parse(e.end) - Date.parse(weekStart)) / 86400000),
                               )
                             return (
@@ -397,8 +398,8 @@ export function LeaveCalendar({
                                 className="leave-timeline-event"
                                 key={e.id}
                                 style={{
-                                  left: `calc(${(start / 14) * 100}% + 4px)`,
-                                  width: `calc(${((end - start + 1) / 14) * 100}% - 8px)`,
+                                  left: `calc(${(start / 7) * 100}% + 4px)`,
+                                  width: `calc(${((end - start + 1) / 7) * 100}% - 8px)`,
                                 }}
                               >
                                 {chip(e)}

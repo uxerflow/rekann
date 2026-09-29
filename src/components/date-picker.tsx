@@ -42,7 +42,7 @@ export function DatePicker({ mode = 'day', today = iso(new Date()), ...props }: 
   if (valid(props.value)) {
     if (mode === 'range') display += ` – ${format(props.endValue ?? '')}`
     if (mode === 'week')
-      display = `${format(monday(props.value), { month: 'short', day: 'numeric' })} – ${format(addDays(monday(props.value), 13))}`
+      display = `${format(monday(props.value), { month: 'short', day: 'numeric' })} – ${format(addDays(monday(props.value), 6))}`
     if (mode === 'month') display = format(props.value, { month: 'short', year: 'numeric' })
     if (mode === 'year') display = props.value.slice(0, 4)
   }

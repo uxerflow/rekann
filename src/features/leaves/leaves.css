@@ -470,28 +470,33 @@
   height: 100%;
 }
 .leave-pending-list {
-  padding: 20px;
+  padding: 16px;
 }
 .leave-pending-list section {
-  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 .leave-pending-list h3 {
   font-size: 13px;
   color: #707070;
-  margin: 0 0 12px;
+  margin: 0;
   font-weight: 400;
+  line-height: 20px;
 }
 .leave-pending-card {
   border: 1px solid #e5e5e5;
   background: white;
-  border-radius: 16px;
+  border-radius: 12px;
   width: 100%;
-  padding: 12px;
+  min-height: 56px;
+  padding: 7px 11px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   text-align: left;
-  margin-bottom: 12px;
+  font-weight: 400;
 }
 .leave-pending-card:hover {
   background: #fafafa;
@@ -508,6 +513,7 @@
   display: block;
   font-weight: 500;
   font-size: 13px;
+  line-height: 20px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -515,8 +521,10 @@
 .leave-pending-card small {
   display: block;
   font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
   color: #707070;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 .leave-pending-list > .button {
   width: 100%;
@@ -578,7 +586,7 @@
 }
 .leave-timeline-dates {
   display: grid;
-  grid-template-columns: repeat(14, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   height: 32px;
 }
 .leave-timeline-dates button {
@@ -604,7 +612,7 @@
 .leave-timeline-row > .leave-person {
   padding: 8px;
   border-right: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--leave-grid-line);
+  border-bottom: 1px solid var(--color-border);
 }
 .leave-timeline-row .leave-person strong,
 .leave-timeline-row .leave-person > div:not(.avatar) > span {
@@ -625,6 +633,7 @@
   background: #ecfbf3;
 }
 .leave-timeline-event {
+  container-type: inline-size;
   position: absolute;
   top: 14px;
   min-width: 32px;
@@ -1931,7 +1940,7 @@
   top: 64px;
   bottom: 0;
   display: grid;
-  grid-template-columns: repeat(14, 1fr);
+  grid-template-columns: repeat(7, 1fr);
 }
 .leave-timeline-header,
 .leave-timeline-row {
@@ -2232,5 +2241,16 @@
   }
   .leave-calendar-toolbar .date-field-compact {
     flex: 1 1 200px;
+  }
+}
+
+/* Keep short events readable before spending their width on decorative icons. */
+@container (max-width: 112px) {
+  .leave-timeline .leave-chip {
+    gap: 0;
+    padding-inline: 6px;
+  }
+  .leave-timeline .leave-chip-icon {
+    display: none;
   }
 }
