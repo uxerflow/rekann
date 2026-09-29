@@ -118,6 +118,8 @@ Assistant drawers use their own compact geometry at all viewport widths: a 392 p
 
 `ScrollArea` reserves the scrollbar lane by default when overflowing: 10 px for the scrollbar hit area plus 6 px separation from content. `DetailDialog` uses `gutter="stable"` so field widths do not jump as content starts or stops overflowing. Its scroll area extends into the dialog's right padding, keeping the scrollbar outside fields and inside the dialog surface. Header and footer remain outside the scroller. Do not override this with feature-specific negative margins or a full-width viewport. Only explicitly opt out of the gutter for a canvas where an overlay scrollbar cannot obscure controls or text.
 
-Calendar date, view, Today, and arrow buttons share 36 px desktop height, 44 px mobile height, 14/20 typography, and the existing 10 px control radius. Today returns to the workspace's current date without changing Week, Month, or Year mode; it does not create or change leave data.
+Calendar date, view, Today, and arrow buttons share 32 px desktop height, 44 px mobile height, 14/20 typography, and the existing 10 px control radius. Today returns to the workspace's current date without changing Week, Month, or Year mode; it does not create or change leave data.
 
 The [Leave review refinements](https://www.figma.com/design/jWSy3bCKjtKfyrToW5zyZ5/Rekann---HR-Platform?node-id=1207-124752) board contains proposed employee-first popovers and a light Week grid. These remain design proposals for owner review; they are not implemented by this scrollbar and toolbar fix. Existing master screens remain unchanged.
+
+The calendar toolbar uses one scoped `--leave-control-height` token and a selector that outranks shared compact-select styling, so stylesheet load order cannot create mismatched heights. The measured compact Week control is the 32 px desktop reference.

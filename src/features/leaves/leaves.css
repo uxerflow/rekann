@@ -2074,19 +2074,22 @@
   line-height: 20px;
 }
 
-/* Every calendar toolbar control uses the same height and corner radius. */
-.leave-calendar-toolbar .icon-button,
-.leave-calendar-toolbar .date-trigger,
-.leave-calendar-toolbar .select-trigger,
-.leave-calendar-toolbar .leave-today-button {
-  height: 36px;
-  min-height: 36px;
+/* Match the compact view select, independently of stylesheet load order. */
+.leave-calendar-toolbar {
+  --leave-control-height: 32px;
+}
+.leave-calendar-toolbar
+  :is(.icon-button, .date-trigger, .select-compact .select-trigger, .leave-today-button) {
+  height: var(--leave-control-height);
+  min-height: var(--leave-control-height);
+  padding-block: 0;
+  box-sizing: border-box;
   border-radius: var(--radius);
   font-size: 14px;
   line-height: 20px;
 }
 .leave-calendar-toolbar .icon-button {
-  width: 36px;
+  width: var(--leave-control-height);
 }
 .leave-today-button {
   flex-shrink: 0;
@@ -2106,12 +2109,8 @@
   .leave-calendar-toolbar > div {
     flex-wrap: wrap;
   }
-  .leave-calendar-toolbar .icon-button,
-  .leave-calendar-toolbar .date-trigger,
-  .leave-calendar-toolbar .select-trigger,
-  .leave-calendar-toolbar .leave-today-button {
-    height: 44px;
-    min-height: 44px;
+  .leave-calendar-toolbar {
+    --leave-control-height: 44px;
   }
   .leave-calendar-toolbar .icon-button {
     width: 44px;
