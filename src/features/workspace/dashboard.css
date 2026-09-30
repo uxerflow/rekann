@@ -148,6 +148,10 @@
   flex: 1;
 }
 .dash-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: #fff;
   height: 48px;
   box-shadow: inset 0 -1px var(--color-border);
   display: flex;
