@@ -1,6 +1,16 @@
 import { useEffect, useRef } from 'react'
 
-export function WelcomeCard({ open, onStart }: { open: boolean; onStart: () => void }) {
+export function WelcomeCard({
+  open,
+  busy,
+  error,
+  onStart,
+}: {
+  open: boolean
+  busy: boolean
+  error: string
+  onStart: () => void
+}) {
   const dialog = useRef<HTMLDialogElement>(null)
   useEffect(() => {
     if (open && !dialog.current?.open) dialog.current?.showModal()
@@ -31,7 +41,8 @@ export function WelcomeCard({ open, onStart }: { open: boolean; onStart: () => v
             <br />
             Track attendance, manage time off, and review requests.
           </p>
-          <button className="button" onClick={onStart}>
+          {error && <p role="alert">{error}</p>}
+          <button className="button" onClick={onStart} disabled={busy}>
             Get started
           </button>
         </div>

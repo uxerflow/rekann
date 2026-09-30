@@ -42,7 +42,7 @@ export const leaveTypes = ['Annual leave', 'Sick leave', 'Personal leave', 'Unpa
 export const leaveInput = detailScope
   .extend({
     requestId: z.uuid(),
-    type: z.enum(leaveTypes),
+    type: z.string().trim().min(1).max(60),
     startDate: z.iso.date(),
     endDate: z.iso.date(),
     duration: z.enum(['Full day', 'Half day']),

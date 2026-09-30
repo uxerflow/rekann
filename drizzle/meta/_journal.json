@@ -99,6 +99,27 @@
       "when": 1790522306932,
       "tag": "0013_clean_jubilee",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1790677408396,
+      "tag": "0014_curved_zodiak",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1790678029062,
+      "tag": "0015_leave_policy_runtime_grants",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1790737148601,
+      "tag": "0016_volatile_bullseye",
+      "breakpoints": true
     }
   ]
 }

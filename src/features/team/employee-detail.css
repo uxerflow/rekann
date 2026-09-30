@@ -141,6 +141,7 @@
   margin: 0 0 24px;
 }
 .detail-dialog-scroll {
+  margin-right: -16px;
   max-height: calc(100dvh - 240px);
   min-height: 0;
 }
@@ -438,7 +439,7 @@
   flex-direction: column;
   gap: 4px;
 }
-.detail-menu button {
+.detail-menu button:not(.button) {
   background: none;
   border: 0;
   border-radius: 6px;
@@ -448,8 +449,8 @@
   line-height: 20px;
   white-space: nowrap;
 }
-.detail-menu button:hover,
-.detail-menu button:focus-visible {
+.detail-menu button:not(.button):hover,
+.detail-menu button:not(.button):focus-visible {
   background: #f2f2f2;
 }
 .danger-text {
@@ -545,6 +546,7 @@
     grid-template-columns: 1fr;
   }
   .detail-dialog-scroll {
+    margin-right: -8px;
     max-height: calc(100dvh - 240px);
   }
   .detail-inline {

@@ -148,6 +148,10 @@
   flex: 1;
 }
 .dash-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: #fff;
   height: 48px;
   box-shadow: inset 0 -1px var(--color-border);
   display: flex;
@@ -629,44 +633,75 @@
 .notes-scroll .scroll-viewport {
   height: 100%;
 }
-.quick-notes textarea {
+.notes-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 0 2px 2px 0;
+}
+.note-line {
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+}
+.note-line-checklist {
+  gap: 10px;
+  padding-left: 2px;
+}
+.quick-notes .note-line textarea {
+  display: block;
   background: transparent;
   border: 0;
+  border-radius: 0;
   padding: 0;
   resize: none;
   width: 100%;
-  min-height: 72px;
+  min-width: 0;
+  min-height: 24px;
+  field-sizing: content;
+  overflow: hidden;
   font-size: 16px;
   line-height: 24px;
   box-shadow: none;
+  outline: none;
 }
 .quick-notes textarea::placeholder {
   color: #707070;
 }
-.quick-notes input:not([type='checkbox']) {
-  background: transparent;
-  width: 100%;
-  padding: 4px 0;
-  border: 0;
-  border-bottom: 1px solid #b9a460;
-  border-radius: 0;
+.quick-notes .note-line textarea:focus-visible {
+  outline: none;
 }
-.note-task {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 8px;
-  line-height: 22px;
+.note-line-checklist input[type='checkbox'] {
+  appearance: none;
+  display: grid;
+  place-items: center;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  margin: 4px 0;
+  border: 1px solid #dccd9b;
+  border-radius: 4px;
+  background: #ffeab0;
+  cursor: pointer;
 }
-.note-task input {
-  margin: 4px 0 0;
-  accent-color: #1da578;
-  flex-shrink: 0;
+.note-line-checklist input[type='checkbox']:checked {
+  border-color: #1da578;
+  background: #1da578;
 }
-.note-task span {
-  overflow-wrap: anywhere;
+.note-line-checklist input[type='checkbox']:checked::after {
+  content: '';
+  width: 8px;
+  height: 4px;
+  border-left: 1.5px solid #fff;
+  border-bottom: 1.5px solid #fff;
+  transform: translateY(-1px) rotate(-45deg);
 }
-.note-task .is-done {
+.note-line-checklist input[type='checkbox']:focus-visible {
+  outline: 2px solid #087c5b;
+  outline-offset: 2px;
+}
+.note-line textarea.is-done {
   text-decoration: line-through;
 }
 .notes-toolbar {

@@ -131,7 +131,12 @@ export function DashboardShell({
                 label: 'TIME',
                 items: [
                   ['Attendance', 'clock-01', '', ''],
-                  ['Leaves', 'calendar-off', '', ''],
+                  [
+                    'Leaves',
+                    'calendar-off',
+                    data.permissions.admin ? `${base}/leaves` : '',
+                    'leaves',
+                  ],
                   ['Permissions', 'calendar-clock', '', ''],
                 ],
               },
@@ -255,18 +260,27 @@ export function DashboardShell({
                   <ArrowLeft size={14} />
                 </a>
               ) : (
-                <img src="/dashboard/header-grid.svg" width="14" height="14" alt="" />
+                <img
+                  src={
+                    view === 'leaves' ? '/dashboard/calendar-off.svg' : '/dashboard/header-grid.svg'
+                  }
+                  width="14"
+                  height="14"
+                  alt=""
+                />
               )}
             </>
             <span>
               {title ??
-                (view === 'ai'
-                  ? 'Rekann AI'
-                  : view === 'overview'
-                    ? 'Dashboard'
-                    : view === 'team'
-                      ? 'Team directory'
-                      : 'Settings')}
+                (view === 'leaves'
+                  ? 'Leaves'
+                  : view === 'ai'
+                    ? 'Rekann AI'
+                    : view === 'overview'
+                      ? 'Dashboard'
+                      : view === 'team'
+                        ? 'Team directory'
+                        : 'Settings')}
             </span>
           </div>
           <button
@@ -311,13 +325,15 @@ export function DashboardShell({
         </header>
         <main
           className={
-            view === 'overview'
-              ? 'dash-main'
-              : view === 'ai'
-                ? 'ai-main'
-                : view === 'team'
-                  ? 'directory-main'
-                  : 'workspace-main'
+            view === 'leaves'
+              ? 'leaves-main'
+              : view === 'overview'
+                ? 'dash-main'
+                : view === 'ai'
+                  ? 'ai-main'
+                  : view === 'team'
+                    ? 'directory-main'
+                    : 'workspace-main'
           }
         >
           {children}

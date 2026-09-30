@@ -109,6 +109,10 @@ export async function bootstrap(db: Database, viewer: Identity) {
 }
 export async function workspaceDetails(db: Database, viewer: Identity, workspaceId: string) {
   const { company, employee } = await authorize(db, viewer.id, workspaceId)
+  const [welcomeState] = await db
+    .select({ welcomeSeenAt: user.welcomeSeenAt })
+    .from(user)
+    .where(eq(user.id, viewer.id))
   const employees = await db
     .select({
       id: workspaceMember.id,
@@ -142,6 +146,7 @@ export async function workspaceDetails(db: Database, viewer: Identity, workspace
   return {
     workspace: company,
     employee,
+    welcomeSeenAt: welcomeState?.welcomeSeenAt ?? null,
     employees,
     invitations,
     permissions: {
@@ -150,6 +155,13 @@ export async function workspaceDetails(db: Database, viewer: Identity, workspace
       remove: canManage(employee.role, company, 'manage_employees'),
     },
   }
+}
+export async function acknowledgeWelcome(db: Database, viewer: Identity) {
+  await db
+    .update(user)
+    .set({ welcomeSeenAt: sql`coalesce(${user.welcomeSeenAt}, now())` })
+    .where(eq(user.id, viewer.id))
+  return { ok: true }
 }
 export async function workspaceBySlug(db: Database, viewer: Identity, slug: string) {
   const [found] = await db

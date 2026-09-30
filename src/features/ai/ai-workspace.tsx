@@ -218,7 +218,7 @@ export function AiWorkspace({
         id={compact ? 'ai-message-drawer' : 'ai-message'}
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder="Ask anything about your team..."
+        placeholder={compact ? 'Ask about your team...' : 'Ask anything about your team...'}
         maxLength={2000}
         disabled={loading || !settings?.available}
         onKeyDown={(e) => {
@@ -336,7 +336,7 @@ export function AiWorkspace({
   return (
     <section className={`ai-workspace ${compact ? 'ai-compact' : ''}`} aria-label="Rekann AI">
       <div className="ai-toolbar">
-        {compact && <strong id="assistant-title">Rekann AI</strong>}
+        {compact && <strong id="assistant-title">Assistant</strong>}
         <div>
           {settings && (
             <button
@@ -430,35 +430,49 @@ export function AiWorkspace({
             </div>
           )}
           {!turns.length ? (
-            <ScrollArea className="ai-welcome-scroll">
-              <div className="ai-welcome">
-                <img
-                  className="ai-welcome-logo"
-                  src="/dashboard/assistant-logo.svg"
-                  width="32"
-                  height="32"
-                  alt=""
-                />
-                <h1>Hello, {name || 'there'}</h1>
-                <p>Find your people. Take care of the details.</p>
-                {composer}
-                <div className="ai-suggestions">
-                  {suggestions
-                    .filter((s) => settings?.allowWrites || s.Icon === Search || s.Icon === Users)
-                    .map((s) => (
-                      <button
-                        key={s.title}
-                        onClick={() => setInput(s.prompt)}
-                        disabled={!settings?.available}
-                      >
-                        <s.Icon size={16} />
-                        <strong>{s.title}</strong>
-                        <span>{s.text}</span>
-                      </button>
-                    ))}
+            <>
+              <ScrollArea className="ai-welcome-scroll">
+                <div className="ai-welcome">
+                  <img
+                    className="ai-welcome-logo"
+                    src="/dashboard/assistant-logo.svg"
+                    width="32"
+                    height="32"
+                    alt=""
+                  />
+                  <h1>{compact ? 'Rekann Assistant' : `Hello, ${name || 'there'}`}</h1>
+                  <p>
+                    {compact
+                      ? 'Ask questions about your team and manage everyday HR tasks.'
+                      : 'Find your people. Take care of the details.'}
+                  </p>
+                  {!compact && composer}
+                  <div className="ai-suggestions">
+                    {suggestions
+                      .filter((s) => settings?.allowWrites || s.Icon === Search || s.Icon === Users)
+                      .map((s) => (
+                        <button
+                          key={s.title}
+                          onClick={() => setInput(s.prompt)}
+                          disabled={!settings?.available}
+                        >
+                          <s.Icon size={16} />
+                          <strong>{s.title}</strong>
+                          <span>{s.text}</span>
+                        </button>
+                      ))}
+                  </div>
                 </div>
-              </div>
-            </ScrollArea>
+              </ScrollArea>
+              {compact && (
+                <div className="ai-bottom">
+                  {composer}
+                  <small className="ai-drawer-disclaimer">
+                    AI can make mistakes. Always verify important information.
+                  </small>
+                </div>
+              )}
+            </>
           ) : (
             <>
               <ScrollArea className="ai-thread-scroll">

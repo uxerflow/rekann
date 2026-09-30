@@ -847,12 +847,10 @@ select {
 .select-trigger:hover:not(:disabled) {
   background: var(--color-surface);
 }
-.select-trigger:focus-visible,
-.select-trigger[aria-expanded='true'] {
-  outline: none;
-  box-shadow:
-    0 0 0 1px #fff,
-    0 0 0 2px var(--color-brand);
+.select-trigger:focus-visible {
+  outline: 2px solid var(--color-action);
+  outline-offset: -3px;
+  box-shadow: none;
 }
 .select-trigger:disabled {
   background: var(--color-surface);
@@ -1030,7 +1028,7 @@ select {
   color: var(--color-action-hover);
 }
 .select-option.active[aria-selected='true'] {
-  box-shadow: inset 0 0 0 1px var(--color-brand);
+  box-shadow: none;
 }
 .select-empty {
   padding: 24px 10px;
@@ -2157,7 +2155,8 @@ select:user-invalid {
 }
 
 /* Keep a real gutter between scrollable content and the full scrollbar hit area. */
-.scroll-area[data-gutter='true'][data-overflow='true'] > .scroll-viewport {
+.scroll-area[data-gutter='true'][data-overflow='true'] > .scroll-viewport,
+.scroll-area[data-gutter='stable'] > .scroll-viewport {
   width: calc(100% - 16px);
 }
 .select-popup .select-option {
@@ -2220,4 +2219,15 @@ select:user-invalid {
 .select-menu-action button:disabled {
   color: var(--color-muted);
   opacity: 0.5;
+}
+
+/* Top-layer portals escape dialog transforms and scroll clipping. Keep keyboard
+   focus inside controls; pointer selection uses the fill and check only. */
+.select-popup[popover],
+.detail-menu-portal[popover] {
+  inset: auto;
+  margin: 0;
+}
+.detail-menu-portal[popover] {
+  overflow: auto;
 }

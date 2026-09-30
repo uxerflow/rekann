@@ -1,0 +1,217 @@
+.date-field {
+  min-width: 0;
+}
+.date-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: white;
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--color-text);
+  text-align: left;
+}
+.date-trigger > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.date-trigger > svg {
+  flex: none;
+  color: #737373;
+}
+.date-trigger:hover:not(:disabled) {
+  background: #fafafa;
+}
+.date-trigger:focus-visible {
+  outline: 2px solid var(--color-action);
+  outline-offset: -3px;
+}
+.date-trigger:disabled {
+  background: #fafafa;
+  color: #a3a3a3;
+  cursor: not-allowed;
+}
+.date-required {
+  color: #ff4d4f;
+}
+.date-popover {
+  padding: 12px;
+  border-radius: 12px;
+  min-width: 0;
+}
+.date-popover button {
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+  white-space: normal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+.date-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.date-navigation button {
+  width: 32px;
+  height: 32px;
+  padding: 8px;
+}
+.date-navigation .date-heading {
+  flex: 1;
+  width: auto;
+  font-weight: 500;
+  padding: 0;
+}
+.date-weekdays,
+.date-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  column-gap: 0;
+}
+.date-weekdays span {
+  text-align: center;
+  font-size: 12px;
+  line-height: 24px;
+  color: #9e9e9e;
+}
+.date-grid {
+  row-gap: 8px;
+}
+.date-popover .date-day {
+  height: 36px;
+  padding: 0;
+  border-radius: 8px;
+}
+.date-day.outside {
+  color: #a3a3a3;
+}
+.date-day[aria-current='date'] {
+  color: #127857;
+  font-weight: 500;
+}
+.date-popover .date-day.in-range {
+  border-radius: 0;
+  background: #ecfbf3;
+  color: #127857;
+}
+.date-popover .date-day.range-start {
+  border-radius: 8px 0 0 8px;
+  background: #1aa67b;
+  color: white;
+}
+.date-popover .date-day.range-end {
+  border-radius: 0 8px 8px 0;
+  background: #1aa67b;
+  color: white;
+}
+.date-popover .date-day.single {
+  border-radius: 8px;
+  background: #1aa67b;
+  color: white;
+}
+.date-popover button:focus-visible {
+  outline: 2px solid var(--color-action);
+  outline-offset: -2px;
+}
+.date-popover .date-day:hover:not(:disabled):not([aria-pressed='true']) {
+  background: #f2f2f2;
+}
+.date-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.date-choices button {
+  min-height: 40px;
+}
+.date-choices button[aria-pressed='true'] {
+  background: #ecfbf3;
+  color: #127857;
+}
+.date-range-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.date-range-fields label {
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 16px;
+  color: #737373;
+}
+.date-range-fields input:not([type]) {
+  width: 100%;
+  min-height: 24px;
+  padding: 4px 0 0;
+  border: 0;
+  border-radius: 0;
+  font-size: 12px;
+  color: #292929;
+  background: transparent;
+  box-shadow: none;
+}
+.date-range-fields label:focus-within {
+  outline: 2px solid var(--color-action);
+  outline-offset: -2px;
+}
+.date-error {
+  font-size: 12px;
+  line-height: 16px;
+  color: #d92d20;
+  margin: 8px 0 0;
+}
+.date-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+.date-actions button {
+  min-width: 80px;
+  min-height: 36px;
+  border: 1px solid var(--color-border);
+}
+.date-actions .date-apply {
+  background: #1aa67b;
+  color: white;
+  border-color: transparent;
+}
+.date-actions .date-apply:hover:not(:disabled) {
+  background: #127857;
+}
+.date-popover button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+@media (pointer: coarse) {
+  .date-popover .date-day {
+    height: 44px;
+  }
+}
+
+@media (max-width: 760px) {
+  .date-trigger {
+    height: 44px;
+    min-height: 44px;
+  }
+}

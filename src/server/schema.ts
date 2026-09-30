@@ -1,4 +1,5 @@
 import { sql } from 'drizzle-orm'
+import type { PolicyRules, PolicyRevision } from '../shared/leaves'
 import {
   bigint,
   boolean,
@@ -22,6 +23,7 @@ export const user = pgTable('auth_user', {
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').notNull().default(false),
   image: text('image'),
+  welcomeSeenAt: timestamp('welcome_seen_at', { withTimezone: true }),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 })
@@ -324,12 +326,46 @@ export const employeeLeave = pgTable(
       .references(() => user.id),
     createdAt: createdAt(),
     attachmentId: text('attachment_id'),
+    policyId: text('policy_id'),
+    policyRules: jsonb('policy_rules').$type<PolicyRules>(),
   },
   (t) => [
     index('leave_member_idx').on(t.workspaceId, t.memberId),
     check('leave_dates_check', sql`${t.endDate} >= ${t.startDate}`),
     check('leave_days_check', sql`${t.halfDays}>0`),
     check('leave_status_check', sql`${t.status} in ('pending','approved','rejected','cancelled')`),
+  ],
+)
+export const leavePolicy = pgTable(
+  'leave_policy',
+  {
+    id: text('id').primaryKey(),
+    workspaceId: text('workspace_id')
+      .notNull()
+      .references(() => workspace.id, { onDelete: 'cascade' }),
+    kind: text('kind').$type<'annual' | 'custom' | 'closure'>().notNull(),
+    name: text('name').notNull(),
+    category: text('category').notNull(),
+    description: text('description').notNull().default(''),
+    active: boolean('active').notNull().default(true),
+    rules: jsonb('rules').$type<PolicyRules>().notNull(),
+    revisions: jsonb('revisions').$type<PolicyRevision[]>().notNull(),
+    coveredMemberIds: jsonb('covered_member_ids').$type<string[]>().notNull().default([]),
+    version: integer('version').notNull().default(1),
+    createdBy: text('created_by')
+      .notNull()
+      .references(() => user.id),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index('leave_policy_workspace_idx').on(t.workspaceId),
+    uniqueIndex('leave_policy_name_unique').on(t.workspaceId, t.name),
+    uniqueIndex('leave_policy_annual_unique')
+      .on(t.workspaceId)
+      .where(sql`${t.kind} = 'annual'`),
+    check('leave_policy_kind_check', sql`${t.kind} in ('annual','custom','closure')`),
+    check('leave_policy_version_check', sql`${t.version} > 0`),
   ],
 )
 export const employeeDocument = pgTable(

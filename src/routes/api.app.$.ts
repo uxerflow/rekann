@@ -1,3 +1,4 @@
+import * as leaves from '../server/leaves'
 import * as memory from '../server/ai/memory'
 import * as ai from '../server/ai/service'
 import { createFileRoute } from '@tanstack/react-router'
@@ -27,6 +28,17 @@ async function handle({ request }: { request: Request }) {
       url.searchParams.get('id') ?? '',
     ] as const
     if (request.method === 'GET') {
+      if (operation === 'leaves') return json(await leaves.adminLeaves(db, viewer.id, scope[2]))
+      if (operation === 'leaves/options')
+        return json(
+          await leaves.employeeLeaveOptions(
+            db,
+            viewer.id,
+            scope[2],
+            scope[3],
+            url.searchParams.get('date') ?? '',
+          ),
+        )
       if (operation === 'ai/memory') return json(await memory.readMemory(db, viewer.id, scope[2]))
       if (operation === 'ai/settings')
         return json(await ai.settingsView(db, viewer.id, scope[2], aiPlatform))
@@ -137,6 +149,8 @@ async function handle({ request }: { request: Request }) {
     )
     await service.limitAction(db, viewer.id, operation, operation === 'invitation/create' ? 10 : 30)
     switch (operation) {
+      case 'leaves/policy':
+        return json(await leaves.saveLeavePolicy(db, viewer.id, body))
       case 'ai/memory':
         return json(await memory.saveMemory(db, viewer.id, body))
       case 'ai/forget':
@@ -188,6 +202,8 @@ async function handle({ request }: { request: Request }) {
         return json(await employees.saveEmployee(db, viewer.id, body))
       case 'workspace/create':
         return json(await service.createWorkspace(db, viewer, body))
+      case 'dashboard/welcome':
+        return json(await service.acknowledgeWelcome(db, viewer))
       case 'workspace/onboarding-update':
         return json(await service.updateOnboardingCompany(db, viewer, body))
       case 'profile/save':

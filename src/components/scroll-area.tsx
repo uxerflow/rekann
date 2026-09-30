@@ -1,16 +1,16 @@
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area'
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 
-// Thin, persistent desktop affordance; scrolling remains native on touch.
+// Reserve a separate desktop scrollbar lane by default. Dialogs use a stable lane.
 export function ScrollArea({
   children,
   className = '',
-  gutter = false,
+  gutter = true,
   type = 'always',
 }: {
   children: ReactNode
   className?: string
-  gutter?: boolean
+  gutter?: boolean | 'stable'
   type?: 'always' | 'auto'
 }) {
   const viewport = useRef<HTMLDivElement>(null)

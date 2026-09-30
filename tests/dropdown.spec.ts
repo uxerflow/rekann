@@ -41,7 +41,7 @@ test('country search, keyboard selection, dismissal and mobile dropdown bounds',
   await expect(page.getByRole('option')).toHaveCount(1)
   await expect(page.getByRole('option')).toHaveText('Åland Islands')
   await search.fill('zzzz')
-  await expect(page.getByText('No countries found')).toBeVisible()
+  await expect(page.getByRole('status').filter({ hasText: 'No options found' })).toBeVisible()
   await search.press('Enter')
   await expect(search).toBeVisible()
   await page.getByRole('button', { name: 'Clear search' }).click()

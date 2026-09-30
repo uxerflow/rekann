@@ -11,9 +11,19 @@ export async function client() {
 export const uniqueEmail = (label: string) =>
   `e2e-${label}-${crypto.randomUUID().slice(0, 8)}@example.test`
 export async function emailMessage(email: string) {
-  const response = await fetch(`http://127.0.0.1:8025/messages?to=${encodeURIComponent(email)}`)
-  const messages = (await response.json()) as { text: string }[]
-  expect(messages.length).toBeGreaterThan(0)
+  let messages: { text: string }[] = []
+  await expect
+    .poll(
+      async () => {
+        const response = await fetch(
+          `http://127.0.0.1:8025/messages?to=${encodeURIComponent(email)}`,
+        )
+        messages = await response.json()
+        return messages.length
+      },
+      { message: 'Wait for the local mailbox delivery' },
+    )
+    .toBeGreaterThan(0)
   return messages.at(-1)!.text
 }
 export async function otp(email: string) {

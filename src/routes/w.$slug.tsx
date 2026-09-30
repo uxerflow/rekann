@@ -19,6 +19,7 @@ export const Route = createFileRoute('/w/$slug')({
       ![
         '',
         '/ai',
+        '/leaves',
         '/team',
         '/access',
         '/profile',
@@ -63,13 +64,15 @@ function WorkspaceRoute() {
       viewer={viewer}
       data={data}
       view={
-        pathname.endsWith('/ai')
-          ? 'ai'
-          : pathname.endsWith('/team')
-            ? 'team'
-            : pathname.endsWith('/access')
-              ? 'access'
-              : 'overview'
+        pathname.endsWith('/leaves')
+          ? 'leaves'
+          : pathname.endsWith('/ai')
+            ? 'ai'
+            : pathname.endsWith('/team')
+              ? 'team'
+              : pathname.endsWith('/access')
+                ? 'access'
+                : 'overview'
       }
     />
   )

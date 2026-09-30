@@ -205,7 +205,7 @@ export function DetailLeaves({
     (a) => a.type === type && a.year === Number((start || month).slice(0, 4)),
   )
   const balance =
-    type === 'Unpaid leave'
+    allowance?.unlimited || (type === 'Unpaid leave' && !allowance)
       ? 'Not limited'
       : allowance
         ? `${(allowance.halfDays - allowance.usedHalfDays) / 2} days`
