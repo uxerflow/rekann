@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Check } from 'lucide-react'
 import { ScrollArea } from '../../components/scroll-area'
 import type { WorkspaceDetails } from '../../server/workspaces'
+import { api, messageOf } from '../../lib/api'
 import './dashboard.css'
 import { SetupChecklist, WelcomeCard } from './dashboard-setup'
 
@@ -39,6 +40,8 @@ export function Dashboard({
   const setup = ['setup', 'welcome', 'setup-progress', 'setup-complete'].includes(state)
   const [completed, setCompleted] = useState([false, false, false])
   const [welcome, setWelcome] = useState(false)
+  const [welcomeBusy, setWelcomeBusy] = useState(false)
+  const [welcomeError, setWelcomeError] = useState('')
   const [storageReady, setStorageReady] = useState(false)
   const [storageError, setStorageError] = useState('')
   const storageKey = `rekann:dashboard-preview:${data.workspace.id}:${data.employee.id}:${state}`
@@ -58,13 +61,17 @@ export function Dashboard({
         stored.completed.every((x: unknown) => typeof x === 'boolean')
       setCompleted(import.meta.env.DEV && valid ? stored.completed : defaults)
       setDismissed(stored?.dismissed === true)
-      setWelcome(state === 'welcome' && stored?.welcomed !== true)
+      const seenLocally = stored?.welcomed === true
+      setWelcome(state === 'welcome' && !data.welcomeSeenAt && !seenLocally)
+      if (seenLocally && !data.welcomeSeenAt)
+        void api('dashboard/welcome', {}).catch((error) => setStorageError(messageOf(error)))
     } catch {
       setCompleted(defaults)
       setStorageError('Setup preview could not be restored on this device.')
+      setWelcome(state === 'welcome' && !data.welcomeSeenAt)
     }
     setStorageReady(true)
-  }, [storageKey, state])
+  }, [storageKey, state, data.welcomeSeenAt])
   useEffect(() => {
     if (!storageReady) return
     try {
@@ -82,15 +89,23 @@ export function Dashboard({
     else onUnavailable(index === 0 ? 'Company settings' : 'Leave policies')
   }
   const allComplete = completed.every(Boolean)
+  async function finishWelcome() {
+    if (welcomeBusy) return
+    setWelcomeBusy(true)
+    setWelcomeError('')
+    try {
+      await api('dashboard/welcome', {})
+      setWelcome(false)
+      setDismissed(false)
+    } catch (error) {
+      setWelcomeError(messageOf(error))
+    } finally {
+      setWelcomeBusy(false)
+    }
+  }
   return (
     <div className="dashboard" data-state={state} data-setup={setup}>
-      <WelcomeCard
-        open={welcome}
-        onStart={() => {
-          setWelcome(false)
-          setDismissed(false)
-        }}
-      />
+      <WelcomeCard open={welcome} busy={welcomeBusy} error={welcomeError} onStart={finishWelcome} />
       {storageError && <p role="status">{storageError}</p>}
       <div className="dashboard-heading">
         <h1>

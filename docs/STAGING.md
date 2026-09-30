@@ -7,7 +7,7 @@ Staging is deployed at https://preview-f3d09c858192da81b6d6.rekann.app. It uses 
 - Cloudflare account: Rekann, `f0f101bf2b8415c34b2a1589e4017295`, Wrangler profile `rekann`.
 - Worker: `rekann-staging`; custom domain: `preview-f3d09c858192da81b6d6.rekann.app`.
 - Private R2 bucket: `rekann-staging-media`.
-- Neon project: `bold-flower-53962598`; branch: `staging` (`br-nameless-salad-b3p61oq1`). Migrations through 0015 are applied to this branch; existing staging accounts were preserved.
+- Neon project: `bold-flower-53962598`; branch: `staging` (`br-nameless-salad-b3p61oq1`). Migrations through 0016 are applied to this branch; existing staging accounts were preserved.
 - Restricted database role: `rekann_runtime`. Production and local development data are separate.
 - Resend sender: `Rekann <noreply@updates.rekann.app>`.
 - `APP_ENV=production` enables HTTPS and secure cookies on staging; resource isolation comes from the Wrangler environment and separate database branch.

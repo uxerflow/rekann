@@ -202,6 +202,8 @@ async function handle({ request }: { request: Request }) {
         return json(await employees.saveEmployee(db, viewer.id, body))
       case 'workspace/create':
         return json(await service.createWorkspace(db, viewer, body))
+      case 'dashboard/welcome':
+        return json(await service.acknowledgeWelcome(db, viewer))
       case 'workspace/onboarding-update':
         return json(await service.updateOnboardingCompany(db, viewer, body))
       case 'profile/save':

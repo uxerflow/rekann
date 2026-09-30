@@ -23,6 +23,7 @@ export const user = pgTable('auth_user', {
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').notNull().default(false),
   image: text('image'),
+  welcomeSeenAt: timestamp('welcome_seen_at', { withTimezone: true }),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 })

@@ -4,6 +4,7 @@ import { mkdirSync } from 'node:fs'
 
 test('welcome, setup and Assistant preview flows preserve data and match design dimensions', async ({
   page,
+  browser,
 }) => {
   test.setTimeout(120_000)
   const ctx = await client()
@@ -23,6 +24,15 @@ test('welcome, setup and Assistant preview flows preserve data and match design 
   await page.screenshot({ path: 'test-results/flows/welcome.png' })
   await page.getByRole('button', { name: 'Get started', exact: true }).click()
   await expect(welcome).not.toBeVisible()
+  const freshBrowser = await browser.newContext()
+  try {
+    await freshBrowser.addCookies((await ctx.storageState()).cookies)
+    const freshPage = await freshBrowser.newPage()
+    await freshPage.goto(`${url}?dashboardPreview=welcome`)
+    await expect(freshPage.getByRole('dialog', { name: 'Welcome to Rekann' })).not.toBeVisible()
+  } finally {
+    await freshBrowser.close()
+  }
   await expect(page.getByText('0 of 3 complete', { exact: true })).toBeVisible()
   expect(await page.locator('.dashboard-setup').boundingBox()).toMatchObject({
     x: 304,
