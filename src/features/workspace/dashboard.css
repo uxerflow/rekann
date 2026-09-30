@@ -664,6 +664,9 @@
 .quick-notes textarea::placeholder {
   color: #707070;
 }
+.quick-notes .note-line textarea:focus::placeholder {
+  color: transparent;
+}
 .quick-notes .note-line textarea:focus-visible {
   outline: none;
 }
