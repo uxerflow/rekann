@@ -641,6 +641,27 @@
   align-items: flex-start;
   min-width: 0;
 }
+.note-line-empty {
+  position: relative;
+}
+.note-focus-hint {
+  display: none;
+}
+.note-line-empty:focus-within .note-focus-hint {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 12px;
+  max-width: calc(100% - 12px);
+  overflow: hidden;
+  color: #707070;
+  font-size: 16px;
+  line-height: 24px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
 .note-line-checklist {
   gap: 10px;
   padding-left: 2px;
