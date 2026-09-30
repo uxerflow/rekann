@@ -431,7 +431,6 @@ function QuickNotes({ storageKey }: { storageKey: string }) {
   const editors = useRef(new Map<string, HTMLTextAreaElement>())
   const focusNext = useRef<string | null>(null)
   const activeBlock = useRef<string | null>(null)
-  const notePlaceholder = 'Write your personal notes...'
   useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey) || 'null')
@@ -517,7 +516,7 @@ function QuickNotes({ storageKey }: { storageKey: string }) {
         <div className="notes-editor">
           {blocks.map((block, index) => (
             <div
-              className={`note-line ${block.type === 'checklist' ? 'note-line-checklist' : ''} ${index === 0 && block.type === 'text' && !block.text ? 'note-line-empty' : ''}`}
+              className={`note-line ${block.type === 'checklist' ? 'note-line-checklist' : ''}`}
               key={block.id}
             >
               {block.type === 'checklist' && (
@@ -546,7 +545,9 @@ function QuickNotes({ storageKey }: { storageKey: string }) {
                       ? 'Personal notes'
                       : `Personal notes line ${index + 1}`
                 }
-                placeholder={index === 0 && block.type === 'text' ? notePlaceholder : ''}
+                placeholder={
+                  index === 0 && block.type === 'text' ? 'Write your personal notes...' : ''
+                }
                 value={block.text}
                 rows={1}
                 maxLength={1000}
@@ -600,11 +601,6 @@ function QuickNotes({ storageKey }: { storageKey: string }) {
                   }
                 }}
               />
-              {index === 0 && block.type === 'text' && !block.text && (
-                <span className="note-focus-hint" aria-hidden="true">
-                  {notePlaceholder}
-                </span>
-              )}
             </div>
           ))}
         </div>
